@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from 'umi';
-import { Request } from '../../utils/index.js'
+import { Request } from '../../utils/index.js';
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
@@ -86,14 +86,25 @@ export async function removeRule(options?: { [key: string]: any }) {
 }
 
 /** github 鉴权 */
-export async function getOauth2Github(options?: { [key: string]: any }) {
-  return Request<Record<string, any>>({
+export const getOauth2Github = () => {
+  return Request({
     url: '/api/github',
     method: 'GET',
     data: {},
     config: {
       isAccess: false,
     },
-    ...(options || {}),
   });
-}
+};
+
+/** github 获取tokent */
+export const getGithubToken = (params?: { [key: string]: any }) => {
+  return Request({
+    url: '/api/github/getWebToken',
+    method: 'GET',
+    data: params,
+    config: {
+      isAccess: false,
+    },
+  });
+};

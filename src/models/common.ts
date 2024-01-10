@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
 import QueryString from 'query-string';
+import { getGithubToken } from '../services/ant-design-pro/api';
 export default {
   namespace: 'common',
   state: {
@@ -27,33 +28,42 @@ export default {
       authorizationURL: 'http://github.com/login/oauth/authorize',
       tokenURL: 'https://github.com/login/oauth/access_token',
       userProfileURL: 'https://api.github.com/user',
-    }
+    },
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(({ pathname, search }) => {
         const query = QueryString.parse(search);
-        console.log('query:', query);
-        console.log('pathname:', pathname);
-        dispatch({
-          type: 'update',
-          payload: {
-            state: 'query.state',
-            code: 'query.code'
-          }
-        });
+        if (query && query.state && query.code) {
+          console.log('query:', query);
+          console.log('pathname:', pathname);
+          dispatch({
+            type: 'update',
+            payload: {
+              state: query.state,
+              code: query.code,
+            },
+          });
+          // 获取token
+          dispatch({ type: 'getGithubToken' });
+        }
       });
-    }
+    },
   },
 
   effects: {
-
+    *getGithubToken({ payload }, { call, put, select }) {
+      const code = yield select((state) => state.common.code);
+      console.log('code:', code);
+      const { access_token } = yield call(getGithubToken, { code });
+      console.log('access_token:', access_token);
+    },
   },
 
   reducers: {
     update(state, { payload: data }) {
       return { ...state, ...data };
-    }
-  }
+    },
+  },
 };

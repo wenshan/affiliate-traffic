@@ -20,22 +20,26 @@ let reqConfig = {
     'client-version': clientVersion, // 接口版本控制
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'DELETE, HEAD, GET, OPTIONS, POST, PUT',
-    'Access-Control-Allow-Headers': 'Content-Type, Content-Range, Content-Disposition, Content-Description',
-    'Access-Control-Max-Age': 1728000
+    'Access-Control-Allow-Headers':
+      'Content-Type, Content-Range, Content-Disposition, Content-Description',
+    'Access-Control-Max-Age': 1728000,
   },
   withCredentials: true,
   isCheckErroCode: true, // 是否检测 erroCodeState 状态
   isToast: false, // 是否走通用 Toast
   isAccess: true, // 是否带上token 值，false 不需要权限，true需要权限
   loading: false, // 是否显示请求加载动画
-  isConsole: false
+  isConsole: false,
 };
 
 // 请求拦截器
 axios.interceptors.request.use(
   (request) => {
     if (reqConfig.isConsole) {
-      console.log(`${new Date().toLocaleString()}【 M=${request.url} 】P=`, request.params || request.data);
+      console.log(
+        `${new Date().toLocaleString()}【 M=${request.url} 】P=`,
+        request.params || request.data,
+      );
     }
 
     request.headers = Object.assign({}, request.headers, reqConfig.headers);
@@ -45,7 +49,7 @@ axios.interceptors.request.use(
   (error) => {
     Toast.offline(String(error));
     return Promise.reject(error);
-  }
+  },
 );
 
 // 接口返回status错误处理
@@ -66,7 +70,10 @@ axios.interceptors.response.use(
     if (res.status >= 200 && res.status < 300) {
       if (reqConfig.isConsole) {
         // eslint-disable-next-line no-console
-        console.log(`${new Date().toLocaleString()}【 M=${res.config.url} 】【接口响应：】`, res.data);
+        console.log(
+          `${new Date().toLocaleString()}【 M=${res.config.url} 】【接口响应：】`,
+          res.data,
+        );
       }
       errorCodeState(res);
       return res.data;
@@ -77,13 +84,18 @@ axios.interceptors.response.use(
   (error) => {
     message.warning(String(error));
     return Promise.reject(error);
-  }
+  },
 );
 
-export default (options = { method: 'GET' }) => {
+export default (options = { method: 'GET', url, data, config }) => {
   const access_token = Cookies.get('access_token');
   let reqConfigParams = Object.assign({}, reqConfig.params, options.params || {});
-  let newReqConfig = Object.assign({}, reqConfig, { params: reqConfigParams }, options.config || {});
+  let newReqConfig = Object.assign(
+    {},
+    reqConfig,
+    { params: reqConfigParams },
+    options.config || {},
+  );
 
   if (access_token && newReqConfig.isAccess) {
     options.data = Object.assign({}, reqConfig.params, options.data, { access_token });
@@ -107,6 +119,6 @@ export default (options = { method: 'GET' }) => {
     url: options.url,
     data: isdata ? options.data : null,
     params: !isdata ? options.data : null,
-    config: options.config
+    config: options.config,
   });
 };
