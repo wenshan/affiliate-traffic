@@ -2,10 +2,10 @@ import Footer from '@/components/Footer';
 import { login, getOauth2Github } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import {
-  AlipayCircleOutlined,
-  LockOutlined,
+  GithubOutlined,
+  GoogleOutlined,
   MobileOutlined,
-  TaobaoCircleOutlined,
+  LockOutlined,
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
@@ -44,19 +44,8 @@ const handleOauth2Github = async () => {
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
 
   const intl = useIntl();
-
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      await setInitialState((s) => ({
-        ...s,
-        currentUser: userInfo,
-      }));
-    }
-  };
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
@@ -68,7 +57,6 @@ const Login: React.FC = () => {
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
         /** 此方法会跳转到 redirect 参数所在的位置 */
         if (!history) return;
         const { query } = history.location;
@@ -108,8 +96,14 @@ const Login: React.FC = () => {
               id="pages.login.loginWith"
               defaultMessage="其他登录方式"
             />,
-            <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.icon} onClick={()=>{handleOauth2Github()}}/>,
-            <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.icon} />,
+            <GithubOutlined
+              key="GithubOutlined"
+              className={styles.icon}
+              onClick={() => {
+                handleOauth2Github();
+              }}
+            />,
+            <GoogleOutlined key="GoogleOutlined" className={styles.icon} />,
             <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.icon} />,
           ]}
           onFinish={async (values) => {

@@ -14,6 +14,12 @@
     ],
   },
   {
+    path: '/welcome',
+    name: 'welcome',
+    icon: 'smile',
+    component: './welcome',
+  },
+  {
     path: '/oauth',
     layout: false,
     access: 'oauth',
@@ -24,7 +30,7 @@
   {
     path: '/failure',
     layout: false,
-    access: 'failure',
+    access: 'oauth',
     name: 'failure',
     icon: 'smile',
     component: './failure',
@@ -32,16 +38,16 @@
   {
     path: '/success',
     layout: false,
-    access: 'success',
+    access: 'oauth',
     name: 'success',
     icon: 'smile',
     component: './success',
   },
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './welcome',
+    path: '/material',
+    name: '素材管理',
+    icon: 'profile',
+    component: './material',
   },
   {
     path: '/admin',

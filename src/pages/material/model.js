@@ -2,10 +2,10 @@
 /* @ts-ignore */
 import QueryString from 'query-string';
 import Cookies from 'js-cookie';
-import { getGithubToken, queryCurrentUser } from '../services/ant-design-pro/api';
-const loginPath = '/user/login';
+import { getGithubToken, queryCurrentUser } from '../../services/ant-design-pro/api';
+
 export default {
-  namespace: 'common',
+  namespace: 'material',
   state: {
     platform: 'pc', // wap:浏览器访问 wxwap: 微信访问
     mobile: '',
@@ -52,8 +52,6 @@ export default {
               },
             });
           } else {
-            // 返回登录页面
-            // history.push(loginPath);
           }
         }
       });

@@ -23,6 +23,7 @@ let reqConfig = {
     'Access-Control-Allow-Headers':
       'Content-Type, Content-Range, Content-Disposition, Content-Description',
     'Access-Control-Max-Age': 1728000,
+    access_token: Cookies.get('access_token'),
   },
   withCredentials: true,
   isCheckErroCode: true, // 是否检测 erroCodeState 状态
