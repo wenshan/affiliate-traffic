@@ -39,7 +39,7 @@ const ImgList: React.FC = (props) => {
             <li className="item">
               <div className="img-box">
                 <Image
-                  width={200}
+                  width={150}
                   src={src}
                   preview={{
                     toolbarRender: (
@@ -69,6 +69,252 @@ const ImgList: React.FC = (props) => {
                   }}
                 />
               </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
+            </li>
+            <li className="item">
+              <div className="img-box">
+                <Image
+                  width={150}
+                  src={src}
+                  preview={{
+                    toolbarRender: (
+                      _,
+                      {
+                        transform: { scale },
+                        actions: {
+                          onFlipY,
+                          onFlipX,
+                          onRotateLeft,
+                          onRotateRight,
+                          onZoomOut,
+                          onZoomIn,
+                        },
+                      },
+                    ) => (
+                      <Space size={12} className="toolbar-wrapper">
+                        <DownloadOutlined onClick={onDownload} />
+                        <SwapOutlined rotate={90} onClick={onFlipY} />
+                        <SwapOutlined onClick={onFlipX} />
+                        <RotateLeftOutlined onClick={onRotateLeft} />
+                        <RotateRightOutlined onClick={onRotateRight} />
+                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                      </Space>
+                    ),
+                  }}
+                />
+              </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
+            </li>
+            <li className="item">
+              <div className="img-box">
+                <Image
+                  width={150}
+                  src={src}
+                  preview={{
+                    toolbarRender: (
+                      _,
+                      {
+                        transform: { scale },
+                        actions: {
+                          onFlipY,
+                          onFlipX,
+                          onRotateLeft,
+                          onRotateRight,
+                          onZoomOut,
+                          onZoomIn,
+                        },
+                      },
+                    ) => (
+                      <Space size={12} className="toolbar-wrapper">
+                        <DownloadOutlined onClick={onDownload} />
+                        <SwapOutlined rotate={90} onClick={onFlipY} />
+                        <SwapOutlined onClick={onFlipX} />
+                        <RotateLeftOutlined onClick={onRotateLeft} />
+                        <RotateRightOutlined onClick={onRotateRight} />
+                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                      </Space>
+                    ),
+                  }}
+                />
+              </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
+            </li>
+            <li className="item">
+              <div className="img-box">
+                <Image
+                  width={150}
+                  src={src}
+                  preview={{
+                    toolbarRender: (
+                      _,
+                      {
+                        transform: { scale },
+                        actions: {
+                          onFlipY,
+                          onFlipX,
+                          onRotateLeft,
+                          onRotateRight,
+                          onZoomOut,
+                          onZoomIn,
+                        },
+                      },
+                    ) => (
+                      <Space size={12} className="toolbar-wrapper">
+                        <DownloadOutlined onClick={onDownload} />
+                        <SwapOutlined rotate={90} onClick={onFlipY} />
+                        <SwapOutlined onClick={onFlipX} />
+                        <RotateLeftOutlined onClick={onRotateLeft} />
+                        <RotateRightOutlined onClick={onRotateRight} />
+                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                      </Space>
+                    ),
+                  }}
+                />
+              </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
+            </li>
+            <li className="item">
+              <div className="img-box">
+                <Image
+                  width={150}
+                  src={src}
+                  preview={{
+                    toolbarRender: (
+                      _,
+                      {
+                        transform: { scale },
+                        actions: {
+                          onFlipY,
+                          onFlipX,
+                          onRotateLeft,
+                          onRotateRight,
+                          onZoomOut,
+                          onZoomIn,
+                        },
+                      },
+                    ) => (
+                      <Space size={12} className="toolbar-wrapper">
+                        <DownloadOutlined onClick={onDownload} />
+                        <SwapOutlined rotate={90} onClick={onFlipY} />
+                        <SwapOutlined onClick={onFlipX} />
+                        <RotateLeftOutlined onClick={onRotateLeft} />
+                        <RotateRightOutlined onClick={onRotateRight} />
+                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                      </Space>
+                    ),
+                  }}
+                />
+              </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
+            </li>
+            <li className="item">
+              <div className="img-box">
+                <Image
+                  width={150}
+                  src={src}
+                  preview={{
+                    toolbarRender: (
+                      _,
+                      {
+                        transform: { scale },
+                        actions: {
+                          onFlipY,
+                          onFlipX,
+                          onRotateLeft,
+                          onRotateRight,
+                          onZoomOut,
+                          onZoomIn,
+                        },
+                      },
+                    ) => (
+                      <Space size={12} className="toolbar-wrapper">
+                        <DownloadOutlined onClick={onDownload} />
+                        <SwapOutlined rotate={90} onClick={onFlipY} />
+                        <SwapOutlined onClick={onFlipX} />
+                        <RotateLeftOutlined onClick={onRotateLeft} />
+                        <RotateRightOutlined onClick={onRotateRight} />
+                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                      </Space>
+                    ),
+                  }}
+                />
+              </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
+            </li>
+            <li className="item">
+              <div className="img-box">
+                <Image
+                  width={150}
+                  src={src}
+                  preview={{
+                    toolbarRender: (
+                      _,
+                      {
+                        transform: { scale },
+                        actions: {
+                          onFlipY,
+                          onFlipX,
+                          onRotateLeft,
+                          onRotateRight,
+                          onZoomOut,
+                          onZoomIn,
+                        },
+                      },
+                    ) => (
+                      <Space size={12} className="toolbar-wrapper">
+                        <DownloadOutlined onClick={onDownload} />
+                        <SwapOutlined rotate={90} onClick={onFlipY} />
+                        <SwapOutlined onClick={onFlipX} />
+                        <RotateLeftOutlined onClick={onRotateLeft} />
+                        <RotateRightOutlined onClick={onRotateRight} />
+                        <ZoomOutOutlined disabled={scale === 1} onClick={onZoomOut} />
+                        <ZoomInOutlined disabled={scale === 50} onClick={onZoomIn} />
+                      </Space>
+                    ),
+                  }}
+                />
+              </div>
+              <div className="tool">
+                <RotateRightOutlined />
+                <SwapOutlined />
+                <DownloadOutlined onClick={onDownload} />
+              </div>
+              <div className="title">测试的得的得得得得得得</div>
             </li>
           </ul>
         </div>

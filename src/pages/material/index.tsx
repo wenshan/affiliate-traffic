@@ -1,19 +1,24 @@
 import { connect } from 'umi';
-import React, { Component } from 'react';
+import React from 'react';
 import Footer from '@/components/Footer';
-import { Button, Result } from 'antd';
 import ImgList from './components/ImgList';
+import UploadFile from './components/UploadFile';
+import UploadDirectory from './components/UploadDirectory';
 
-import style from './index.less';
+import './index.less';
 
 const Material: React.FC = (props) => {
   console.log('props:', props);
   return (
-    <div className={style.material}>
+    <div className="material">
       <div className="content">
+        <div className="header">
+          <UploadFile></UploadFile>
+          <UploadDirectory></UploadDirectory>
+        </div>
         <ImgList></ImgList>
       </div>
-      <Footer />
+      <Footer></Footer>
     </div>
   );
 };
