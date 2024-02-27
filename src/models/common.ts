@@ -1,9 +1,7 @@
-/* eslint-disable no-undef */
+/* eslint-disable */
 /* @ts-ignore */
 import QueryString from 'query-string';
-import Cookies from 'js-cookie';
-import { getGithubToken, queryCurrentUser } from '../services/ant-design-pro/api';
-const loginPath = '/user/login';
+import { getGithubToken } from '../services/ant-design-pro/api';
 export default {
   namespace: 'common',
   state: {
@@ -14,7 +12,7 @@ export default {
     code: '', // 微信code
     state: '',
     isAuthorized: false, // 是否已经授权
-    currentUser: {
+    userinfo: {
       access_token: '',
       expires_in: '',
       nickname: 'nickname',
@@ -22,13 +20,19 @@ export default {
       openid: '',
       unionid: '',
       email: '',
-      userid: '',
+    },
+    oauth2Github: {
+      key: 'd966e3647ef6461d35de',
+      secret: 'b5e9563b98c6a7831f99178b4e5f67130e08e05d',
+      redirect_uri: 'http://127.0.0.1:8000/oauth',
+      authorizationURL: 'http://github.com/login/oauth/authorize',
+      tokenURL: 'https://github.com/login/oauth/access_token',
+      userProfileURL: 'https://api.github.com/user',
     },
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
-      const access_token = Cookies.get('access_token');
       history.listen(({ pathname, search }) => {
         const query = QueryString.parse(search);
         if (query && query.state && query.code) {
@@ -43,18 +47,6 @@ export default {
           });
           // 获取token
           dispatch({ type: 'getGithubToken' });
-        } else {
-          if (access_token) {
-            dispatch({
-              type: 'getCurrentUserInfo',
-              payload: {
-                access_token,
-              },
-            });
-          } else {
-            // 返回登录页面
-            // history.push(loginPath);
-          }
         }
       });
     },
@@ -64,31 +56,8 @@ export default {
     *getGithubToken({ payload }, { call, put, select }) {
       const code = yield select((state) => state.common.code);
       console.log('code:', code);
-      const result = yield call(getGithubToken, { code });
-      console.log('result:', result.data);
-      // 更新成功 获取用户信息
-      if (result && result.data && result.data.access_token) {
-        yield put({ type: 'update', payload: { currentUser: result.data } });
-        // 设置token 有效期
-        // expires 失效时间
-        const expiresTime = new Date(new Date() * 1 + (7200 - 200) * 1000);
-        Cookies.set('access_token', result.data.access_token, { expires: expiresTime });
-      }
-    },
-    // subscriptions 更新当前的用户信息
-    *updateUserinfo({ payload: data }, { call, put, select }) {
-      const currentUserinfo = yield select((state) => state.common.currentUser);
-      const updetaUserinfo = Object.assign({}, currentUserinfo, data);
-      yield put({ type: 'update', payload: { currentUser: updetaUserinfo } });
-    },
-    // 获取用户信息
-    *getCurrentUserInfo({ payload: data }, { call, put, select }) {
-      const { access_token } = data;
-      const result = yield call(queryCurrentUser, { access_token });
-      console.log('getCurrentUserInfo-result:', result.data);
-      if (result && result.data) {
-        yield put({ type: 'update', payload: { currentUser: result.data } });
-      }
+      const { access_token } = yield call(getGithubToken, { code });
+      console.log('access_token:', access_token);
     },
   },
 

@@ -1,9 +1,8 @@
-import { connect } from 'umi';
-import React from 'react';
 import Footer from '@/components/Footer';
+import React from 'react';
+import { connect } from 'umi';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
-import UploadDirectory from './components/UploadDirectory';
 
 import './index.less';
 
@@ -14,7 +13,6 @@ const Material: React.FC = (props) => {
       <div className="content">
         <div className="header">
           <UploadFile></UploadFile>
-          <UploadDirectory></UploadDirectory>
         </div>
         <ImgList></ImgList>
       </div>

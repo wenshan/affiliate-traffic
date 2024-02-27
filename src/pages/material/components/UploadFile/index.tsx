@@ -1,7 +1,7 @@
-import { connect } from 'umi';
-import Cookies from 'js-cookie';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message } from 'antd';
+import Cookies from 'js-cookie';
+import { connect } from 'umi';
 
 import './index.less';
 
@@ -18,7 +18,9 @@ const UploadFile: React.FC = (props) => {
       message.error(`${info.file.name} file upload failed.`);
     }
   };
-  const access_token = props.common.currentUser.access_token || Cookies.get('access_token');
+  const access_token =
+    (props.common && props.common.currentUser && props.common.currentUser.access_token) ||
+    Cookies.get('access_token');
 
   return (
     <div className="uploadfile">
