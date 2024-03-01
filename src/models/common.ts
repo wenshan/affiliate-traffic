@@ -29,6 +29,12 @@ export default {
       tokenURL: 'https://github.com/login/oauth/access_token',
       userProfileURL: 'https://api.github.com/user',
     },
+    oauth2Google: {
+      client_id: '894075544945-9akdiivfddi14fksil4s2pdrva0rgls9.apps.googleusercontent.com',
+      redirect_uri: 'https://dreamstep.top/user/login',
+      response_type: '',
+      scope: '',
+    },
   },
 
   subscriptions: {

@@ -154,4 +154,5 @@ export default defineConfig({
   },
   esbuildMinifyIIFE: true,
   requestRecord: {},
+  scripts: [{ src: 'https://accounts.google.com/gsi/client', defer: true, async: true }],
 });

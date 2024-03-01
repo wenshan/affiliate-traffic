@@ -11,6 +11,7 @@ const Material: React.FC = (props) => {
   return (
     <div className="material">
       <div className="content">
+        <div id="buttonDiv"></div>
         <div className="header">
           <UploadFile></UploadFile>
         </div>

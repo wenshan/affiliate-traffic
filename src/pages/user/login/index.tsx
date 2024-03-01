@@ -3,6 +3,7 @@ import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import {
   AlipayCircleOutlined,
+  GooglePlusOutlined,
   LockOutlined,
   MobileOutlined,
   TaobaoCircleOutlined,
@@ -63,6 +64,7 @@ const ActionIcons = () => {
 
   return (
     <>
+      <GooglePlusOutlined key="GooglePlusOutlined" className={styles.action} />
       <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
       <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
       <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
