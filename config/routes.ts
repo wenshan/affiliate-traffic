@@ -46,9 +46,9 @@ export default [
         component: './Product/productCreate',
       },
       {
-        name: 'productSku',
-        path: '/product/productSku',
-        component: './Product/productSku',
+        name: 'productDetail',
+        path: '/product/productDetail',
+        component: './Product/productDetail',
       },
       {
         name: 'productEdit',

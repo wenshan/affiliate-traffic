@@ -51,8 +51,8 @@ export default {
   'menu.editor.koni': '拓扑编辑器',
   'menu.material': '素材管理',
   'menu.product': '商品管理',
-  'menu.product.productCreate': '创建SKU商品',
+  'menu.product.productCreate': '创建主商品',
   'menu.product.productEdit': '编辑商品',
   'menu.product.productList': '商品列表',
-  'menu.product.productSku': '创建SKU商品详情',
+  'menu.product.productDetail': '创建商品详情',
 };

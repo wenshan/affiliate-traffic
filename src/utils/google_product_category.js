@@ -1,4 +1,4 @@
-const data = [
+const tableData = [
   { value: 632, name: '五金/硬件' },
   { value: 500096, name: '五金/硬件 > 五金泵>' },
   { value: 500100, name: '五金/硬件 > 五金泵 > 井泵/系统' },
@@ -7060,3 +7060,5 @@ const data = [
   { value: 410, name: '艺术与娱乐 > 聚会/庆典 > 舞台视觉设备 > 视觉特效灯光' },
   { value: 5711, name: '艺术与娱乐 > 聚会/庆典 > 舞台视觉设备 > 迪斯科球灯' },
 ];
+
+export default tableData;

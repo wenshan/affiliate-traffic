@@ -5,55 +5,18 @@ import QueryString from 'query-string';
 import { getGithubToken, queryCurrentUser } from '../../../services/ant-design-pro/api';
 
 export default {
-  namespace: 'productSku',
+  namespace: 'productDetail',
   state: {
-    platform: 'pc', // wap:浏览器访问 wxwap: 微信访问
-    mobile: '',
-    type: 1, // 登录参数 1.微信 2.QQ 3.穿新衣 4.微信公众号 5.芝麻信用 6.京东 7.宝宝树 8.返利 9.QQ内部应用登录 10.微信积分购小程序 11. 支付宝无线换小程序 12.微信无线换小程序 13.微信穿新衣小程序
-    query: '',
-    code: '', // 微信code
-    state: '',
-    isAuthorized: false, // 是否已经授权
-    currentUser: {
-      access_token: '',
-      expires_in: '',
-      nickname: 'nickname',
-      refresh_token: '',
-      openid: '',
-      unionid: '',
-      email: '',
-      userid: '',
-    },
+    productDetail: {},
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
-      const access_token = Cookies.get('access_token');
       history.listen(({ pathname, search }) => {
-        const query = QueryString.parse(search);
-        if (query && query.state && query.code) {
-          console.log('query:', query);
-          console.log('pathname:', pathname);
-          dispatch({
-            type: 'update',
-            payload: {
-              state: query.state,
-              code: query.code,
-            },
-          });
-          // 获取token
-          dispatch({ type: 'getGithubToken' });
-        } else {
-          if (access_token) {
-            dispatch({
-              type: 'getCurrentUserInfo',
-              payload: {
-                access_token,
-              },
-            });
-          } else {
-          }
-        }
+        const query = QueryString.parse(window.location.search);
+        console.log('query:', query);
+        console.log('pathname:', pathname);
+        console.log('search:', search);
       });
     },
   },
