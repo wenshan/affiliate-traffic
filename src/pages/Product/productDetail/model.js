@@ -1,8 +1,7 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import Cookies from 'js-cookie';
+import { queryCurrentUser } from '@/services/ant-design-pro/api';
 import QueryString from 'query-string';
-import { getGithubToken, queryCurrentUser } from '../../../services/ant-design-pro/api';
 
 export default {
   namespace: 'productDetail',
@@ -22,20 +21,6 @@ export default {
   },
 
   effects: {
-    *getGithubToken({ payload }, { call, put, select }) {
-      const code = yield select((state) => state.common.code);
-      console.log('code:', code);
-      const result = yield call(getGithubToken, { code });
-      console.log('result:', result.data);
-      // 更新成功 获取用户信息
-      if (result && result.data && result.data.access_token) {
-        yield put({ type: 'update', payload: { currentUser: result.data } });
-        // 设置token 有效期
-        // expires 失效时间
-        const expiresTime = new Date(new Date() * 1 + (7200 - 200) * 1000);
-        Cookies.set('access_token', result.data.access_token, { expires: expiresTime });
-      }
-    },
     // subscriptions 更新当前的用户信息
     *updateUserinfo({ payload: data }, { call, put, select }) {
       const currentUserinfo = yield select((state) => state.common.currentUser);

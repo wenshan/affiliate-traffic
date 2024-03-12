@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
+import { queryCurrentUser } from '@/services/ant-design-pro/api';
 import Cookies from 'js-cookie';
 import QueryString from 'query-string';
-import { getGithubToken, queryCurrentUser } from '../../../services/ant-design-pro/api';
 
 export default {
   namespace: 'productEdit',
@@ -31,48 +31,13 @@ export default {
       const access_token = Cookies.get('access_token');
       history.listen(({ pathname, search }) => {
         const query = QueryString.parse(search);
-        if (query && query.state && query.code) {
-          console.log('query:', query);
-          console.log('pathname:', pathname);
-          dispatch({
-            type: 'update',
-            payload: {
-              state: query.state,
-              code: query.code,
-            },
-          });
-          // 获取token
-          dispatch({ type: 'getGithubToken' });
-        } else {
-          if (access_token) {
-            dispatch({
-              type: 'getCurrentUserInfo',
-              payload: {
-                access_token,
-              },
-            });
-          } else {
-          }
-        }
+        console.log('query:', query);
+        console.log('pathname:', pathname);
       });
     },
   },
 
   effects: {
-    *getGithubToken({ payload }, { call, put, select }) {
-      const code = yield select((state) => state.common.code);
-      console.log('code:', code);
-      const result = yield call(getGithubToken, { code });
-      console.log('result:', result.data);
-      // 更新成功 获取用户信息
-      if (result && result.data && result.data.access_token) {
-        yield put({ type: 'update', payload: { currentUser: result.data } });
-        // 设置token 有效期
-        // expires 失效时间
-        const expiresTime = new Date(new Date() * 1 + (7200 - 200) * 1000);
-        Cookies.set('access_token', result.data.access_token, { expires: expiresTime });
-      }
-    },
     // subscriptions 更新当前的用户信息
     *updateUserinfo({ payload: data }, { call, put, select }) {
       const currentUserinfo = yield select((state) => state.common.currentUser);

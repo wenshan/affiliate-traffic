@@ -25,6 +25,7 @@ interface ResponseStructure {
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const errorConfig: RequestConfig = {
+  timeout: 60000,
   // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
     // 错误抛出
@@ -88,15 +89,23 @@ export const errorConfig: RequestConfig = {
   // 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
+      let url;
+      const fixUrl = 'http://127.0.0.1:7001';
       // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token = 123');
+      if (config && config.url) {
+        if (config.url.indexOf('http') > -1) {
+          url = config.url;
+        } else {
+          url = fixUrl + config.url;
+        }
+      }
       return { ...config, url };
     },
   ],
 
   // 响应拦截器
   responseInterceptors: [
-    (response) => {
+    (response: unknown) => {
       // 拦截响应数据，进行个性化处理
       const { data } = response as unknown as ResponseStructure;
 

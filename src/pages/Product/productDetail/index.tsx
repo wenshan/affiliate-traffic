@@ -2,6 +2,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { Button, Image, Input, Radio, Select, Table } from 'antd';
 import { Component } from 'react';
 import { connect } from 'umi';
+import ImageSelectModal from '../components/ImageSelectModal';
 import ProductAttribute from '../components/ProductAttribute';
 
 import './index.less';
@@ -617,6 +618,7 @@ class ProductDetail extends Component {
           callbackCancel={this.productAttributeCallbackCancel}
           callbackOk={this.productAttributeCallbackOk}
         ></ProductAttribute>
+        <ImageSelectModal></ImageSelectModal>
       </PageContainer>
     );
   }

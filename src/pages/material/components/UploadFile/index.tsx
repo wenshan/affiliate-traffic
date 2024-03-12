@@ -31,7 +31,7 @@ const UploadFile: React.FC = (props) => {
         headers={{ access_token }}
         onChange={changeEvent}
       >
-        <Button icon={<UploadOutlined />}>Click to Upload</Button>
+        <Button icon={<UploadOutlined />}>上传图片</Button>
       </Upload>
     </div>
   );

@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* @ts-ignore */
+import { googleGetToken, googleGetUserinfo } from '@/services/ant-design-pro/api';
 import QueryString from 'query-string';
-import { getGithubToken } from '../services/ant-design-pro/api';
 export default {
   namespace: 'common',
   state: {
@@ -20,56 +20,54 @@ export default {
       openid: '',
       unionid: '',
       email: '',
-    },
-    oauth2Github: {
-      key: 'd966e3647ef6461d35de',
-      secret: 'b5e9563b98c6a7831f99178b4e5f67130e08e05d',
-      redirect_uri: 'http://127.0.0.1:8000/oauth',
-      authorizationURL: 'http://github.com/login/oauth/authorize',
-      tokenURL: 'https://github.com/login/oauth/access_token',
-      userProfileURL: 'https://api.github.com/user',
-    },
-    oauth2Google: {
-      client_id: '894075544945-9akdiivfddi14fksil4s2pdrva0rgls9.apps.googleusercontent.com',
-      redirect_uri: 'https://dreamstep.top/user/login',
-      response_type: '',
       scope: '',
+      token_type: 'Bearer',
     },
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(({ pathname, search }) => {
-        const query = QueryString.parse(search);
-        if (query && query.state && query.code) {
-          console.log('query:', query);
-          console.log('pathname:', pathname);
-          dispatch({
-            type: 'update',
-            payload: {
-              state: query.state,
-              code: query.code,
-            },
-          });
-          // 获取token
-          dispatch({ type: 'getGithubToken' });
-        }
-      });
+      const search = window.document.location.hash;
+      const query = QueryString.parse(search);
+      console.log('query:', query);
+      if (query && query.access_token) {
+        dispatch({
+          type: 'updateUserinfo',
+          payload: query,
+        });
+        dispatch({
+          type: 'getUserinfoGoogleOauth',
+          payload: query,
+        });
+      }
     },
   },
 
   effects: {
-    *getGithubToken({ payload }, { call, put, select }) {
-      const code = yield select((state) => state.common.code);
-      console.log('code:', code);
-      const { access_token } = yield call(getGithubToken, { code });
-      console.log('access_token:', access_token);
+    *googleGetUserinfo({ payload }, { call, put, select }) {
+      const userinfo = yield select((state) => state.common);
+      const { expires_in, access_token } = payload;
+      if (expires_in && access_token) {
+        const result = yield call(googleGetUserinfo, { access_token, expires_in });
+        console.log('result:', result);
+      }
+    },
+    *googleGetToken({ payload }, { call, put, select }) {
+      const { code } = payload;
+      if (code) {
+        const result = yield call(googleGetToken, { code });
+        console.log('result:', result);
+      }
     },
   },
 
   reducers: {
     update(state, { payload: data }) {
       return { ...state, ...data };
+    },
+    updateUserinfo(state, { payload: data }) {
+      const { userinfo } = state;
+      return Object.assign({}, userinfo, data);
     },
   },
 };

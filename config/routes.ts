@@ -48,6 +48,7 @@ export default [
       {
         name: 'productDetail',
         path: '/product/productDetail',
+        hideInMenu: true,
         component: './Product/productDetail',
       },
       {

@@ -2,16 +2,25 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** github 获取tokent */
-export const getGithubToken = async (params?: { [key: string]: any }) => {
-  return request<{ data: any }>('/api/github/getWebToken', {
-    method: 'GET',
+/** google 授权 */
+export const googleGetToken = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/googleOauth/getToken', {
+    method: 'POST',
+    ...(params || {}),
+  });
+};
+
+export const googleGetUserinfo = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/googleOauth/getUserinfo', {
+    method: 'POST',
     ...(params || {}),
   });
 };
 
 /** 获取当前的用户 GET /api/currentUser */
 export const queryCurrentUser = async (params?: { [key: string]: any }) => {
+  debugger;
+  console.log('params:', params);
   return request<{ data: any }>('/api/currentUser', {
     method: 'POST',
     ...(params || {}),
