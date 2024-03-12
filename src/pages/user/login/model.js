@@ -14,7 +14,6 @@ export default {
     oauth2Google: {
       merchantId: 5321978010,
       client_id: '894075544945-9akdiivfddi14fksil4s2pdrva0rgls9.apps.googleusercontent.com',
-      client_secret: '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',
       redirect_uri: 'http://127.0.0.1:8000/user/login',
       scope: [
         'https://www.googleapis.com/auth/userinfo.profile',
