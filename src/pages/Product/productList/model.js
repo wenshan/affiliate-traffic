@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import { queryCurrentUser } from '@/services/ant-design-pro/api';
+import { currentUser } from '@/services/ant-design-pro/api';
 import QueryString from 'query-string';
 
 export default {
@@ -45,7 +45,7 @@ export default {
     // 获取用户信息
     *getCurrentUserInfo({ payload: data }, { call, put, select }) {
       const { access_token } = data;
-      const result = yield call(queryCurrentUser, { access_token });
+      const result = yield call(currentUser, { access_token });
       console.log('getCurrentUserInfo-result:', result.data);
       if (result && result.data) {
         yield put({ type: 'update', payload: { currentUser: result.data } });

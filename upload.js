@@ -7,7 +7,7 @@ const port = 22;
 const localFilePath = `${__dirname}/dist`;
 const remoteFilePath = '/www/traffic'; // /www/traffic
 
-const remoteAddress = `${username}:${password}@${host}`;
+const remoteAddress = `${name}:${password}@${host}`;
 console.log('localFilePath:', `${localFilePath}/index.html`);
 console.log('au:', `${remoteAddress}:${remoteFilePath}`);
 

@@ -54,7 +54,6 @@
     "antd-style": "^3.6.1",
     "axios": "^1.6.7",
     "classnames": "^2.5.1",
-    "gaxios": "^6.3.0",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",

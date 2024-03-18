@@ -1,59 +1,71 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from '@umijs/max';
-
+// import { request } from '@umijs/max';
+import request from '@/utils/request';
+import requestToken from '@/utils/requestToken';
 /** google 授权 */
 export const googleGetToken = async (params?: { [key: string]: any }) => {
   return request<{ data: any }>('/api/googleOauth/getToken', {
     method: 'POST',
-    ...(params || {}),
+    data: params,
+  });
+};
+
+export const googleGetJwtToken = async (params) => {
+  return requestToken({
+    url: params.url,
+    method: 'POST',
+    data: {},
+  });
+};
+
+export const googlePostJwtToken = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/googleOauth/pushJwtToken', {
+    method: 'POST',
+    data: params,
   });
 };
 
 export const googleGetUserinfo = async (params?: { [key: string]: any }) => {
   return request<{ data: any }>('/api/googleOauth/getUserinfo', {
     method: 'POST',
-    ...(params || {}),
+    data: params,
   });
 };
 
-/** 获取当前的用户 GET /api/currentUser */
-export const queryCurrentUser = async (params?: { [key: string]: any }) => {
-  debugger;
-  console.log('params:', params);
-  return request<{ data: any }>('/api/currentUser', {
-    method: 'POST',
-    ...(params || {}),
-  });
-};
-
-/** 获取当前的用户 GET /api/currentUser */
+/** 获取当前的用户 POST /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
-  }>('/api/currentUser', {
-    method: 'GET',
-    ...(options || {}),
+  }>('/api/user/currentUser', {
+    method: 'POST',
+    data: options,
   });
 }
 
 /** 退出登录接口 POST /api/login/outLogin */
 export async function outLogin(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/login/outLogin', {
+  return request<Record<string, any>>('/api/user/outLogin', {
     method: 'POST',
-    ...(options || {}),
+    data: options,
   });
 }
 
-/** 登录接口 POST /api/login/account */
-export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-  return request<API.LoginResult>('/api/login/account', {
+/** 登录接口 POST /api/user/login */
+export async function login(params: API.LoginParams, options?: { [key: string]: any }) {
+  console.log('params:', params);
+  return request<API.LoginResult>('/api/user/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
+    data: params,
+  });
+}
+
+// register
+export async function register(params: API.LoginParams, options?: { [key: string]: any }) {
+  console.log('params:', params);
+  return request<API.RegisterParams>('/api/user/register', {
+    method: 'POST',
+    data: params,
   });
 }
 
@@ -61,7 +73,7 @@ export async function login(body: API.LoginParams, options?: { [key: string]: an
 export async function getNotices(options?: { [key: string]: any }) {
   return request<API.NoticeIconList>('/api/notices', {
     method: 'GET',
-    ...(options || {}),
+    data: options,
   });
 }
 
@@ -78,10 +90,7 @@ export async function rule(
 ) {
   return request<API.RuleList>('/api/rule', {
     method: 'GET',
-    params: {
-      ...params,
-    },
-    ...(options || {}),
+    data: params,
   });
 }
 
@@ -89,10 +98,7 @@ export async function rule(
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data: {
-      method: 'update',
-      ...(options || {}),
-    },
+    data: options,
   });
 }
 
@@ -100,10 +106,7 @@ export async function updateRule(options?: { [key: string]: any }) {
 export async function addRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data: {
-      method: 'post',
-      ...(options || {}),
-    },
+    data: options,
   });
 }
 
@@ -111,9 +114,6 @@ export async function addRule(options?: { [key: string]: any }) {
 export async function removeRule(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/rule', {
     method: 'POST',
-    data: {
-      method: 'delete',
-      ...(options || {}),
-    },
+    data: options,
   });
 }

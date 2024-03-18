@@ -113,9 +113,11 @@ export default defineConfig({
    * @description 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
    * @doc https://umijs.org/docs/max/request
    */
+  /*
   request: {
     dataField: 'data',
   },
+  */
   /**
    * @name 权限插件
    * @description 基于 initialState 的权限插件，必须先打开 initialState
@@ -160,6 +162,7 @@ export default defineConfig({
   metas: [
     { name: 'keywords', content: 'umi, umijs' },
     { name: 'description', content: 'React framework.' },
+    { name: 'google-site-verification', content: 'KxHWtVZGvgcLVkcM4l40FNpLvHf3tA_z7D_jE83_wXM' },
     // { 'http-equiv': 'Content-Security-Policy', content: "default-src https://accounts.google.com/gsi/; child-src 'none'; object-src 'none'" },
   ],
 });

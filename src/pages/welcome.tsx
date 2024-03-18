@@ -11,7 +11,7 @@ class Welcome extends Component {
   render() {
     return (
       <PageContainer>
-        <></>
+        <h1>欢迎</h1>
       </PageContainer>
     );
   }

@@ -1,6 +1,10 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import { googleGetToken } from '@/services/ant-design-pro/api';
+import {
+  googleGetJwtToken,
+  googleGetToken,
+  googlePostJwtToken,
+} from '@/services/ant-design-pro/api';
 import QueryString from 'query-string';
 
 export default {
@@ -89,10 +93,18 @@ export default {
     *googleGetToken({ payload }, { call, put, select }) {
       const { code } = yield select((state) => state.login);
       const currentCode = (payload && payload.code) || code;
-      if (code) {
+      if (true) {
         console.log('code:', code);
-        const result = yield call(googleGetToken, { code: currentCode });
-        console.log('result:', result);
+        const result = yield call(googleGetToken);
+        console.log('result:', result.data);
+        if (result && result.data && result.data.url) {
+          const resultToken = yield call(googleGetJwtToken, { url: result.data.url });
+          console.log('resultToken:', resultToken);
+          if (resultToken && resultToken.access_token) {
+            const postToken = yield call(googlePostJwtToken, resultToken);
+            console.log('postToken');
+          }
+        }
       }
     },
     *initState({ payload }, { call, put, select }) {

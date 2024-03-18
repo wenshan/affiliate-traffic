@@ -1,69 +1,69 @@
 import { Footer } from '@/components';
-import { Helmet } from '@umijs/max';
-import { Button } from 'antd';
-import { Component } from 'react';
-import { connect } from 'umi';
+import { Helmet, SelectLang, useIntl } from '@umijs/max';
+import { Tabs } from 'antd';
+import React, { useState } from 'react';
+import Settings from '../../../../config/defaultSettings';
+import Login from './components/Login';
+import Register from './components/Register';
 
-@connect(({ common, login }) => ({
-  common,
-  login,
-}))
-class Login extends Component {
-  constructor(props) {
-    super(props);
-    console.log('props:', props);
-    this.state = {};
-  }
-  handleSubmit = () => {};
+import './index.less';
 
-  testHandleSubmit = () => {
-    this.props.dispatch({
-      type: 'login/googleAuth2InitCodeClient2',
-    });
-  };
-  testHandleSubmit2 = () => {
-    this.props.dispatch({
-      type: 'login/googleGetToken',
-    });
-  };
+const Lang = () => {
+  return (
+    <div className="lang" data-lang>
+      {SelectLang && <SelectLang />}
+    </div>
+  );
+};
 
-  componentDidMount() {}
-
-  render() {
-    return (
-      <div className="container">
-        <Helmet>
-          <title></title>
-        </Helmet>
-        <div>
-          <Button onClick={this.handleSubmit}>Google 登录</Button>
-          <Button onClick={this.testHandleSubmit}>Authorize with Google</Button>
-          <Button onClick={this.testHandleSubmit2}>Get Authorize Token with Google</Button>
-
-          <div
-            id="g_id_onload"
-            data-client_id="894075544945-9akdiivfddi14fksil4s2pdrva0rgls9.apps.googleusercontent.com"
-            data-context="signin"
-            data-ux_mode="popup"
-            data-login_uri="https://dreamstep.top/user/login"
-            data-close_on_tap_outside="false"
-            data-itp_support="false"
-          ></div>
-
-          <div
-            className="g_id_signin"
-            data-type="standard"
-            data-shape="rectangular"
-            data-theme="outline"
-            data-text="signin_with"
-            data-size="large"
-            data-logo_alignment="left"
-          ></div>
-        </div>
-        <Footer />
+const LoginInit: React.FC = () => {
+  const intl = useIntl();
+  const [type, setType] = useState<string>('login');
+  return (
+    <div className="container">
+      <Helmet>
+        <title>
+          {intl.formatMessage({
+            id: 'menu.login',
+            defaultMessage: '登录注册页',
+          })}
+          - {Settings.title}
+        </title>
+      </Helmet>
+      <Lang />
+      <div
+        style={{
+          flex: '1',
+          padding: '32px 0',
+        }}
+      >
+        <Tabs
+          activeKey={type}
+          onChange={setType}
+          centered
+          items={[
+            {
+              key: 'login',
+              label: intl.formatMessage({
+                id: 'pages.login.accountLogin.tab',
+                defaultMessage: '登录',
+              }),
+            },
+            {
+              key: 'register',
+              label: intl.formatMessage({
+                id: 'pages.login.phoneLogin.tab',
+                defaultMessage: '注册',
+              }),
+            },
+          ]}
+        />
+        {type === 'register' && <Register></Register>}
+        {type === 'login' && <Login></Login>}
       </div>
-    );
-  }
-}
+      <Footer />
+    </div>
+  );
+};
 
-export default Login;
+export default LoginInit;
