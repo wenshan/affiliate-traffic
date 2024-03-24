@@ -1,10 +1,6 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import {
-  googleGetJwtToken,
-  googleGetToken,
-  googlePostJwtToken,
-} from '@/services/ant-design-pro/api';
+import { googleGetJwtToken, googleGetToken, googlePostJwtToken } from '@/services/api/login';
 import QueryString from 'query-string';
 
 export default {

@@ -1,6 +1,6 @@
 /* eslint-disable */
 /* @ts-ignore */
-import { googleGetToken, googleGetUserinfo } from '@/services/ant-design-pro/api';
+import { googleGetToken, googleGetUserinfo } from '@/services/api/login';
 import QueryString from 'query-string';
 export default {
   namespace: 'common',

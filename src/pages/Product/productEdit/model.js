@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import { currentUser } from '@/services/ant-design-pro/api';
+import { currentUser } from '@/services/api/login';
 import Cookies from 'js-cookie';
 import QueryString from 'query-string';
 

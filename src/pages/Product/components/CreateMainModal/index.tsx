@@ -8,16 +8,18 @@ import './index.less';
 class CreateMainModal extends Component {
   constructor(props) {
     super(props);
-    console.log('props:', props);
     this.state = {
       isProductTypeShow: false,
       isProductCategoryShow: false,
       currentProductMain: {
         title: '',
-        productType: { value: '1', label: 'Jack' },
-        offerId: '111111',
-        googleProductCategory: { key: '1', title: 'Jack' },
-        gtin: '123123123123',
+        product_type_id: null,
+        offer_id: '',
+        google_product_category: {
+          key: 632,
+          title: '五金/硬件',
+        },
+        gtin: '',
       },
     };
   }
@@ -33,7 +35,9 @@ class CreateMainModal extends Component {
   // 自定商品分类
   productTypeSelectHandle = (event, option) => {
     const { currentProductMain } = this.state;
-    const newCurrentProductMain = Object.assign({}, currentProductMain, { productType: option });
+    const newCurrentProductMain = Object.assign({}, currentProductMain, {
+      product_type_id: option.value,
+    });
     this.setState({
       currentProductMain: newCurrentProductMain,
     });
@@ -48,7 +52,7 @@ class CreateMainModal extends Component {
   offerIdInputHandle = (e) => {
     const { value } = e.target;
     const { currentProductMain } = this.state;
-    const newCurrentProductMain = Object.assign({}, currentProductMain, { offerId: value });
+    const newCurrentProductMain = Object.assign({}, currentProductMain, { offer_id: value });
     this.setState({
       currentProductMain: newCurrentProductMain,
     });
@@ -83,7 +87,7 @@ class CreateMainModal extends Component {
   productCategoryCallBackOk = (option) => {
     const { currentProductMain } = this.state;
     const newCurrentProductMain = Object.assign({}, currentProductMain, {
-      googleProductCategory: option,
+      google_product_category: option,
     });
     this.setState({
       isProductCategoryShow: false,
@@ -119,14 +123,13 @@ class CreateMainModal extends Component {
   }
 
   render() {
-    console.log('dataSource:', this.props.dataSource);
     const { currentProductMain } = this.state;
     const { productTypeOption } = this.props.dataSource;
-    const { title, productType, offerId, googleProductCategory, gtin } = currentProductMain;
+    const { title, product_type_id, offer_id, google_product_category, gtin } = currentProductMain;
     return (
       <div className="custom-product-type">
         <Modal
-          title="创建主商品信息 "
+          title={this.props.optionAction > 0 ? '编辑主商品信息' : '创建主商品信息'}
           open={this.props.open}
           width={900}
           onOk={this.handleOk}
@@ -149,7 +152,7 @@ class CreateMainModal extends Component {
                 <i>*</i> 自定商品分类:
               </span>
               <Select
-                value={productType.value}
+                value={product_type_id}
                 style={{ width: 120 }}
                 onChange={this.productTypeSelectHandle}
                 options={productTypeOption}
@@ -167,7 +170,7 @@ class CreateMainModal extends Component {
               <Input
                 placeholder="商品货号"
                 style={{ width: 350 }}
-                value={offerId}
+                value={offer_id}
                 onChange={this.offerIdInputHandle}
               />
             </div>
@@ -178,7 +181,7 @@ class CreateMainModal extends Component {
               <Input
                 placeholder="选择Google 商品类目"
                 style={{ width: 350 }}
-                value={googleProductCategory.title}
+                value={google_product_category.title}
                 disabled
               />
               <span className="operate">

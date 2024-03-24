@@ -14,9 +14,9 @@ class CustomProductType extends Component {
   }
   googleProductCategoryTreeHandle = (selectedKeys, event) => {
     console.log('selectedKeys:', selectedKeys);
-    console.log('selectedNodes:', event.selectedNodes);
+    console.log('selectedNodes:', event.selectedNodes[0]);
     this.setState({
-      selectedNodes: event.selectedNodes[0],
+      selectedNodes: Object.assign({}, event.selectedNodes[0], { children: null }),
     });
   };
 

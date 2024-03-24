@@ -1,5 +1,5 @@
 import { Footer } from '@/components';
-import { register } from '@/services/ant-design-pro/api';
+import { register } from '@/services/api/login';
 import {
   AlipayCircleOutlined,
   LockOutlined,
