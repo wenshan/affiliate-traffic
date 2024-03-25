@@ -113,7 +113,7 @@ class CreateMainModal extends Component {
   };
 
   // eslint-disable-next-line react/no-deprecated
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     console.log('nextProps:', nextProps);
     if (nextProps.dataSource.currentProductMain) {
       this.setState({

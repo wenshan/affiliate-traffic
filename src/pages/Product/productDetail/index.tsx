@@ -17,6 +17,8 @@ class ProductDetail extends Component {
     console.log('props:', props);
     this.state = {
       isProductAttributeModal: false,
+      isProductImageModal: false,
+      currentImageProductType: 'imageLink',
     };
   }
   // 语言
@@ -222,6 +224,25 @@ class ProductDetail extends Component {
     });
   };
 
+  productImageCallbackCancel = () => {
+    this.setState({
+      isProductImageModal: false,
+    });
+  };
+  productImageCallbackOk = () => {
+    this.setState({
+      isProductImageModal: false,
+    });
+  };
+
+  imageSelectModel = (type: string) => {
+    console.log(type);
+    this.setState({
+      isProductImageModal: true,
+      currentImageProductType: type,
+    });
+  };
+
   render() {
     const columnsProductAttribute = [
       {
@@ -309,7 +330,13 @@ class ProductDetail extends Component {
                   <span className="label">
                     <i>*</i> 商品主图:
                   </span>
-                  <Button type="primary" size="small">
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      this.imageSelectModel('imageLink');
+                    }}
+                  >
                     添加主图
                   </Button>
                 </div>
@@ -320,7 +347,13 @@ class ProductDetail extends Component {
               <div className="form-item">
                 <div className="line-box">
                   <span className="label">商品附加图片:</span>
-                  <Button type="primary" size="small">
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      this.imageSelectModel('additionalImageLinks');
+                    }}
+                  >
                     添加附属图片
                   </Button>
                 </div>
@@ -356,7 +389,13 @@ class ProductDetail extends Component {
               <div className="form-item">
                 <div className="line-box">
                   <span className="label">添加商品详情:</span>
-                  <Button type="primary" size="small">
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      this.imageSelectModel('lifestyleImageLinks');
+                    }}
+                  >
                     添加商品详情
                   </Button>
                 </div>
@@ -618,7 +657,11 @@ class ProductDetail extends Component {
           callbackCancel={this.productAttributeCallbackCancel}
           callbackOk={this.productAttributeCallbackOk}
         ></ProductAttribute>
-        <ImageSelectModal></ImageSelectModal>
+        <ImageSelectModal
+          open={this.state.isProductImageModal}
+          callbackCancel={this.productImageCallbackCancel}
+          callbackOk={this.productImageCallbackOk}
+        ></ImageSelectModal>
       </PageContainer>
     );
   }

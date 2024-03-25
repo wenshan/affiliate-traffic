@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import Cookies from 'js-cookie';
-import QueryString from 'query-string';
+import { createFolder, delFolder, editFolder, queryFolder } from '@/services/api/material';
 
 export default {
   namespace: 'material',
@@ -23,37 +22,67 @@ export default {
       email: '',
       userid: '',
     },
+    currentFolderDirectory: {
+      label: '默认分组',
+      key: '0',
+      is_default: true,
+      active: true,
+    },
+    folderDirectory: [
+      {
+        label: '默认分组',
+        key: '0',
+        is_default: true,
+        active: true,
+      },
+      {
+        label: '分组一',
+        key: '1',
+        is_default: false,
+        active: false,
+      },
+      {
+        label: '分组二',
+        key: '2',
+        is_default: false,
+        active: false,
+      },
+      {
+        label: '分组三',
+        key: '3',
+        is_default: false,
+        active: false,
+      },
+    ],
   },
 
-  subscriptions: {
-    setup({ dispatch, history }) {
-      const access_token = Cookies.get('access_token');
-      history.listen(({ pathname, search }) => {
-        const query = QueryString.parse(search);
-        console.log('query:', query);
-        console.log('pathname:', pathname);
-      });
-    },
-  },
+  subscriptions: {},
 
   effects: {
-    *getGithubToken({ payload }, { call, put, select }) {
-      const code = yield select((state) => state.common.code);
-      console.log('code:', code);
+    *queryFolder({ payload }, { call, put, select }) {
+      const result = yield call(queryFolder);
+      if (result.status === 200 && result.data && result.data.rows) {
+        yield put({ type: 'update', payload: { folderDirectory: result.data.rows } });
+      }
     },
     // subscriptions 更新当前的用户信息
-    *updateUserinfo({ payload: data }, { call, put, select }) {
-      const currentUserinfo = yield select((state) => state.common.currentUser);
-      const updetaUserinfo = Object.assign({}, currentUserinfo, data);
-      yield put({ type: 'update', payload: { currentUser: updetaUserinfo } });
+    *editFolder({ payload: data }, { call, put, select }) {
+      const result = yield call(editFolder, data);
+      if (result.status === 200 && result.data) {
+        yield put({ type: 'queryFolder' });
+      }
     },
     // 获取用户信息
-    *getCurrentUserInfo({ payload: data }, { call, put, select }) {
-      const { access_token } = data;
-      const result = yield call(queryCurrentUser, { access_token });
-      console.log('getCurrentUserInfo-result:', result.data);
-      if (result && result.data) {
-        yield put({ type: 'update', payload: { currentUser: result.data } });
+    *delFolder({ payload: data }, { call, put, select }) {
+      const result = yield call(delFolder, data);
+      if (result.status === 200 && result.data) {
+        yield put({ type: 'queryFolder' });
+      }
+    },
+    *createFolder({ payload: data }, { call, put, select }) {
+      const result = yield call(createFolder, data);
+      if (result.status === 200 && result.data) {
+        yield put({ type: 'queryFolder' });
       }
     },
   },

@@ -71,7 +71,7 @@ class ImageSelectModal extends Component {
       <div className="image-select-modal">
         <Modal
           title="选择图片素材 "
-          open={true}
+          open={this.props.open}
           width={900}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
