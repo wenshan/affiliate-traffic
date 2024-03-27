@@ -1,45 +1,19 @@
 import { FolderOpenOutlined } from '@ant-design/icons';
-import { Col, Menu, Modal, Row } from 'antd';
+import { Col, Modal, Row } from 'antd';
 import { Component } from 'react';
+import ImgList from '../../../Material/components/ImgList';
 
 import './index.less';
-
-const items = [
-  {
-    label: '文件目录',
-    key: 'group',
-    type: 'group',
-    icon: <FolderOpenOutlined />,
-    children: [
-      {
-        label: '默认分组',
-        key: '0',
-      },
-      {
-        label: '分组一',
-        key: '1',
-      },
-      {
-        label: '分组二',
-        key: '2',
-      },
-      {
-        label: '分组三',
-        key: '3',
-      },
-    ],
-  },
-];
-
-const src = 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png';
 
 class ImageSelectModal extends Component {
   constructor(props) {
     super(props);
     console.log('props:', props);
     this.state = {
-      attribute_name: '',
-      attribute_value: '',
+      folderDirectory: props.folderDirectory,
+      currentFolderDirectory: props.currentFolderDirectory,
+      limit: props.imageLimitNum,
+      selectedMaterial: [],
     };
   }
 
@@ -49,9 +23,9 @@ class ImageSelectModal extends Component {
 
   // Modal
   handleOk = () => {
-    const { currentProductMain } = this.state;
+    const { selectedMaterial } = this.state;
     if (this.props.callbackOk) {
-      this.props.callbackOk(currentProductMain);
+      this.props.callbackOk(selectedMaterial);
     }
   };
 
@@ -64,61 +38,117 @@ class ImageSelectModal extends Component {
   nameInputHandle = () => {};
 
   valueInputHandle = () => {};
+  handleClickFolderMenu = (currentItem) => {
+    const { folderDirectory } = this.props;
+    const newFolderDirectory = [];
+    // eslint-disable-next-line array-callback-return
+    folderDirectory.map((item) => {
+      if (item.key === currentItem.key) {
+        newFolderDirectory.push(Object.assign({}, item, { active: true }));
+      } else {
+        newFolderDirectory.push(Object.assign({}, item, { active: false }));
+      }
+    });
+    if (this.props.folderMenuSelectCallback) {
+      this.props.folderMenuSelectCallback(currentItem, newFolderDirectory);
+    }
+  };
+
+  folderMenuHtml = () => {
+    const html = [];
+    const { folderDirectory } = this.props;
+    if (folderDirectory && folderDirectory.length > 0) {
+      // eslint-disable-next-line array-callback-return
+      folderDirectory.map((item) => {
+        html.push(
+          <dd
+            className={item.active ? 'active' : ''}
+            key={item.key}
+            onClick={() => {
+              this.handleClickFolderMenu(item);
+            }}
+          >
+            {item.label}
+          </dd>,
+        );
+      });
+    }
+    return html;
+  };
+  // 图片素材操作
+  handelCheckCallback = (items) => {
+    console.log('items:', items);
+    this.setState({
+      selectedMaterial: items,
+    });
+  };
+
+  // subTile
+  imageSubTitle = () => {
+    let html = '';
+    const { selectedType } = this.props;
+    // eslint-disable-next-line eqeqeq
+    if (selectedType == 'imageLink') {
+      html = '选择商品主图（选择1张图片）';
+      // eslint-disable-next-line eqeqeq
+    } else if (selectedType == 'additionalImageLinks') {
+      html = '商品附加图片（选择5张图片）';
+      // eslint-disable-next-line eqeqeq
+    } else if (selectedType == 'lifestyleImageLinks') {
+      html = '添加商品详情（最多选择20张图片）';
+    }
+    return html;
+  };
+  /*
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    console.log('nextProps folderDirectory:', nextProps.folderDirectory);
+    if (this.props.folderDirectory !== nextProps.folderDirectory || this.props.currentFolderDirectory !== nextProps.currentFolderDirectory) {
+      this.setState({
+        folderDirectory: nextProps.folderDirectory,
+        currentFolderDirectory: nextProps.currentFolderDirectory,
+      });
+    }
+  }
+  */
 
   render() {
-    const { attribute_name, attribute_value } = this.state;
+    const { currentFolderDirectory, imageLimitNum } = this.props;
+    console.log('imageLimitNum:', imageLimitNum);
     return (
       <div className="image-select-modal">
         <Modal
+          className="wrap-select-modal"
           title="选择图片素材 "
           open={this.props.open}
-          width={900}
+          width={1100}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
-          <div className="content imglist-modal">
+          <div className="content">
             <Row>
-              <Col span={4}>
-                <Menu items={items}></Menu>
+              <Col span={5}>
+                <div className="folder-menu">
+                  <dl>
+                    <dt>
+                      <FolderOpenOutlined /> 文件目录
+                    </dt>
+                    {this.folderMenuHtml()}
+                  </dl>
+                </div>
               </Col>
-              <Col span={20}>
-                <div className="imglist">
-                  <div className="content">
-                    <div className="list-owflow">
-                      <ul className="list-ul">
-                        <li className="item">
-                          <div className="img-box">
-                            <img src={src} />
-                          </div>
-                          <div className="title">测试的得的得得得得得得</div>
-                        </li>
-                        <li className="item">
-                          <div className="img-box">
-                            <img src={src} />
-                          </div>
-                          <div className="title">测试的得的得得得得得得</div>
-                        </li>
-                        <li className="item">
-                          <div className="img-box">
-                            <img src={src} />
-                          </div>
-                          <div className="title">测试的得的得得得得得得</div>
-                        </li>
-                        <li className="item">
-                          <div className="img-box">
-                            <img src={src} />
-                          </div>
-                          <div className="title">测试的得的得得得得得得</div>
-                        </li>
-                        <li className="item">
-                          <div className="img-box">
-                            <img src={src} />
-                          </div>
-                          <div className="title">测试的得的得得得得得得</div>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+              <Col span={19}>
+                <div className="sub-title">{this.imageSubTitle()}</div>
+                <div className="imglist-modal">
+                  <ImgList
+                    limit={imageLimitNum}
+                    dataSource={
+                      (currentFolderDirectory &&
+                        currentFolderDirectory.data &&
+                        currentFolderDirectory.data.rows) ||
+                      []
+                    }
+                    onChangeCallback={this.handelCheckCallback}
+                  ></ImgList>
                 </div>
               </Col>
             </Row>

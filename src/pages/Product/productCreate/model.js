@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
+import { queryFolder, queryFolderMaterial } from '@/services/api/material';
 import {
   createProductMain,
   delProductMain,
@@ -12,6 +13,8 @@ export default {
   namespace: 'productCreate',
   state: {
     productMainTotal: 0,
+    folderDirectory: [],
+    currentFolderDirectory: {},
     languageOption: [
       { value: 'en-US', label: '英语' },
       { value: 'jp', label: '日语' },
@@ -184,6 +187,48 @@ export default {
         }
       }
     },
+
+    // 获取图片文件夹
+    *queryFolder({ payload }, { call, put, select }) {
+      const result = yield call(queryFolder);
+      if (result.status === 200 && result.data && result.data.rows) {
+        yield put({ type: 'update', payload: { folderDirectory: result.data.rows } });
+        yield put({ type: 'update', payload: { currentFolderDirectory: result.data.rows[0] } });
+        // 初始化默认文件夹素材
+        yield put({ type: 'queryFolderMaterial', payload: { ...result.data.rows[0] } });
+      }
+    },
+    // 获取图片素材
+    *queryFolderMaterial({ payload: data }, { call, put, select }) {
+      const { folderDirectory, currentFolderDirectory } = yield select(
+        (state) => state.productCreate,
+      );
+      const result = yield call(queryFolderMaterial, data);
+      if (result.status === 200 && result.data) {
+        console.log('queryFolderMaterial:', result);
+        // eslint-disable-next-line array-callback-return
+        folderDirectory.map((item, idx) => {
+          if (item.key === data.key) {
+            folderDirectory[idx] = Object.assign({}, item, { data: result.data });
+          }
+        });
+        console.log('folderDirectory:', folderDirectory);
+        yield put({
+          type: 'update',
+          payload: {
+            folderDirectory,
+            currentFolderDirectory: Object.assign({}, currentFolderDirectory, {
+              data: result.data,
+            }),
+          },
+        });
+      }
+    },
+    *createProduct({ payload: data }, { call, put, select }) {},
+    *queryProductAll({ payload: data }, { call, put, select }) {},
+    *editProduct({ payload: data }, { call, put, select }) {},
+    *delProduct({ payload: data }, { call, put, select }) {},
+    *queryProductDetail({ payload: data }, { call, put, select }) {},
   },
 
   reducers: {

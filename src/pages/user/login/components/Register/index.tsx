@@ -1,4 +1,3 @@
-import { Footer } from '@/components';
 import { register } from '@/services/api/login';
 import {
   AlipayCircleOutlined,
@@ -249,7 +248,6 @@ const Register: React.FC = () => {
           </div>
         </LoginForm>
       </div>
-      <Footer />
     </div>
   );
 };

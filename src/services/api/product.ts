@@ -38,6 +38,7 @@ export const queryProductMainDetail = async (params?: { [key: string]: any }) =>
     data: params,
   });
 };
+
 /** 创建语言商品 */
 export const createProduct = async (params?: { [key: string]: any }) => {
   return request<{ data: any }>('/api/product/createProduct', {

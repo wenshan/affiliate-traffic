@@ -7,6 +7,8 @@ export default {
   namespace: 'productDetail',
   state: {
     productDetail: {},
+    folderDirectory: [],
+    currentFolderDirectory: {},
   },
 
   subscriptions: {

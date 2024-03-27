@@ -2,7 +2,6 @@ import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { Button, Col, Modal, Row } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'umi';
-import FolderDirectory from './components/FolderDirectory';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
 
@@ -26,10 +25,6 @@ class Material extends Component {
   handelFolderCancel = () => {
     this.setState({
       folderOpenStatus: false,
-      currentFolderDirectory: {
-        label: '',
-        key: '',
-      },
     });
   };
   handelFolderOk = (currentItem) => {
@@ -40,6 +35,12 @@ class Material extends Component {
         currentFolderDirectory: currentItem,
       },
       () => {
+        this.props.dispatch({
+          type: 'material/update',
+          payload: {
+            currentFolderDirectory: currentItem,
+          },
+        });
         if (optionAction === 1) {
           this.props.dispatch({
             type: 'material/editFolder',
@@ -115,6 +116,13 @@ class Material extends Component {
       type: 'material/update',
       payload: {
         folderDirectory: newFolderDirectory,
+        currentFolderDirectory: currentItem,
+      },
+    });
+    this.props.dispatch({
+      type: 'material/queryFolderMaterial',
+      payload: {
+        ...currentItem,
       },
     });
   };
@@ -162,12 +170,44 @@ class Material extends Component {
     }
     return html;
   };
+
+  delMaterialCallback = (item) => {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+    Modal.confirm({
+      title: '确认删除',
+      content: '删除当前的素材',
+      onOk() {
+        self.props.dispatch({
+          type: 'material/delMaterial',
+          payload: {
+            ...item,
+          },
+        });
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+  handelUploadOk = () => {
+    this.props.dispatch({
+      type: 'material/queryFolder',
+    });
+  };
+  handelUploadFailed = () => {};
+  handelCheckCallback = (items) => {
+    console.log('items:', items);
+  };
+
   componentDidMount() {
     this.props.dispatch({
       type: 'material/queryFolder',
     });
   }
   render() {
+    console.log('this.props:', this.props);
+    const { currentFolderDirectory } = this.props.material;
     return (
       <div className="material">
         <div className="content">
@@ -188,16 +228,23 @@ class Material extends Component {
                   <Button icon={<FolderAddOutlined />} onClick={this.handelCreateFolder}>
                     新建文件目录
                   </Button>
-                  <UploadFile></UploadFile>
+                  <UploadFile
+                    callbackOk={this.handelUploadOk}
+                    callbackFailed={this.handelUploadFailed}
+                    data={currentFolderDirectory}
+                  ></UploadFile>
                 </div>
-                <ImgList></ImgList>
-                <FolderDirectory
-                  open={this.state.folderOpenStatus}
-                  optionAction={this.state.optionAction}
-                  callbackOk={this.handelFolderOk}
-                  callbackCancel={this.handelFolderCancel}
-                  currentFolderDirectory={this.state.currentFolderDirectory}
-                ></FolderDirectory>
+                <ImgList
+                  dataSource={
+                    (currentFolderDirectory &&
+                      currentFolderDirectory.data &&
+                      currentFolderDirectory.data.rows) ||
+                    []
+                  }
+                  delMaterialCallback={this.delMaterialCallback}
+                  checked={['1085370435/22159932/limeet_logo_绿色.png']}
+                  onChangeCallback={this.handelCheckCallback}
+                ></ImgList>
               </div>
             </Col>
           </Row>

@@ -1,4 +1,3 @@
-import { Footer } from '@/components';
 import { login } from '@/services/api/login';
 import {
   AlipayCircleOutlined,
@@ -249,7 +248,6 @@ const Login: React.FC = () => {
           </div>
         </LoginForm>
       </div>
-      <Footer />
     </div>
   );
 };

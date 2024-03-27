@@ -1,6 +1,13 @@
 /* eslint-disable no-undef */
 /* @ts-ignore */
-import { createFolder, delFolder, editFolder, queryFolder } from '@/services/api/material';
+import {
+  createFolder,
+  delFolder,
+  delMaterial,
+  editFolder,
+  queryFolder,
+  queryFolderMaterial,
+} from '@/services/api/material';
 
 export default {
   namespace: 'material',
@@ -34,24 +41,10 @@ export default {
         key: '0',
         is_default: true,
         active: true,
-      },
-      {
-        label: '分组一',
-        key: '1',
-        is_default: false,
-        active: false,
-      },
-      {
-        label: '分组二',
-        key: '2',
-        is_default: false,
-        active: false,
-      },
-      {
-        label: '分组三',
-        key: '3',
-        is_default: false,
-        active: false,
+        data: {
+          count: 1,
+          rows: [],
+        },
       },
     ],
   },
@@ -63,6 +56,9 @@ export default {
       const result = yield call(queryFolder);
       if (result.status === 200 && result.data && result.data.rows) {
         yield put({ type: 'update', payload: { folderDirectory: result.data.rows } });
+        yield put({ type: 'update', payload: { currentFolderDirectory: result.data.rows[0] } });
+        // 初始化默认文件夹素材
+        yield put({ type: 'queryFolderMaterial', payload: { ...result.data.rows[0] } });
       }
     },
     // subscriptions 更新当前的用户信息
@@ -81,6 +77,34 @@ export default {
     },
     *createFolder({ payload: data }, { call, put, select }) {
       const result = yield call(createFolder, data);
+      if (result.status === 200 && result.data) {
+        yield put({ type: 'queryFolder' });
+      }
+    },
+    *queryFolderMaterial({ payload: data }, { call, put, select }) {
+      const { folderDirectory, currentFolderDirectory } = yield select((state) => state.material);
+      const result = yield call(queryFolderMaterial, data);
+      if (result.status === 200 && result.data) {
+        console.log('queryFolderMaterial:', result);
+        // eslint-disable-next-line array-callback-return
+        folderDirectory.map((item, idx) => {
+          if (item.key === data.key) {
+            folderDirectory[idx] = Object.assign({}, item, { data: result.data });
+          }
+        });
+        yield put({
+          type: 'update',
+          payload: {
+            folderDirectory,
+            currentFolderDirectory: Object.assign({}, currentFolderDirectory, {
+              data: result.data,
+            }),
+          },
+        });
+      }
+    },
+    *delMaterial({ payload: data }, { call, put, select }) {
+      const result = yield call(delMaterial, data);
       if (result.status === 200 && result.data) {
         yield put({ type: 'queryFolder' });
       }

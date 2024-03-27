@@ -31,6 +31,20 @@ export const queryFolder = async (params?: { [key: string]: any }) => {
   });
 };
 
+export const queryFolderMaterial = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/material/queryFolderMaterial', {
+    method: 'POST',
+    data: params,
+  });
+};
+//
+export const delMaterial = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/material/delMaterial', {
+    method: 'POST',
+    data: params,
+  });
+};
+
 /** 获取规则列表 GET /api/rule */
 export async function rule(
   params: {
