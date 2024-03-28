@@ -14,7 +14,7 @@ class ImgList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: props.dataSource,
+      imageList: props.dataSource,
       limit: props.limit || 20,
     };
   }
@@ -40,29 +40,28 @@ class ImgList extends Component {
   };
 
   handelSelectCurrent = (currentItem) => {
-    const { data, limit } = this.state;
-    console.log(currentItem);
+    const { imageList, limit } = this.state;
     const checkedData = [];
     // 单选
     if (limit === 1) {
       // eslint-disable-next-line array-callback-return
-      data.map((item: any[], idx: number) => {
+      imageList.map((item: any[], idx: number) => {
         if (item.keys === currentItem.keys) {
-          data[idx] = Object.assign({}, item, { current: true });
+          imageList[idx] = Object.assign({}, item, { current: true });
           checkedData.push(Object.assign({}, item, { current: true }));
         } else {
-          data[idx] = Object.assign({}, item, { current: false });
+          imageList[idx] = Object.assign({}, item, { current: false });
           checkedData.push(item);
         }
       });
     } else {
       // eslint-disable-next-line array-callback-return
-      data.map((item: any[], idx: number) => {
+      imageList.map((item: any[], idx: number) => {
         if (item.keys === currentItem.keys) {
           if (currentItem.current) {
-            data[idx] = Object.assign({}, item, { current: false });
+            imageList[idx] = Object.assign({}, item, { current: false });
           } else {
-            data[idx] = Object.assign({}, item, { current: true });
+            imageList[idx] = Object.assign({}, item, { current: true });
             checkedData.push(Object.assign({}, item, { current: true }));
           }
         } else {
@@ -80,7 +79,7 @@ class ImgList extends Component {
 
     this.setState(
       {
-        data,
+        imageList,
       },
       () => {
         if (this.props.onChangeCallback) {
@@ -92,11 +91,11 @@ class ImgList extends Component {
 
   htmlLi = () => {
     const html: React.JSX.Element[] = [];
-    const { data } = this.state;
+    const { imageList } = this.state;
     // eslint-disable-next-line array-callback-return
-    data &&
-      data.length &&
-      data.map((item: { url: string | undefined; keys: string }) => {
+    imageList &&
+      imageList.length &&
+      imageList.map((item: { url: string | undefined; keys: string }) => {
         html.push(
           <li className="item" key={item.keys}>
             <div className={item.current ? 'style current' : 'style'}>
@@ -131,33 +130,8 @@ class ImgList extends Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     console.log('nextProps:', nextProps);
     if (nextProps.dataSource !== this.props.dataSource) {
-      const dataObject = {};
-      const rows = [];
-      // eslint-disable-next-line array-callback-return
-      nextProps.dataSource &&
-        nextProps.dataSource.length &&
-        nextProps.dataSource.map((item: { keys: string }) => {
-          if (item.keys) {
-            dataObject[item.keys] = Object.assign({}, item);
-          }
-        });
-      if (nextProps.checked) {
-        // eslint-disable-next-line array-callback-return
-        nextProps.checked &&
-          nextProps.checked.length &&
-          nextProps.checked.map((item: string | number) => {
-            if (dataObject[item]) {
-              dataObject[item] = Object.assign({}, dataObject[item], { current: true });
-            }
-          });
-      }
-      // eslint-disable-next-line guard-for-in
-      for (let key in dataObject) {
-        dataObject[key] && rows.push(dataObject[key]);
-      }
-      console.log('rows:', rows);
       this.setState({
-        data: rows,
+        imageList: nextProps.dataSource,
         checked: nextProps.checked,
         limit: nextProps.limit,
       });

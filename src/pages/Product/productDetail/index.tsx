@@ -8,9 +8,9 @@ import ProductAttribute from '../components/ProductAttribute';
 import './index.less';
 
 const { TextArea } = Input;
-@connect(({ productCreate, productDetail, material }) => ({
-  productCreate,
-  productDetail,
+@connect(({ product, common, material }) => ({
+  product,
+  common,
   material,
 }))
 class ProductDetail extends Component {
@@ -28,7 +28,7 @@ class ProductDetail extends Component {
   languageRadioHandle = (event) => {
     console.log(event);
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         language: event.target.value,
       },
@@ -38,7 +38,7 @@ class ProductDetail extends Component {
   monetaryUnitSelectHandle = (event, option) => {
     console.log(event, option);
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         monetary_unit: option,
       },
@@ -48,7 +48,7 @@ class ProductDetail extends Component {
   titleInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         title: value,
       },
@@ -58,7 +58,7 @@ class ProductDetail extends Component {
   linkInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         link: value,
       },
@@ -68,7 +68,7 @@ class ProductDetail extends Component {
   mobileLinkInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         mobile_link: value,
       },
@@ -78,7 +78,7 @@ class ProductDetail extends Component {
   priceInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         price: value,
       },
@@ -88,7 +88,7 @@ class ProductDetail extends Component {
   salePriceInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         salePrice: value,
       },
@@ -98,7 +98,7 @@ class ProductDetail extends Component {
   productHighlightInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         product_highlight: value,
       },
@@ -108,7 +108,7 @@ class ProductDetail extends Component {
   descriptionTextAreaHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         description: value,
       },
@@ -118,7 +118,7 @@ class ProductDetail extends Component {
   productLengthInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         product_length: value,
       },
@@ -127,7 +127,7 @@ class ProductDetail extends Component {
   productWidthInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         product_width: value,
       },
@@ -136,7 +136,7 @@ class ProductDetail extends Component {
   productHeightInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         product_height: value,
       },
@@ -146,7 +146,7 @@ class ProductDetail extends Component {
   productWeightInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         product_weight: value,
       },
@@ -156,7 +156,7 @@ class ProductDetail extends Component {
   shippingLengthInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         shipping_length: value,
       },
@@ -165,7 +165,7 @@ class ProductDetail extends Component {
   shippingWidthInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         shipping_width: value,
       },
@@ -174,7 +174,7 @@ class ProductDetail extends Component {
   shippingHeightInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         shipping_height: value,
       },
@@ -184,7 +184,7 @@ class ProductDetail extends Component {
   shipsFromCountryInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         ships_from_country: value,
       },
@@ -194,7 +194,7 @@ class ProductDetail extends Component {
   brandInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         brand: value,
       },
@@ -204,7 +204,7 @@ class ProductDetail extends Component {
   materialInputHandle = (e) => {
     const { value } = e.target;
     this.props.dispatch({
-      type: 'productCreate/updateProduct',
+      type: 'product/updateProduct',
       payload: {
         material: value,
       },
@@ -244,7 +244,7 @@ class ProductDetail extends Component {
 
     if (currentImageProductType === 'imageLink') {
       this.props.dispatch({
-        type: 'productCreate/updateProduct',
+        type: 'product/updateProduct',
         payload: {
           imageLink: imageSrc[0],
         },
@@ -252,7 +252,7 @@ class ProductDetail extends Component {
     }
     if (currentImageProductType === 'additionalImageLinks') {
       this.props.dispatch({
-        type: 'productCreate/updateProduct',
+        type: 'product/updateProduct',
         payload: {
           additionalImageLinks: imageSrc,
         },
@@ -260,7 +260,7 @@ class ProductDetail extends Component {
     }
     if (currentImageProductType === 'lifestyleImageLinks') {
       this.props.dispatch({
-        type: 'productCreate/updateProduct',
+        type: 'product/updateProduct',
         payload: {
           lifestyleImageLinks: imageSrc,
         },
@@ -273,24 +273,25 @@ class ProductDetail extends Component {
   };
 
   imageSelectModel = (type: string, imageLimitNum: number) => {
-    console.log(type);
     this.setState({
       isProductImageModal: true,
       currentImageProductType: type,
       imageLimitNum,
     });
+    this.props.dispatch({
+      type: 'material/queryFolder',
+    });
   };
 
   handelFolderMenuSelect = (currentItem: any, folderDirectory: any) => {
-    console.log('folderDirectory:====', folderDirectory);
     this.props.dispatch({
-      type: 'productCreate/update',
+      type: 'material/update',
       payload: {
         folderDirectory,
       },
     });
     this.props.dispatch({
-      type: 'productCreate/queryFolderMaterial',
+      type: 'material/queryFolderMaterial',
       payload: {
         ...currentItem,
       },
@@ -305,7 +306,7 @@ class ProductDetail extends Component {
       data.map((item: string) => {
         html.push(
           <>
-            <div className="add-img-item">
+            <div className="add-img-item" key={item.keys}>
               <Image width={100} src={item} />
             </div>
           </>,
@@ -313,11 +314,7 @@ class ProductDetail extends Component {
       });
     return html;
   };
-  componentDidMount() {
-    this.props.dispatch({
-      type: 'productCreate/queryFolder',
-    });
-  }
+  componentDidMount() {}
 
   render() {
     const columnsProductAttribute = [
@@ -360,14 +357,9 @@ class ProductDetail extends Component {
         },
       },
     ];
-    const {
-      monetaryUnitOption,
-      languageOption,
-      productDetail,
-      productAttributeOption,
-      folderDirectory,
-      currentFolderDirectory,
-    } = this.props.productCreate;
+    const { monetaryUnitOption, languageOption, productDetail, productAttributeOption } =
+      this.props.product;
+    const { folderDirectory, imageList } = this.props.material;
     const {
       language,
       monetary_unit,
@@ -682,7 +674,7 @@ class ProductDetail extends Component {
           callbackCancel={this.productImageCallbackCancel}
           callbackOk={this.productImageCallbackOk}
           folderDirectory={folderDirectory}
-          currentFolderDirectory={currentFolderDirectory}
+          imageList={imageList}
           folderMenuSelectCallback={this.handelFolderMenuSelect}
           selectedType={this.state.currentImageProductType}
           imageLimitNum={this.state.imageLimitNum}

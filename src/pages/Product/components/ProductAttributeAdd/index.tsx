@@ -48,9 +48,9 @@ class ProductAttribute extends Component {
   render() {
     const { attribute_name, attribute_value } = this.state;
     return (
-      <div className="product-attribute">
+      <div className="product-attribute-add">
         <Modal
-          title="商品属性管理"
+          title="添加商品属性 "
           open={this.props.open}
           width={500}
           onOk={this.handleOk}

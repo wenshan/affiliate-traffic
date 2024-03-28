@@ -8,10 +8,8 @@ import './index.less';
 class ImageSelectModal extends Component {
   constructor(props) {
     super(props);
-    console.log('props:', props);
     this.state = {
       folderDirectory: props.folderDirectory,
-      currentFolderDirectory: props.currentFolderDirectory,
       limit: props.imageLimitNum,
       selectedMaterial: [],
     };
@@ -77,7 +75,6 @@ class ImageSelectModal extends Component {
   };
   // 图片素材操作
   handelCheckCallback = (items) => {
-    console.log('items:', items);
     this.setState({
       selectedMaterial: items,
     });
@@ -99,6 +96,7 @@ class ImageSelectModal extends Component {
     }
     return html;
   };
+
   /*
   UNSAFE_componentWillReceiveProps(nextProps) {
     console.log('nextProps folderDirectory:', nextProps.folderDirectory);
@@ -112,8 +110,7 @@ class ImageSelectModal extends Component {
   */
 
   render() {
-    const { currentFolderDirectory, imageLimitNum } = this.props;
-    console.log('imageLimitNum:', imageLimitNum);
+    const { imageLimitNum, imageList } = this.props;
     return (
       <div className="image-select-modal">
         <Modal
@@ -141,12 +138,7 @@ class ImageSelectModal extends Component {
                 <div className="imglist-modal">
                   <ImgList
                     limit={imageLimitNum}
-                    dataSource={
-                      (currentFolderDirectory &&
-                        currentFolderDirectory.data &&
-                        currentFolderDirectory.data.rows) ||
-                      []
-                    }
+                    dataSource={imageList || []}
                     onChangeCallback={this.handelCheckCallback}
                   ></ImgList>
                 </div>

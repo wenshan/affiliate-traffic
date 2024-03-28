@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* @ts-ignore */
+
 import { googleGetToken, googleGetUserinfo } from '@/services/api/login';
 import QueryString from 'query-string';
 export default {

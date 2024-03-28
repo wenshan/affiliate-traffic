@@ -1,20 +1,19 @@
-/* eslint-disable no-undef */
+/* eslint-disable */
 /* @ts-ignore */
-import { queryFolder, queryFolderMaterial } from '@/services/api/material';
+
 import {
   createProductMain,
   delProductMain,
   editProductMain,
   queryProductMainAll,
 } from '@/services/api/product';
+import { cerateType, delType, editType, queryType } from '@/services/api/productType';
 import QueryString from 'query-string';
 
 export default {
-  namespace: 'productCreate',
+  namespace: 'product',
   state: {
     productMainTotal: 0,
-    folderDirectory: [],
-    currentFolderDirectory: {},
     languageOption: [
       { value: 'en-US', label: '英语' },
       { value: 'jp', label: '日语' },
@@ -29,16 +28,11 @@ export default {
       { value: 'CAD', label: '加拿大' },
       { value: 'AUD', label: '澳大利亚' },
     ],
-    productTypeOption: [
-      { value: '1', label: 'Jack' },
-      { value: '4536', label: 'Lucy' },
-      { value: '3', label: 'yiminghe' },
-      { value: '4', label: 'Disabled' },
-    ],
+    productTypeOption: [],
     googleProductCategoryOption: {},
     currentProductMain: {
       title: '',
-      product_type_id: '',
+      product_type_id: { key: '', title: '' },
       offer_id: '',
       google_product_category: {
         key: 632,
@@ -137,7 +131,7 @@ export default {
       if (title && google_product_category) {
         const result = yield call(editProductMain, {
           title,
-          product_type_id,
+          product_type_id: JSON.stringify(product_type_id),
           offer_id,
           google_product_category: JSON.stringify(google_product_category),
           gtin,
@@ -160,6 +154,7 @@ export default {
           const productMainList = result.data.rows.map((item) =>
             Object.assign({}, item, {
               google_product_category: JSON.parse(item.google_product_category),
+              product_type_id: JSON.parse(item.product_type_id),
             }),
           );
           yield put({
@@ -174,7 +169,7 @@ export default {
       if (title && google_product_category) {
         const result = yield call(createProductMain, {
           title,
-          product_type_id,
+          product_type_id: JSON.stringify(product_type_id),
           offer_id,
           google_product_category: JSON.stringify(google_product_category),
           gtin,
@@ -187,43 +182,59 @@ export default {
         }
       }
     },
-
-    // 获取图片文件夹
-    *queryFolder({ payload }, { call, put, select }) {
-      const result = yield call(queryFolder);
-      if (result.status === 200 && result.data && result.data.rows) {
-        yield put({ type: 'update', payload: { folderDirectory: result.data.rows } });
-        yield put({ type: 'update', payload: { currentFolderDirectory: result.data.rows[0] } });
-        // 初始化默认文件夹素材
-        yield put({ type: 'queryFolderMaterial', payload: { ...result.data.rows[0] } });
+    // 商品分类
+    *cerateType({ payload: data }, { call, put, select }) {
+      const { title } = data;
+      if (title) {
+        const result = yield call(cerateType, { title });
+        if (result && result.status && result.status === 200) {
+          yield put({ type: 'queryType' });
+          console.log('添加商品分类成功');
+        }
       }
     },
-    // 获取图片素材
-    *queryFolderMaterial({ payload: data }, { call, put, select }) {
-      const { folderDirectory, currentFolderDirectory } = yield select(
-        (state) => state.productCreate,
-      );
-      const result = yield call(queryFolderMaterial, data);
-      if (result.status === 200 && result.data) {
-        console.log('queryFolderMaterial:', result);
-        // eslint-disable-next-line array-callback-return
-        folderDirectory.map((item, idx) => {
-          if (item.key === data.key) {
-            folderDirectory[idx] = Object.assign({}, item, { data: result.data });
-          }
+    *editType({ payload: data }, { call, put, select }) {
+      const { key, title } = data;
+      if (key && title) {
+        const result = yield call(editType, { ...data });
+        if (result && result.status && result.status === 200) {
+          yield put({ type: 'queryType' });
+          console.log('编辑商品分类成功');
+        }
+      }
+    },
+    *delType({ payload: data }, { call, put, select }) {
+      const { key } = data;
+      if (key) {
+        const result = yield call(delType, { key });
+        if (result && result.status && result.status === 200) {
+          yield put({ type: 'queryType' });
+          console.log('删除商品分类成功');
+        }
+      }
+    },
+    *queryType({ payload: data }, { call, put, select }) {
+      const { currentProductMain } = yield select((state) => state.product);
+      const result = yield call(queryType);
+      if (result && result.status && result.status === 200 && result.data.rows) {
+        const newCurrentProductMain = Object.assign({}, currentProductMain, {
+          product_type_id: result.data.rows[0],
         });
-        console.log('folderDirectory:', folderDirectory);
         yield put({
           type: 'update',
           payload: {
-            folderDirectory,
-            currentFolderDirectory: Object.assign({}, currentFolderDirectory, {
-              data: result.data,
-            }),
+            productTypeOption: result.data.rows,
+            currentProductMain: newCurrentProductMain,
           },
         });
       }
     },
+    // 商品属性
+    *cerateAttr({ payload: data }, { call, put, select }) {},
+    *editAttr({ payload: data }, { call, put, select }) {},
+    *delAttr({ payload: data }, { call, put, select }) {},
+    *queryAttr({ payload: data }, { call, put, select }) {},
+    // 商品SKU
     *createProduct({ payload: data }, { call, put, select }) {},
     *queryProductAll({ payload: data }, { call, put, select }) {},
     *editProduct({ payload: data }, { call, put, select }) {},

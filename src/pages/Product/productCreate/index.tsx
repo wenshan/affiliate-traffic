@@ -6,8 +6,10 @@ import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';
 
-@connect(({ productCreate }) => ({
-  productCreate,
+@connect(({ product, common, material }) => ({
+  product,
+  common,
+  material,
 }))
 class ProductCreate extends Component {
   constructor(props) {
@@ -30,36 +32,64 @@ class ProductCreate extends Component {
       isCreateMainModalShow: false,
     });
   };
-  createMainModalCallbackOk = (params) => {
+  createMainModalCallbackOk = (currentProductMain) => {
     const { currentOptionActionStatus } = this.state;
+    console.log('currentProductMain:', currentProductMain);
     this.setState(
       {
         isCreateMainModalShow: false,
       },
       () => {
         this.props.dispatch({
-          type: 'productCreate/update',
+          type: 'product/update',
           payload: {
-            currentProductMain: params,
+            currentProductMain,
           },
         });
         if (currentOptionActionStatus === 0) {
           this.props.dispatch({
-            type: 'productCreate/createProductMain',
+            type: 'product/createProductMain',
             payload: {
-              ...params,
+              ...currentProductMain,
             },
           });
         } else {
           this.props.dispatch({
-            type: 'productCreate/editProductMain',
+            type: 'product/editProductMain',
             payload: {
-              ...params,
+              ...currentProductMain,
             },
           });
         }
       },
     );
+  };
+  // 添加新产品分类
+  handelAddProductType = (item, type) => {
+    if (type) {
+      this.props.dispatch({
+        type: 'product/editType',
+        payload: {
+          ...item,
+        },
+      });
+    } else {
+      this.props.dispatch({
+        type: 'product/cerateType',
+        payload: {
+          ...item,
+        },
+      });
+    }
+  };
+  // 删除商品分类
+  handelDelProductType = (item) => {
+    this.props.dispatch({
+      type: 'product/delType',
+      payload: {
+        ...item,
+      },
+    });
   };
 
   // table
@@ -70,7 +100,7 @@ class ProductCreate extends Component {
   handelTableEdit = (record) => {
     console.log('record:', record);
     this.props.dispatch({
-      type: 'productCreate/update',
+      type: 'product/update',
       payload: {
         currentProductMain: record,
       },
@@ -89,7 +119,7 @@ class ProductCreate extends Component {
       content: '删除当前的主产品信息，所包含的多语言产品数据一并删除。',
       onOk() {
         self.props.dispatch({
-          type: 'productCreate/delProductMain',
+          type: 'product/delProductMain',
           payload: {
             ...record,
           },
@@ -109,7 +139,7 @@ class ProductCreate extends Component {
       },
       () => {
         this.props.dispatch({
-          type: 'productCreate/queryProductMainAll',
+          type: 'product/queryProductMainAll',
           payload: {
             pageSize,
             current: page,
@@ -122,17 +152,20 @@ class ProductCreate extends Component {
   componentDidMount() {
     const { pageSize, current } = this.state;
     this.props.dispatch({
-      type: 'productCreate/queryProductMainAll',
+      type: 'product/queryProductMainAll',
       payload: {
         pageSize,
         current,
       },
     });
+    this.props.dispatch({
+      type: 'product/queryType',
+    });
   }
 
   render() {
     const { productTypeOption, currentProductMain, productMainList, productMainTotal } =
-      this.props.productCreate;
+      this.props.product;
     const { pageSize, current, currentOptionActionStatus } = this.state;
     const columns = [
       {
@@ -144,16 +177,8 @@ class ProductCreate extends Component {
         title: '自定商品分类',
         dataIndex: 'product_type_id',
         key: 'product_type_id',
-        render: (text: any) => {
-          let name = '-';
-          // eslint-disable-next-line array-callback-return
-          productTypeOption.map((item: { value: any; label: any }) => {
-            if (Number(item.value) === text) {
-              name = item.label;
-              // return;
-            }
-          });
-          return name;
+        render: (text: any, record: any) => {
+          return record.product_type_id.title || '-';
         },
       },
       {
@@ -212,7 +237,6 @@ class ProductCreate extends Component {
         },
       },
     ];
-
     return (
       <PageContainer>
         <div className="page">
@@ -245,6 +269,8 @@ class ProductCreate extends Component {
                 callbackCancel={this.createMainModalCallbackCancel}
                 callbackOk={this.createMainModalCallbackOk}
                 optionAction={currentOptionActionStatus}
+                callbackAddProductType={this.handelAddProductType}
+                callbackDelProductType={this.handelDelProductType}
               ></CreateMainModal>
             </div>
           </div>

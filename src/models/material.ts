@@ -1,5 +1,6 @@
-/* eslint-disable no-undef */
+/* eslint-disable */
 /* @ts-ignore */
+
 import {
   createFolder,
   delFolder,
@@ -29,6 +30,7 @@ export default {
       email: '',
       userid: '',
     },
+    imageList: [],
     currentFolderDirectory: {
       label: '默认分组',
       key: '0',
@@ -96,9 +98,7 @@ export default {
           type: 'update',
           payload: {
             folderDirectory,
-            currentFolderDirectory: Object.assign({}, currentFolderDirectory, {
-              data: result.data,
-            }),
+            imageList: result.data.rows,
           },
         });
       }

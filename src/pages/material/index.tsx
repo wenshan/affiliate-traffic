@@ -7,7 +7,9 @@ import UploadFile from './components/UploadFile';
 
 import './index.less';
 
-@connect(({ material }) => ({
+@connect(({ product, common, material }) => ({
+  product,
+  common,
   material,
 }))
 class Material extends Component {
@@ -207,7 +209,7 @@ class Material extends Component {
   }
   render() {
     console.log('this.props:', this.props);
-    const { currentFolderDirectory } = this.props.material;
+    const { currentFolderDirectory, imageList } = this.props.material;
     return (
       <div className="material">
         <div className="content">
@@ -235,12 +237,7 @@ class Material extends Component {
                   ></UploadFile>
                 </div>
                 <ImgList
-                  dataSource={
-                    (currentFolderDirectory &&
-                      currentFolderDirectory.data &&
-                      currentFolderDirectory.data.rows) ||
-                    []
-                  }
+                  dataSource={imageList || []}
                   delMaterialCallback={this.delMaterialCallback}
                   checked={['1085370435/22159932/limeet_logo_绿色.png']}
                   onChangeCallback={this.handelCheckCallback}
