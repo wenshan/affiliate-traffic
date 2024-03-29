@@ -28,9 +28,20 @@ class CustomProductType extends Component {
     }
   };
   handelTableDel = (record) => {
-    if (this.props.callbackDelOk) {
-      this.props.callbackDelOk(record);
-    }
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+    Modal.warning({
+      title: '确认删除',
+      content: '删除当前的商品属性',
+      onOk() {
+        if (self.props.callbackDelOk) {
+          self.props.callbackDelOk(record);
+        }
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   };
 
   handelTableAdd = () => {

@@ -94,7 +94,13 @@ class ProductCreate extends Component {
 
   // table
   handelTableCreateSku = (record) => {
-    history.push(`/product/productDetail?offer_id=${record.offer_id}`);
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        currentProductMain: record,
+      },
+    });
+    history.push(`/product/productDetail?product_main_id=${record.product_main_id}`);
   };
 
   handelTableEdit = (record) => {

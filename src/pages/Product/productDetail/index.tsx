@@ -226,6 +226,24 @@ class ProductDetail extends Component {
       isProductAttributeModal: false,
     });
   };
+  // 新增
+  productAttributeAddCallbackOk = (item) => {
+    this.props.dispatch({
+      type: 'product/cerateAttr',
+      payload: {
+        ...item,
+      },
+    });
+  };
+  // 删除
+  productAttributeDelCallbackOk = (item) => {
+    this.props.dispatch({
+      type: 'product/delAttr',
+      payload: {
+        ...item,
+      },
+    });
+  };
 
   productImageCallbackCancel = () => {
     this.setState({
@@ -314,7 +332,11 @@ class ProductDetail extends Component {
       });
     return html;
   };
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'product/queryAttr',
+    });
+  }
 
   render() {
     const columnsProductAttribute = [
@@ -548,7 +570,7 @@ class ProductDetail extends Component {
                     商品属性:
                   </span>
                   <Button type="primary" size="small" onClick={this.productAttributeButtonHandle}>
-                    添加属性
+                    属性管理
                   </Button>
                 </div>
                 <div className="line-box">
@@ -668,6 +690,8 @@ class ProductDetail extends Component {
           open={this.state.isProductAttributeModal}
           callbackCancel={this.productAttributeCallbackCancel}
           callbackOk={this.productAttributeCallbackOk}
+          callbackAddOk={this.productAttributeAddCallbackOk}
+          callbackDelOk={this.productAttributeDelCallbackOk}
         ></ProductAttribute>
         <ImageSelectModal
           open={this.state.isProductImageModal}

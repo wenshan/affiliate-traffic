@@ -7,6 +7,7 @@ import {
   editProductMain,
   queryProductMainAll,
 } from '@/services/api/product';
+import { cerateAttr, delAttr, editAttr, queryAttr } from '@/services/api/productAttr';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
 import QueryString from 'query-string';
 
@@ -16,8 +17,8 @@ export default {
     productMainTotal: 0,
     languageOption: [
       { value: 'en-US', label: '英语' },
-      { value: 'jp', label: '日语' },
-      { value: 'kor', label: '韩语' },
+      { value: 'ja-JP', label: '日语' },
+      { value: 'ko_KR', label: '韩语' },
     ],
     monetaryUnitOption: [
       { value: 'USD', label: '美元' },
@@ -131,9 +132,9 @@ export default {
       if (title && google_product_category) {
         const result = yield call(editProductMain, {
           title,
-          product_type_id: JSON.stringify(product_type_id),
+          product_type_id,
           offer_id,
-          google_product_category: JSON.stringify(google_product_category),
+          google_product_category,
           gtin,
           product_main_id,
         });
@@ -151,27 +152,22 @@ export default {
         const result = yield call(queryProductMainAll, { current, pageSize });
         console.log('result:', result);
         if (result && result.status && result.status === 200 && result.data && result.data.rows) {
-          const productMainList = result.data.rows.map((item) =>
-            Object.assign({}, item, {
-              google_product_category: JSON.parse(item.google_product_category),
-              product_type_id: JSON.parse(item.product_type_id),
-            }),
-          );
           yield put({
             type: 'update',
-            payload: { productMainList, productMainTotal: result.data.count },
+            payload: { productMainList: result.data.rows, productMainTotal: result.data.count },
           });
         }
       }
     },
     *createProductMain({ payload }, { call, put, select }) {
       const { title, product_type_id, offer_id, google_product_category, gtin } = payload;
-      if (title && google_product_category) {
+      console.log(product_type_id, google_product_category);
+      if (title && google_product_category && product_type_id) {
         const result = yield call(createProductMain, {
           title,
-          product_type_id: JSON.stringify(product_type_id),
+          product_type_id,
           offer_id,
-          google_product_category: JSON.stringify(google_product_category),
+          google_product_category,
           gtin,
         });
         console.log('result:', result);
@@ -230,10 +226,60 @@ export default {
       }
     },
     // 商品属性
-    *cerateAttr({ payload: data }, { call, put, select }) {},
-    *editAttr({ payload: data }, { call, put, select }) {},
-    *delAttr({ payload: data }, { call, put, select }) {},
-    *queryAttr({ payload: data }, { call, put, select }) {},
+    *cerateAttr({ payload: data }, { call, put, select }) {
+      const { productDetail, currentProductMain } = yield select((state) => state.product);
+      const { product_main_id } = currentProductMain;
+      const { language } = productDetail;
+      const { attribute_name, attribute_value } = data;
+      if (attribute_value && attribute_name) {
+        const result = yield call(cerateAttr, {
+          attribute_name,
+          attribute_value,
+          language,
+          product_main_id,
+        });
+        if (result && result.status && result.status === 200) {
+          yield put({ type: 'queryAttr' });
+          console.log('添加商品分类成功');
+        }
+      }
+    },
+    *editAttr({ payload: data }, { call, put, select }) {
+      const { key, attribute_name, attribute_value } = data;
+      if (key && attribute_name && attribute_value) {
+        const result = yield call(editAttr, { ...data });
+        if (result && result.status && result.status === 200) {
+          yield put({ type: 'queryAttr' });
+          console.log('编辑商品分类成功');
+        }
+      }
+    },
+    *delAttr({ payload: data }, { call, put, select }) {
+      const { key } = data;
+      if (key) {
+        const result = yield call(delAttr, { key });
+        if (result && result.status && result.status === 200) {
+          yield put({ type: 'queryAttr' });
+          console.log('删除商品分类成功');
+        }
+      }
+    },
+    *queryAttr({ payload: data }, { call, put, select }) {
+      const { productDetail } = yield select((state) => state.product);
+      const result = yield call(queryAttr);
+      if (result && result.status && result.status === 200 && result.data.rows) {
+        const newProductDetail = Object.assign({}, productDetail, {
+          product_detail: result.data.rows[0],
+        });
+        yield put({
+          type: 'update',
+          payload: {
+            productAttributeOption: result.data.rows,
+            productDetail: newProductDetail,
+          },
+        });
+      }
+    },
     // 商品SKU
     *createProduct({ payload: data }, { call, put, select }) {},
     *queryProductAll({ payload: data }, { call, put, select }) {},
