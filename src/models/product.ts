@@ -16,7 +16,7 @@ import {
   queryProductMainAll,
 } from '@/services/api/productMain';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
-import { message, Modal } from 'antd';
+import { Modal, message } from 'antd';
 import QueryString from 'query-string';
 import { history } from 'umi';
 
@@ -162,7 +162,8 @@ export default {
       }
     },
     *editProductMain({ payload }, { call, put, select }) {
-      const { id, title, offer_id, google_product_category, gtin, product_main_id } = payload;
+      const { id, title, offer_id, google_product_category, gtin, product_main_id, brand } =
+        payload;
       if (title && google_product_category) {
         const result = yield call(editProductMain, {
           title,
@@ -170,6 +171,7 @@ export default {
           google_product_category,
           gtin,
           product_main_id,
+          brand,
         });
         console.log('result:', result);
         if (result && result.status && result.status === 200) {
@@ -197,7 +199,7 @@ export default {
       }
     },
     *createProductMain({ payload }, { call, put, select }) {
-      const { title, product_type_id, offer_id, google_product_category, gtin } = payload;
+      const { title, product_type_id, offer_id, google_product_category, gtin, brand } = payload;
       console.log(product_type_id, google_product_category);
       if (title && google_product_category && product_type_id) {
         const result = yield call(createProductMain, {
@@ -206,6 +208,7 @@ export default {
           offer_id,
           google_product_category,
           gtin,
+          brand,
         });
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
