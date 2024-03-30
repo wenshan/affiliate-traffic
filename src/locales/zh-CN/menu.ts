@@ -54,5 +54,5 @@ export default {
   'menu.product.productCreate': '创建主商品',
   'menu.product.productEdit': '编辑商品',
   'menu.product.productList': '商品列表',
-  'menu.product.productDetail': '创建商品详情',
+  'menu.product.productCreateSku': '创建SKU商品',
 };

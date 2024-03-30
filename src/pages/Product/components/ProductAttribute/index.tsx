@@ -4,16 +4,16 @@ import { Component } from 'react';
 import './index.less';
 
 class ProductAttribute extends Component {
-  constructor(props) {
+  constructor(props: Readonly<object>) {
     super(props);
-    console.log('props:', props);
     this.state = {
-      currentProductType: [],
+      selectedRowsProductAttr: [],
       optionAddStatus: 0,
       currentProductAttribute: {
         attribute_name: '',
         attribute_value: '',
       },
+      selectedRowKeys: [],
       addOpen: false,
       open: false,
     };
@@ -21,9 +21,9 @@ class ProductAttribute extends Component {
 
   // Modal
   handleOk = () => {
-    const { currentProductMain } = this.state;
+    const { selectedRowsProductAttr } = this.state;
     if (this.props.callbackOk) {
-      this.props.callbackOk(currentProductMain);
+      this.props.callbackOk(selectedRowsProductAttr);
     }
   };
 
@@ -57,7 +57,7 @@ class ProductAttribute extends Component {
     });
   };
 
-  nameInputHandle = (event) => {
+  nameInputHandle = (event: { target: { value: any } }) => {
     const { value } = event.target;
     const { currentProductAttribute } = this.state;
     const newCurrentProductAttribute = Object.assign({}, currentProductAttribute, {
@@ -68,7 +68,7 @@ class ProductAttribute extends Component {
     });
   };
 
-  valueInputHandle = (event) => {
+  valueInputHandle = (event: { target: { value: any } }) => {
     const { value } = event.target;
     const { currentProductAttribute } = this.state;
     const newCurrentProductAttribute = Object.assign({}, currentProductAttribute, {
@@ -91,7 +91,7 @@ class ProductAttribute extends Component {
     });
   };
 
-  handelTableEdit = (record) => {
+  handelTableEdit = (record: any) => {
     this.setState({
       addOpen: true,
       optionAddStatus: 1,
@@ -99,7 +99,7 @@ class ProductAttribute extends Component {
     });
   };
 
-  handelTableDel = (record) => {
+  handelTableDel = (record: any) => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     Modal.confirm({
@@ -117,13 +117,35 @@ class ProductAttribute extends Component {
   };
 
   onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
+    console.log(selectedRowKeys, selectedRows);
     this.setState({
-      currentProductType: selectedRows,
+      selectedRowsProductAttr: selectedRows,
+      selectedRowKeys,
     });
   };
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.dataSource.product_detail) {
+      const selectedRowKeys: any[] = [];
+      const { product_detail } = nextProps.dataSource;
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      product_detail &&
+        product_detail.length &&
+        product_detail.map((item: { key: any }) => {
+          selectedRowKeys.push(item.key);
+        });
+      this.setState({
+        selectedRowKeys,
+      });
+    }
+  }
+
   render() {
     const { attribute_name, attribute_value } = this.state.currentProductAttribute;
+    const { productAttributeOption } = this.props.dataSource;
+    const { selectedRowKeys } = this.state;
+    console.log('productAttributeOption:', productAttributeOption);
+    console.log('selectedRowKeys:', selectedRowKeys);
     const columns = [
       {
         title: '属性名称',
@@ -175,6 +197,7 @@ class ProductAttribute extends Component {
     ];
 
     const rowSelection = {
+      selectedRowKeys,
       onChange: this.onChangeSelectedRows,
     };
     return (
@@ -187,7 +210,7 @@ class ProductAttribute extends Component {
           onCancel={this.handleCancel}
         >
           <Table
-            dataSource={this.props.dataSource.productAttributeOption}
+            dataSource={productAttributeOption}
             columns={columns}
             pagination={false}
             rowSelection={rowSelection}

@@ -13,7 +13,7 @@ const { TextArea } = Input;
   common,
   material,
 }))
-class ProductDetail extends Component {
+class ProductCreateSku extends Component {
   constructor(props) {
     super(props);
     console.log('props:', props);
@@ -26,7 +26,6 @@ class ProductDetail extends Component {
   }
   // 语言
   languageRadioHandle = (event) => {
-    console.log(event);
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
@@ -190,16 +189,6 @@ class ProductDetail extends Component {
       },
     });
   };
-  // 品牌
-  brandInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        brand: value,
-      },
-    });
-  };
   // 材料
   materialInputHandle = (e) => {
     const { value } = e.target;
@@ -212,19 +201,37 @@ class ProductDetail extends Component {
   };
 
   productAttributeButtonHandle = () => {
-    this.setState({
-      isProductAttributeModal: true,
-    });
+    this.setState(
+      {
+        isProductAttributeModal: true,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'product/queryAttr',
+        });
+      },
+    );
   };
   productAttributeCallbackCancel = () => {
     this.setState({
       isProductAttributeModal: false,
     });
   };
-  productAttributeCallbackOk = () => {
-    this.setState({
-      isProductAttributeModal: false,
-    });
+  productAttributeCallbackOk = (selectedRowsProductAttr) => {
+    console.log('selectedRowsProductAttr:', selectedRowsProductAttr);
+    this.setState(
+      {
+        isProductAttributeModal: false,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'product/updateProduct',
+          payload: {
+            product_detail: selectedRowsProductAttr,
+          },
+        });
+      },
+    );
   };
   // 新增
   productAttributeAddCallbackOk = (item) => {
@@ -268,19 +275,19 @@ class ProductDetail extends Component {
         },
       });
     }
-    if (currentImageProductType === 'additionalImageLinks') {
+    if (currentImageProductType === 'additional_image_link') {
       this.props.dispatch({
         type: 'product/updateProduct',
         payload: {
-          additionalImageLinks: imageSrc,
+          additional_image_link: imageSrc,
         },
       });
     }
-    if (currentImageProductType === 'lifestyleImageLinks') {
+    if (currentImageProductType === 'lifestyle_image_link') {
       this.props.dispatch({
         type: 'product/updateProduct',
         payload: {
-          lifestyleImageLinks: imageSrc,
+          lifestyle_image_link: imageSrc,
         },
       });
     }
@@ -332,68 +339,67 @@ class ProductDetail extends Component {
       });
     return html;
   };
+  // 提交创建SKU
+  handelSubmitCreateSku = (product_sku_option_status) => {
+    if (product_sku_option_status > 0) {
+      this.props.dispatch({
+        type: 'product/editProduct',
+      });
+    } else {
+      this.props.dispatch({
+        type: 'product/createProduct',
+      });
+    }
+  };
+
+  columnsProductAttribute = () => {
+    return [
+      {
+        title: '属性名称',
+        dataIndex: 'attribute_name',
+      },
+      {
+        title: '属性值',
+        dataIndex: 'attribute_value',
+      },
+    ];
+  };
+  handelRadioAvailability = (event) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        availability: event.target.value,
+      },
+    });
+  };
+
   componentDidMount() {
     this.props.dispatch({
-      type: 'product/queryAttr',
+      type: 'product/initQueryParams',
     });
   }
 
   render() {
-    const columnsProductAttribute = [
-      {
-        title: '属性名称',
-        dataIndex: 'attribute_name',
-        key: 'attribute_name',
-      },
-      {
-        title: '属性名称',
-        dataIndex: 'attribute_value',
-        key: 'attribute_value',
-      },
-      {
-        title: '操作',
-        dataIndex: 'operate',
-        render: (_: any, record: any) => {
-          console.log('record:', record);
-          return (
-            <div className="operate">
-              <span
-                className="tx"
-                onClick={() => {
-                  this.productAttributeButtonHandle(record);
-                }}
-              >
-                添加
-              </span>
-              <span className="line">|</span>
-              <span
-                className="tx"
-                onClick={() => {
-                  this.handelTableDel(record);
-                }}
-              >
-                删除
-              </span>
-            </div>
-          );
-        },
-      },
-    ];
-    const { monetaryUnitOption, languageOption, productDetail, productAttributeOption } =
-      this.props.product;
+    const {
+      monetaryUnitOption,
+      languageOption,
+      productDetail,
+      productAttributeOption,
+      product_sku_option_status,
+    } = this.props.product;
     const { folderDirectory, imageList } = this.props.material;
+    console.log('productDetail:', productDetail);
+    console.log('product_sku_option_status:', product_sku_option_status);
     const {
       language,
       monetary_unit,
       imageLink,
-      additionalImageLinks,
-      lifestyleImageLinks,
+      additional_image_link,
+      lifestyle_image_link,
       link,
       mobile_link,
       description,
       title,
-      brand,
-      material,
       price,
       salePrice,
       product_highlight,
@@ -402,11 +408,9 @@ class ProductDetail extends Component {
       product_height,
       product_length,
       product_weight,
-      shipping_width,
-      shipping_height,
-      shipping_length,
-      ships_from_country,
+      product_detail,
     } = productDetail;
+    console.log('product_detail:', product_detail);
     return (
       <PageContainer>
         <div className="page">
@@ -453,31 +457,31 @@ class ProductDetail extends Component {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('additionalImageLinks', 5);
+                      this.imageSelectModel('additional_image_link', 5);
                     }}
                   >
                     添加附属图片
                   </Button>
                 </div>
                 <div className="line-box">
-                  <div className="add-img-list">{this.imageRenderView(additionalImageLinks)}</div>
+                  <div className="add-img-list">{this.imageRenderView(additional_image_link)}</div>
                 </div>
               </div>
               <div className="form-item">
                 <div className="line-box">
-                  <span className="label">添加商品详情:</span>
+                  <span className="label">添加生活风格图:</span>
                   <Button
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('lifestyleImageLinks', 20);
+                      this.imageSelectModel('lifestyle_image_link', 20);
                     }}
                   >
-                    添加商品详情
+                    添加生活风格图
                   </Button>
                 </div>
                 <div className="line-box">
-                  <div className="add-img-list">{this.imageRenderView(lifestyleImageLinks)}</div>
+                  <div className="add-img-list">{this.imageRenderView(lifestyle_image_link)}</div>
                 </div>
               </div>
               <div className="form-item">
@@ -576,22 +580,13 @@ class ProductDetail extends Component {
                 <div className="line-box">
                   <div className="table-box">
                     <Table
-                      dataSource={productAttributeOption}
-                      columns={columnsProductAttribute}
+                      dataSource={product_detail}
+                      columns={this.columnsProductAttribute()}
                       pagination={false}
                       style={{ width: 350 }}
                     />
                   </div>
                 </div>
-              </div>
-              <div className="form-item">
-                <span className="label">品牌名称:</span>
-                <Input
-                  placeholder="品牌名称"
-                  style={{ width: 350 }}
-                  value={brand}
-                  onChange={this.brandInputHandle}
-                />
               </div>
               <div className="form-item">
                 <span className="label">商品材料:</span>
@@ -604,7 +599,7 @@ class ProductDetail extends Component {
               </div>
               <div className="form-item">
                 <span className="label">商品是否缺货:</span>
-                <Radio.Group value={availability}>
+                <Radio.Group value={availability} onChange={this.handelRadioAvailability}>
                   <Radio value="in_stock"> 有货 </Radio>
                   <Radio value="out_of_stock"> 缺货 </Radio>
                 </Radio.Group>
@@ -643,50 +638,22 @@ class ProductDetail extends Component {
                 />
               </div>
               <div className="form-item">
-                <span className="label">商品包装尺寸:</span>
-                长:
-                <Input
-                  placeholder="长"
-                  style={{ width: 100 }}
-                  value={shipping_length}
-                  onChange={this.shippingLengthInputHandle}
-                />
-                宽:
-                <Input
-                  placeholder="宽"
-                  style={{ width: 100 }}
-                  value={shipping_width}
-                  onChange={this.shippingWidthInputHandle}
-                />
-                高:
-                <Input
-                  placeholder="高"
-                  style={{ width: 100 }}
-                  value={shipping_height}
-                  onChange={this.shippingHeightInputHandle}
-                />
-              </div>
-
-              <div className="form-item">
-                <span className="label">发货国家:</span>
-                <Input
-                  placeholder="发货国家"
-                  style={{ width: 350 }}
-                  value={ships_from_country}
-                  onChange={this.shipsFromCountryInputHandle}
-                />
-              </div>
-              <div className="form-item">
                 <span className="label"></span>
-                <Button type="primary" size="large">
-                  确认创建SKU商品
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={() => {
+                    this.handelSubmitCreateSku(product_sku_option_status);
+                  }}
+                >
+                  {product_sku_option_status > 0 ? '确认编辑SKU商品' : '确认创建SKU商品'}
                 </Button>
               </div>
             </div>
           </div>
         </div>
         <ProductAttribute
-          dataSource={{ productAttributeOption }}
+          dataSource={{ productAttributeOption, product_detail }}
           open={this.state.isProductAttributeModal}
           callbackCancel={this.productAttributeCallbackCancel}
           callbackOk={this.productAttributeCallbackOk}
@@ -708,4 +675,4 @@ class ProductDetail extends Component {
   }
 }
 
-export default ProductDetail;
+export default ProductCreateSku;

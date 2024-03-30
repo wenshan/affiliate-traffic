@@ -46,10 +46,10 @@ export default [
         component: './Product/productCreate',
       },
       {
-        name: 'productDetail',
-        path: '/product/productDetail',
+        name: 'productCreateSku',
+        path: '/product/productCreateSku',
         hideInMenu: true,
-        component: './Product/productDetail',
+        component: './Product/productCreateSku',
       },
       {
         name: 'productEdit',

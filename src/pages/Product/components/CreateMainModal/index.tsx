@@ -20,6 +20,7 @@ class CreateMainModal extends Component {
           title: '五金/硬件',
         },
         gtin: '',
+        brand: '',
       },
       productTypeOption: [],
     };
@@ -31,6 +32,18 @@ class CreateMainModal extends Component {
     const newCurrentProductMain = Object.assign({}, currentProductMain, { title: value });
     this.setState({
       currentProductMain: newCurrentProductMain,
+    });
+  };
+  // 品牌
+  brandInputHandle = (e) => {
+    const { value } = e.target;
+    const { currentProductMain } = this.state;
+    const newCurrentProductMain = Object.assign({}, currentProductMain, { brand: value });
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        currentProductMain: newCurrentProductMain,
+      },
     });
   };
 
@@ -133,7 +146,6 @@ class CreateMainModal extends Component {
   };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    console.log('nextProps:', nextProps);
     if (nextProps.dataSource !== this.props.dataSource) {
       this.setState({
         currentProductMain: nextProps.dataSource.currentProductMain,
@@ -144,7 +156,8 @@ class CreateMainModal extends Component {
 
   render() {
     const { currentProductMain, productTypeOption } = this.state;
-    const { title, product_type_id, offer_id, google_product_category, gtin } = currentProductMain;
+    const { title, product_type_id, offer_id, google_product_category, gtin, brand } =
+      currentProductMain;
     return (
       <div className="custom-product-type">
         <Modal
@@ -220,6 +233,15 @@ class CreateMainModal extends Component {
                 style={{ width: 350 }}
                 value={gtin}
                 onChange={this.gtinInputHandle}
+              />
+            </div>
+            <div className="form-item">
+              <span className="label">品牌名称:</span>
+              <Input
+                placeholder="品牌名称"
+                style={{ width: 350 }}
+                value={brand}
+                onChange={this.brandInputHandle}
               />
             </div>
           </div>

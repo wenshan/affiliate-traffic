@@ -94,13 +94,22 @@ class ProductCreate extends Component {
 
   // table
   handelTableCreateSku = (record) => {
+    console.log('record:', record);
     this.props.dispatch({
       type: 'product/update',
       payload: {
         currentProductMain: record,
       },
     });
-    history.push(`/product/productDetail?product_main_id=${record.product_main_id}`);
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        product_main_id: record.product_main_id,
+      },
+    });
+    history.push(
+      `/product/productCreateSku?product_main_id=${record.product_main_id}&product_sku_option_status=0`,
+    );
   };
 
   handelTableEdit = (record) => {
@@ -138,31 +147,29 @@ class ProductCreate extends Component {
   };
 
   handelTablePagination = (page, pageSize) => {
-    console.log(page, pageSize);
-    this.setState(
-      {
-        current: page,
+    const { pagination } = this.props.product;
+    const updatePagination = Object.assign({}, pagination, { current: page });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        pagination: updatePagination,
       },
-      () => {
-        this.props.dispatch({
-          type: 'product/queryProductMainAll',
-          payload: {
-            pageSize,
-            current: page,
-          },
-        });
-      },
-    );
-  };
-
-  componentDidMount() {
-    const { pageSize, current } = this.state;
+    });
     this.props.dispatch({
       type: 'product/queryProductMainAll',
       payload: {
         pageSize,
-        current,
+        current: page,
       },
+    });
+  };
+
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'product/initQueryParams',
+    });
+    this.props.dispatch({
+      type: 'product/queryProductMainAll',
     });
     this.props.dispatch({
       type: 'product/queryType',
@@ -170,9 +177,9 @@ class ProductCreate extends Component {
   }
 
   render() {
-    const { productTypeOption, currentProductMain, productMainList, productMainTotal } =
+    const { productTypeOption, currentProductMain, productMainList, pagination } =
       this.props.product;
-    const { pageSize, current, currentOptionActionStatus } = this.state;
+    const { currentOptionActionStatus } = this.state;
     const columns = [
       {
         title: '商品名称',
@@ -250,8 +257,7 @@ class ProductCreate extends Component {
             <div className="header">
               <div className="creat-button">
                 <Button type="primary" size="large" onClick={this.createMainModalStatusHandle}>
-                  {' '}
-                  确认创建主商品{' '}
+                  创建主商品
                 </Button>
               </div>
             </div>
@@ -261,9 +267,9 @@ class ProductCreate extends Component {
                 columns={columns}
                 pagination={{
                   position: ['bottomRight'],
-                  current,
-                  pageSize,
-                  total: productMainTotal,
+                  current: pagination.current,
+                  pageSize: pagination.pageSize,
+                  total: pagination.total,
                   onChange: this.handelTablePagination,
                 }}
               />
