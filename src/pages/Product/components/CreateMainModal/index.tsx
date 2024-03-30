@@ -39,11 +39,8 @@ class CreateMainModal extends Component {
     const { value } = e.target;
     const { currentProductMain } = this.state;
     const newCurrentProductMain = Object.assign({}, currentProductMain, { brand: value });
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        currentProductMain: newCurrentProductMain,
-      },
+    this.setState({
+      currentProductMain: newCurrentProductMain,
     });
   };
 
