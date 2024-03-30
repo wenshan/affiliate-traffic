@@ -213,6 +213,11 @@ class ProductCreate extends Component {
         key: 'gtin',
       },
       {
+        title: '品牌名称',
+        dataIndex: 'brand',
+        key: 'brand',
+      },
+      {
         title: '操作',
         dataIndex: 'operate',
         render: (text: any, record: any) => {

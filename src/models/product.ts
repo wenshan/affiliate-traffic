@@ -162,15 +162,23 @@ export default {
       }
     },
     *editProductMain({ payload }, { call, put, select }) {
-      const { id, title, offer_id, google_product_category, gtin, product_main_id, brand } =
-        payload;
-      if (title && google_product_category) {
+      const {
+        title,
+        offer_id,
+        google_product_category,
+        gtin,
+        product_main_id,
+        product_type_id,
+        brand,
+      } = payload;
+      if (title && google_product_category && product_main_id && product_type_id) {
         const result = yield call(editProductMain, {
           title,
           offer_id,
           google_product_category,
           gtin,
           product_main_id,
+          product_type_id,
           brand,
         });
         console.log('result:', result);

@@ -199,6 +199,16 @@ class ProductCreateSku extends Component {
       },
     });
   };
+  // 颜色
+  colorInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        color: value,
+      },
+    });
+  };
 
   productAttributeButtonHandle = () => {
     this.setState(
@@ -402,6 +412,8 @@ class ProductCreateSku extends Component {
       title,
       price,
       salePrice,
+      color,
+      material,
       product_highlight,
       availability,
       product_width,
@@ -595,6 +607,15 @@ class ProductCreateSku extends Component {
                   style={{ width: 350 }}
                   value={material}
                   onChange={this.materialInputHandle}
+                />
+              </div>
+              <div className="form-item">
+                <span className="label">商品颜色:</span>
+                <Input
+                  placeholder="商品颜色"
+                  style={{ width: 350 }}
+                  value={color}
+                  onChange={this.colorInputHandle}
                 />
               </div>
               <div className="form-item">
