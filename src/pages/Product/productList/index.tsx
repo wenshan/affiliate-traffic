@@ -1,5 +1,5 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Radio, Table } from 'antd';
+import { Select, Table } from 'antd';
 import { Component, JSX, Key } from 'react';
 import { connect, history } from 'umi';
 
@@ -165,12 +165,6 @@ class ProductList extends Component {
         },
       },
       {
-        title: '品牌',
-        dataIndex: 'brand',
-        key: 'brand',
-        width: 90,
-      },
-      {
         title: '颜色',
         dataIndex: 'color',
         key: 'color',
@@ -209,17 +203,7 @@ class ProductList extends Component {
         dataIndex: 'color',
         key: 'color',
         width: 200,
-        render: (
-          text: any,
-          record: {
-            product_length: any;
-            product_width: any;
-            product_height: any;
-            shipping_length: any;
-            shipping_width: any;
-            shipping_height: any;
-          },
-        ) => {
+        render: (text: any, record: any) => {
           return (
             <div>{`${record.product_length}x${record.product_width}x${record.product_height}`}</div>
           );
@@ -242,12 +226,6 @@ class ProductList extends Component {
         title: '语言',
         dataIndex: 'language',
         key: 'language',
-        width: 90,
-      },
-      {
-        title: '发货国家',
-        dataIndex: 'ships_from_country',
-        key: 'ships_from_country',
         width: 90,
       },
       {
@@ -330,11 +308,11 @@ class ProductList extends Component {
       type: 'product/queryProductAll',
     });
   }
-  languageRadioHandle = (event) => {
+  languageRadioHandle = (value) => {
     this.props.dispatch({
-      type: 'product/updateProduct',
+      type: 'product/update',
       payload: {
-        language: event.target.value,
+        language: value,
       },
     });
   };
@@ -347,14 +325,14 @@ class ProductList extends Component {
           <div className="product-list">
             <div className="header">
               <div className="form-item">
-                <span className="label">
-                  <i>*</i> 选择语言:
-                </span>
-                <Radio.Group
+                <span className="label">选择语言:</span>
+                <Select
+                  defaultValue={language}
                   value={language}
+                  style={{ width: 120 }}
                   onChange={this.languageRadioHandle}
                   options={languageOption}
-                ></Radio.Group>
+                />
               </div>
             </div>
             <div className="content">
