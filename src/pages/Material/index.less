@@ -1,0 +1,114 @@
+.material {
+  padding: 0px;
+  text-align: left;
+  .icon {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+  }
+  .arrow_right {
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+    background-image: url('https://gtraffic-1259139579.cos.ap-hongkong.myqcloud.com/web/icon/arrow-right.png');
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 75%;
+  }
+  .container {
+    padding: 0 0 0 20px;
+  }
+  .header {
+    margin-bottom: 20px;
+    padding: 0;
+  }
+  .folder-menu {
+    width: 180px;
+    padding-top: 10px;
+    padding-right: 5px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    background-color: #fff;
+    dl {
+      clear: both;
+      margin: 0;
+      padding: 0;
+      dt {
+        height: 35px;
+        margin: 0;
+        padding: 0 0 0 10px;
+        color: #999;
+        font-weight: 400;
+        line-height: 35px;
+      }
+      dd {
+        height: 40px;
+        margin: 0 0 2px 0;
+        padding: 0 0 0 20px;
+        line-height: 40px;
+        border-radius: 10px;
+        cursor: pointer;
+        .span {
+          display: block;
+          float: right;
+          width: 20px;
+          margin: 0;
+          color: #999;
+        }
+      }
+      dd:hover {
+        background-color: rgba(0, 0, 0, 0.06);
+      }
+      dd.active {
+        background-color: #e6f4ff;
+        .dropdown {
+          display: block;
+        }
+      }
+      .dropdown {
+        position: relative;
+        z-index: 99;
+        display: none;
+        .arrow_right {
+          z-index: 99;
+          margin-top: 5px;
+        }
+        ul {
+          position: absolute;
+          top: 15px;
+          right: -55px;
+          z-index: 999;
+          display: none;
+          width: 60px;
+          margin: 0;
+          padding: 0;
+          padding: 4px;
+          list-style-type: none;
+          background-color: #ffffff;
+          background-clip: padding-box;
+          border-radius: 8px;
+          outline: none;
+          box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+            0 9px 28px 8px rgba(0, 0, 0, 0.05);
+          li {
+            display: block;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            color: #333;
+            font-size: 14px;
+            text-align: center;
+          }
+          li:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+        }
+      }
+      .dropdown:hover {
+        ul {
+          display: block;
+        }
+      }
+    }
+  }
+}
