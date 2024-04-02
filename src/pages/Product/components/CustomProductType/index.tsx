@@ -30,7 +30,7 @@ class CustomProductType extends Component {
   handelTableDel = (record) => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    Modal.warning({
+    Modal.confirm({
       title: '确认删除',
       content: '删除当前的商品属性',
       onOk() {
@@ -110,9 +110,8 @@ class CustomProductType extends Component {
       currentProductType: selectedRows,
     });
   };
-
-  render() {
-    const columns = [
+  columns = () => {
+    return [
       {
         title: '分类名称',
         dataIndex: 'title',
@@ -156,6 +155,9 @@ class CustomProductType extends Component {
         },
       },
     ];
+  };
+
+  render() {
     const rowSelection = {
       type: 'radio',
       onChange: this.onChangeSelectedRows,
@@ -172,7 +174,7 @@ class CustomProductType extends Component {
         >
           <Table
             dataSource={this.props.dataSource}
-            columns={columns}
+            columns={this.columns()}
             pagination={false}
             rowSelection={rowSelection}
           />

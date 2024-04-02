@@ -13,7 +13,7 @@ class CreateMainModal extends Component {
       isProductCategoryShow: false,
       currentProductMain: {
         title: '',
-        product_type_id: { key: '', title: '' },
+        product_type: { key: '', title: '' },
         offer_id: '',
         google_product_category: {
           key: 632,
@@ -83,7 +83,7 @@ class CreateMainModal extends Component {
   productTypeCallBackOk = (item) => {
     const { currentProductMain } = this.state;
     const newCurrentProductMain = Object.assign({}, currentProductMain, {
-      product_type_id: item[0],
+      product_type: item[0],
     });
     this.setState({
       isProductTypeShow: false,
@@ -123,7 +123,7 @@ class CreateMainModal extends Component {
     const { currentProductMain } = this.state;
     console.log('currentProductMain:', currentProductMain);
     for (let key in currentProductMain) {
-      if (key !== 'gtin' && key !== 'remark' && key !== 'imgSrc') {
+      if (key !== 'gtin' && key !== 'remark' && key !== 'imgSrc' && key !== 'id') {
         if (!currentProductMain[key]) {
           message.warning({
             content: '必填字段不能为空~',
@@ -153,7 +153,7 @@ class CreateMainModal extends Component {
 
   render() {
     const { currentProductMain, productTypeOption } = this.state;
-    const { title, product_type_id, offer_id, google_product_category, gtin, brand } =
+    const { title, product_type, offer_id, google_product_category, gtin, brand } =
       currentProductMain;
     return (
       <div className="custom-product-type">
@@ -183,7 +183,7 @@ class CreateMainModal extends Component {
               <Input
                 placeholder="自定商品分类"
                 style={{ width: 350 }}
-                value={product_type_id.title}
+                value={product_type && product_type.title}
                 disabled
               />
               <span className="operate">

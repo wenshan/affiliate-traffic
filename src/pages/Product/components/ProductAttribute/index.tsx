@@ -1,4 +1,4 @@
-import { Input, Modal, Table } from 'antd';
+import { Button, Input, Modal, Table } from 'antd';
 import { Component } from 'react';
 
 import './index.less';
@@ -161,15 +161,9 @@ class ProductAttribute extends Component {
         title: '操作',
         dataIndex: 'operate',
         render: (_: any, record: any) => {
-          console.log('record:', record);
           return (
             <div className="operate">
-              <span
-                className="tx"
-                onClick={() => {
-                  this.handelTableAdd(record);
-                }}
-              >
+              <span className="tx" onClick={this.handelTableAdd}>
                 添加
               </span>
               <span className="line">|</span>
@@ -209,12 +203,20 @@ class ProductAttribute extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
-          <Table
-            dataSource={productAttributeOption}
-            columns={columns}
-            pagination={false}
-            rowSelection={rowSelection}
-          />
+          {productAttributeOption && productAttributeOption.length > 0 ? (
+            <Table
+              dataSource={productAttributeOption}
+              columns={columns}
+              pagination={false}
+              rowSelection={rowSelection}
+            />
+          ) : (
+            <div className="operate">
+              <span className="tx">
+                <Button onClick={this.handelTableAdd}>添加商品属性</Button>
+              </span>
+            </div>
+          )}
         </Modal>
         <Modal
           title={this.state.optionAddStatus > 0 ? '编辑属性' : '添加属性'}

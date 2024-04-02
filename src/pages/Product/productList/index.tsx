@@ -1,5 +1,5 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Select, Table } from 'antd';
+import { Modal, Select, Table } from 'antd';
 import { Component, JSX, Key } from 'react';
 import { connect, history } from 'umi';
 
@@ -64,7 +64,11 @@ class ProductList extends Component {
         fixed: 'left',
         width: 100,
         render: (text, record) => {
-          return `${record.price} ${record.monetary_unit.value}`;
+          if (record && record.price && record.monetary_unit.value) {
+            return `${record.price} ${record.monetary_unit.value}`;
+          } else {
+            return '-';
+          }
         },
       },
       {
@@ -74,7 +78,11 @@ class ProductList extends Component {
         fixed: 'left',
         width: 100,
         render: (text, record) => {
-          return `${record.price} ${record.monetary_unit.value}`;
+          if (record && record.salePrice && record.monetary_unit.value) {
+            return `${record.salePrice} ${record.monetary_unit.value}`;
+          } else {
+            return '-';
+          }
         },
       },
       {
@@ -141,6 +149,7 @@ class ProductList extends Component {
           const html: JSX.Element[] = [];
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
           record &&
+            record.additional_image_link &&
             record.additional_image_link.length &&
             record.additional_image_link.map((item: string, idx: Key) => {
               html.push(<img key={idx} src={item} width={50}></img>);
@@ -153,12 +162,13 @@ class ProductList extends Component {
         dataIndex: 'lifestyle_image_link',
         key: 'lifestyle_image_link',
         width: 200,
-        render: (text: any, record: { additional_image_link: string[] }) => {
+        render: (text: any, record: { lifestyle_image_link: string[] }) => {
           const html: JSX.Element[] = [];
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
           record &&
-            record.additional_image_link.length &&
-            record.additional_image_link.map((item: string, idx: Key) => {
+            record.lifestyle_image_link &&
+            record.lifestyle_image_link.length &&
+            record.lifestyle_image_link.map((item: string, idx: Key) => {
               html.push(<img key={idx} src={item} width={50}></img>);
             });
           return html;
@@ -236,40 +246,35 @@ class ProductList extends Component {
         render: (text, record) => {
           return (
             <div className="operate">
-              <span
+              <a
                 className="tx"
+                rel="nofollow"
                 onClick={() => {
                   this.handelTableView(record);
                 }}
               >
                 详情
-              </span>
-              <span
-                className="tx"
-                onClick={() => {
-                  this.handelTableAdd(record);
-                }}
-              >
-                添加
-              </span>
+              </a>
               <span className="line">|</span>
-              <span
+              <a
                 className="tx"
+                rel="nofollow"
                 onClick={() => {
                   this.handelTableEdit(record);
                 }}
               >
                 编辑
-              </span>
+              </a>
               <span className="line">|</span>
-              <span
+              <a
                 className="tx"
+                rel="nofollow"
                 onClick={() => {
                   this.handelTableDel(record);
                 }}
               >
                 删除
-              </span>
+              </a>
             </div>
           );
         },
@@ -277,9 +282,6 @@ class ProductList extends Component {
     ];
   };
   handelTableView = (record) => {
-    console.log(record);
-  };
-  handelTableAdd = (record) => {
     console.log(record);
   };
   handelTableEdit = (record) => {
@@ -296,6 +298,21 @@ class ProductList extends Component {
   };
   handelTableDel = (record) => {
     console.log(record);
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+    Modal.confirm({
+      title: '确认删除',
+      content: '删除当前的SKU',
+      onOk() {
+        self.props.dispatch({
+          type: 'product/delProduct',
+          payload: record,
+        });
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   };
 
   // 翻页
@@ -306,6 +323,10 @@ class ProductList extends Component {
     });
     this.props.dispatch({
       type: 'product/queryProductAll',
+    });
+    // queryProductMainAllCompos
+    this.props.dispatch({
+      type: 'product/queryProductMainAllCompos',
     });
   }
   languageRadioHandle = (value) => {

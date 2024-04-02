@@ -33,32 +33,29 @@ class ProductCreate extends Component {
     });
   };
   createMainModalCallbackOk = (currentProductMain) => {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     const { currentOptionActionStatus } = this.state;
     console.log('currentProductMain:', currentProductMain);
+    console.log('currentOptionActionStatus:', currentOptionActionStatus);
     this.setState(
       {
         isCreateMainModalShow: false,
       },
       () => {
-        this.props.dispatch({
+        self.props.dispatch({
           type: 'product/update',
-          payload: {
-            currentProductMain,
-          },
+          payload: currentProductMain,
         });
         if (currentOptionActionStatus === 0) {
-          this.props.dispatch({
+          self.props.dispatch({
             type: 'product/createProductMain',
-            payload: {
-              ...currentProductMain,
-            },
+            payload: currentProductMain,
           });
         } else {
-          this.props.dispatch({
+          self.props.dispatch({
             type: 'product/editProductMain',
-            payload: {
-              ...currentProductMain,
-            },
+            payload: currentProductMain,
           });
         }
       },
@@ -104,26 +101,30 @@ class ProductCreate extends Component {
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
-        product_main_id: record.product_main_id,
+        product_main_id: record.id,
       },
     });
     history.push(
-      `/product/productCreateSku?product_main_id=${record.product_main_id}&product_sku_option_status=0`,
+      `/product/productCreateSku?product_main_id=${record.id}&product_sku_option_status=0`,
     );
   };
 
   handelTableEdit = (record) => {
-    console.log('record:', record);
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        currentProductMain: record,
+    console.log(' handelTableEdit record:', record);
+    this.setState(
+      {
+        isCreateMainModalShow: true,
+        currentOptionActionStatus: 1,
       },
-    });
-    this.setState({
-      isCreateMainModalShow: true,
-      currentOptionActionStatus: 1,
-    });
+      () => {
+        this.props.dispatch({
+          type: 'product/update',
+          payload: {
+            currentProductMain: record,
+          },
+        });
+      },
+    );
   };
 
   handelTableDel = (record: any) => {
@@ -176,11 +177,8 @@ class ProductCreate extends Component {
     });
   }
 
-  render() {
-    const { productTypeOption, currentProductMain, productMainList, pagination } =
-      this.props.product;
-    const { currentOptionActionStatus } = this.state;
-    const columns = [
+  mainTableColumns = () => {
+    return [
       {
         title: '商品名称',
         dataIndex: 'title',
@@ -188,10 +186,10 @@ class ProductCreate extends Component {
       },
       {
         title: '自定商品分类',
-        dataIndex: 'product_type_id',
-        key: 'product_type_id',
+        dataIndex: 'product_type',
+        key: 'product_type',
         render: (text: any, record: any) => {
-          return record.product_type_id.title || '-';
+          return (record.product_type && record.product_type.title) || '-';
         },
       },
       {
@@ -255,6 +253,12 @@ class ProductCreate extends Component {
         },
       },
     ];
+  };
+
+  render() {
+    const { productTypeOption, currentProductMain, productMainList, pagination } =
+      this.props.product;
+    const { currentOptionActionStatus } = this.state;
     return (
       <PageContainer>
         <div className="page">
@@ -269,7 +273,7 @@ class ProductCreate extends Component {
             <div className="content">
               <Table
                 dataSource={productMainList}
-                columns={columns}
+                columns={this.mainTableColumns()}
                 pagination={{
                   position: ['bottomRight'],
                   current: pagination.current,

@@ -42,9 +42,16 @@ class FolderDirectory extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     console.log('nextProps:', nextProps);
-    if (nextProps.currentFolderDirectory) {
+    if (nextProps.currentFolderDirectory !== this.props.currentFolderDirectory) {
+      const newCurrentFolderDirectory = Object.assign(
+        {},
+        {
+          label: nextProps.currentFolderDirectory.label,
+          key: nextProps.currentFolderDirectory.key,
+        },
+      );
       this.setState({
-        currentFolderDirectory: nextProps.currentFolderDirectory,
+        currentFolderDirectory: newCurrentFolderDirectory,
       });
     }
   }

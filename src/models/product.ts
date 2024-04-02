@@ -14,6 +14,7 @@ import {
   delProductMain,
   editProductMain,
   queryProductMainAll,
+  queryProductMainAllCompos,
 } from '@/services/api/productMain';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
 import { Modal, message } from 'antd';
@@ -29,8 +30,6 @@ export default {
       pageSize: 20,
       total: 0,
     },
-    productMainTotal: 0,
-    productListTotal: 0,
     product_sku_option_status: 0,
     languageOption: [
       { value: 'en-US', label: '英语' },
@@ -49,8 +48,9 @@ export default {
     productTypeOption: [],
     googleProductCategoryOption: {},
     currentProductMain: {
+      id: '',
       title: '',
-      product_type_id: { key: '', title: '' },
+      product_type: { key: '', title: '' },
       offer_id: '',
       google_product_category: {
         key: 632,
@@ -59,22 +59,7 @@ export default {
       gtin: '',
       brand: '',
     },
-    productMainList: [
-      {
-        title: '商品衣蛾',
-        product_type_id: 1,
-        offer_id: '111111',
-        google_product_category: { key: '1', title: 'Jack' },
-        gtin: '123123123123',
-      },
-      {
-        title: '商品衣蛾2',
-        product_type_id: 1,
-        offer_id: '111111',
-        google_product_category: { key: '1', title: 'Jack' },
-        gtin: '1231231231232',
-      },
-    ],
+    productMainList: [],
     productAttributeOption: [
       {
         attribute_name: '1323',
@@ -85,9 +70,8 @@ export default {
     productDetail: {
       product_main_id: 0,
       language: 'en-US',
-      product_type: { value: '', label: '' },
+      product_type: { key: '', title: '' },
       monetary_unit: { value: 'USD', label: '美元' },
-      offer_id: '',
       title: '',
       description: '',
       link: '',
@@ -151,9 +135,9 @@ export default {
       yield put({ type: 'update', payload: { pagination } });
     },
     *delProductMain({ payload }, { call, put, select }) {
-      const { product_main_id } = payload;
-      if (product_main_id) {
-        const result = yield call(delProductMain, { product_main_id });
+      const { id } = payload;
+      if (id) {
+        const result = yield call(delProductMain, { id });
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
           const current = 1;
@@ -162,23 +146,15 @@ export default {
       }
     },
     *editProductMain({ payload }, { call, put, select }) {
-      const {
-        title,
-        offer_id,
-        google_product_category,
-        gtin,
-        product_main_id,
-        product_type_id,
-        brand,
-      } = payload;
-      if (title && google_product_category && product_main_id && product_type_id) {
+      const { id, title, offer_id, google_product_category, gtin, product_type, brand } = payload;
+      if (title && google_product_category && id && product_type) {
         const result = yield call(editProductMain, {
           title,
           offer_id,
           google_product_category,
           gtin,
-          product_main_id,
-          product_type_id,
+          id,
+          product_type,
           brand,
         });
         console.log('result:', result);
@@ -207,12 +183,12 @@ export default {
       }
     },
     *createProductMain({ payload }, { call, put, select }) {
-      const { title, product_type_id, offer_id, google_product_category, gtin, brand } = payload;
-      console.log(product_type_id, google_product_category);
-      if (title && google_product_category && product_type_id) {
+      const { title, product_type, offer_id, google_product_category, gtin, brand } = payload;
+      console.log(product_type, google_product_category);
+      if (title && google_product_category && product_type) {
         const result = yield call(createProductMain, {
           title,
-          product_type_id,
+          product_type,
           offer_id,
           google_product_category,
           gtin,
@@ -267,7 +243,7 @@ export default {
       const result = yield call(queryType);
       if (result && result.status && result.status === 200 && result.data.rows) {
         const newCurrentProductMain = Object.assign({}, currentProductMain, {
-          product_type_id: result.data.rows[0],
+          product_type: result.data.rows[0],
         });
         yield put({
           type: 'update',
@@ -423,6 +399,30 @@ export default {
         message.warning({ content: '确实查询字段！' });
       }
     },
+    /** 复合查询 */
+    *queryProductMainAllCompos({ payload: data }, { call, put, select }) {
+      const { pagination, language } = yield select((state) => state.product);
+      const { current, pageSize } = pagination;
+      if (current && pageSize && language) {
+        const result = yield call(queryProductMainAllCompos, { current, pageSize, language });
+        if (result && result.status && result.status === 200 && result.data.rows) {
+          const updatePagination = Object.assign({}, pagination, { total: result.data.count });
+          /*
+          yield put({
+            type: 'update',
+            payload: {
+              productList: result.data.rows,
+              pagination: updatePagination,
+            },
+          });
+          */
+        } else {
+          message.warning({ content: result.msg });
+        }
+      } else {
+        message.warning({ content: '确实查询字段！' });
+      }
+    },
     *editProduct({ payload: data }, { call, put, select }) {
       const { productDetail, currentProductMain } = yield select((state) => state.product);
       console.log('productDetail:', productDetail);
@@ -471,9 +471,9 @@ export default {
       }
     },
     *delProduct({ payload: data }, { call, put, select }) {
-      const { product_id } = data;
-      if (product_id) {
-        const result = yield call(delProduct, { product_id });
+      const { id } = data;
+      if (id) {
+        const result = yield call(delProduct, { id });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
           console.log('删除商品SKU分类成功');
@@ -481,9 +481,9 @@ export default {
       }
     },
     *queryProductDetail({ payload: data }, { call, put, select }) {
-      const { product_id } = data;
-      if (product_id) {
-        const result = yield call(queryProductDetail, { product_id });
+      const { id } = data;
+      if (id) {
+        const result = yield call(queryProductDetail, { id });
         if (result && result.status && result.status === 200) {
           yield put({
             type: 'update',

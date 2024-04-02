@@ -2,6 +2,7 @@ import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { Button, Col, Modal, Row } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'umi';
+import FolderDirectory from './components/FolderDirectory';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
 
@@ -242,6 +243,13 @@ class Material extends Component {
                   checked={['1085370435/22159932/limeet_logo_绿色.png']}
                   onChangeCallback={this.handelCheckCallback}
                 ></ImgList>
+                <FolderDirectory
+                  open={this.state.folderOpenStatus}
+                  optionAction={this.state.optionAction}
+                  callbackOk={this.handelFolderOk}
+                  callbackCancel={this.handelFolderCancel}
+                  currentFolderDirectory={currentFolderDirectory}
+                ></FolderDirectory>
               </div>
             </Col>
           </Row>

@@ -74,3 +74,11 @@ export const queryProductDetail = async (params?: { [key: string]: any }) => {
     data: params,
   });
 };
+
+/* 复合查询 */
+export const queryProductMainAllCompos = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/product/queryProductMainAllCompos', {
+    method: 'POST',
+    data: params,
+  });
+};
