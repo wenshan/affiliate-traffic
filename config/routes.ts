@@ -42,24 +42,24 @@ export default [
     routes: [
       {
         name: 'productCreate',
-        path: '/product/productCreate',
-        component: './Product/productCreate',
+        path: '/product/ProductCreate',
+        component: './Product/ProductCreate',
       },
       {
         name: 'productCreateSku',
-        path: '/product/productCreateSku',
+        path: '/product/ProductCreateSku',
         hideInMenu: true,
-        component: './Product/productCreateSku',
+        component: './Product/ProductCreateSku',
       },
       {
         name: 'productEdit',
         path: '/product/productEdit',
-        component: './Product/productEdit',
+        component: './Product/ProductEdit',
       },
       {
         name: 'productList',
-        path: '/product/productList',
-        component: './Product/productList',
+        path: '/product/ProductList',
+        component: './Product/ProductList',
       },
     ],
   },
@@ -88,7 +88,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/Welcome',
   },
   {
     path: '*',
