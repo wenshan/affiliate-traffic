@@ -61,6 +61,11 @@ export default [
         path: '/product/ProductList',
         component: './Product/ProductList',
       },
+      {
+        name: 'productList',
+        path: '/product/ProductListCompos',
+        component: './Product/ProductListCompos',
+      },
     ],
   },
   {

@@ -6,6 +6,7 @@ import {
   delProduct,
   editProduct,
   queryProductAll,
+  queryProductAllCompos,
   queryProductDetail,
 } from '@/services/api/product';
 import { cerateAttr, delAttr, editAttr, queryAttr } from '@/services/api/productAttr';
@@ -17,18 +18,22 @@ import {
   queryProductMainAllCompos,
 } from '@/services/api/productMain';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
+import { history } from '@umijs/max';
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
-import { history } from 'umi';
 
 export default {
   namespace: 'product',
   state: {
-    language: 'en-US',
     pagination: {
       current: 1,
-      pageSize: 20,
+      pageSize: 50,
       total: 0,
+    },
+    searchParams: {
+      language: 'en-US',
+      title: '',
+      product_type_id: '',
     },
     product_sku_option_status: 0,
     languageOption: [
@@ -51,11 +56,13 @@ export default {
       id: '',
       title: '',
       product_type: { key: '', title: '' },
+      product_type_id: '',
       offer_id: '',
       google_product_category: {
         key: 632,
         title: '五金/硬件',
       },
+      google_product_category_id: 632,
       gtin: '',
       brand: '',
     },
@@ -68,10 +75,14 @@ export default {
     ],
     productList: [],
     productDetail: {
+      gtin: '',
+      brand: '',
+      offer_id: '',
       product_main_id: 0,
       language: 'en-US',
       product_type: { key: '', title: '' },
-      monetary_unit: { value: 'USD', label: '美元' },
+      product_type_id: '',
+      monetary_unit: 'USD',
       title: '',
       description: '',
       link: '',
@@ -80,9 +91,9 @@ export default {
       additional_image_link: [],
       lifestyle_image_link: [],
       google_product_category: '',
+      google_product_category_id: '',
       color: '',
       material: '',
-      gtin: '',
       price: '',
       salePrice: '',
       product_detail: [], // 商品属性
@@ -145,9 +156,17 @@ export default {
         }
       }
     },
-    *editProductMain({ payload }, { call, put, select }) {
-      const { id, title, offer_id, google_product_category, gtin, product_type, brand } = payload;
-      if (title && google_product_category && id && product_type) {
+    *editProductMain({ payload: data }, { call, put, select }) {
+      const { id, title, offer_id, google_product_category, gtin, product_type, brand } = data;
+      if (
+        title &&
+        google_product_category &&
+        google_product_category_id &&
+        id &&
+        product_type &&
+        product_type_id &&
+        offer_id
+      ) {
         const result = yield call(editProductMain, {
           title,
           offer_id,
@@ -157,7 +176,6 @@ export default {
           product_type,
           brand,
         });
-        console.log('result:', result);
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
           const current = 1;
@@ -182,15 +200,32 @@ export default {
         }
       }
     },
-    *createProductMain({ payload }, { call, put, select }) {
-      const { title, product_type, offer_id, google_product_category, gtin, brand } = payload;
-      console.log(product_type, google_product_category);
-      if (title && google_product_category && product_type) {
+    *createProductMain({ payload: data }, { call, put, select }) {
+      const {
+        title,
+        product_type,
+        product_type_id,
+        offer_id,
+        google_product_category,
+        google_product_category_id,
+        gtin,
+        brand,
+      } = data;
+      if (
+        title &&
+        google_product_category &&
+        product_type &&
+        product_type_id &&
+        google_product_category_id &&
+        offer_id
+      ) {
         const result = yield call(createProductMain, {
           title,
           product_type,
+          product_type_id,
           offer_id,
           google_product_category,
+          google_product_category_id,
           gtin,
           brand,
         });
@@ -244,11 +279,16 @@ export default {
       if (result && result.status && result.status === 200 && result.data.rows) {
         const newCurrentProductMain = Object.assign({}, currentProductMain, {
           product_type: result.data.rows[0],
+          product_type_id: result.data.rows[0].key,
+        });
+        const productTypeOption: ({ title: any; key: any } & { label: any; value: any })[] = [];
+        result.data.rows.map((item: { title: any; key: any }) => {
+          productTypeOption.push(Object.assign({}, item, { label: item.title, value: item.key }));
         });
         yield put({
           type: 'update',
           payload: {
-            productTypeOption: result.data.rows,
+            productTypeOption,
             currentProductMain: newCurrentProductMain,
           },
         });
@@ -332,29 +372,82 @@ export default {
       console.log('productDetail:', productDetail);
       console.log('currentProductMain:', currentProductMain);
       const {
+        id,
+        product_type,
+        product_type_id,
+        title: title_main,
+        offer_id,
+        google_product_category,
+        google_product_category_id,
+        gtin,
+        brand,
+      } = currentProductMain;
+      const {
         title,
         language,
         monetary_unit,
         link,
+        mobile_link,
         imageLink,
+        lifestyle_image_link,
+        additional_image_link,
+        color,
+        material,
         price,
+        salePrice,
+        product_detail,
+        product_highlight,
+        product_length,
+        product_height,
+        product_width,
+        product_weight,
+        availability,
         description,
-        product_main_id,
-        product_type,
       } = productDetail;
       if (
         title &&
+        title_main &&
         language &&
         monetary_unit &&
         link &&
         imageLink &&
         price &&
         description &&
-        product_main_id &&
-        product_type
+        id &&
+        product_type &&
+        google_product_category &&
+        offer_id
       ) {
         const result = yield call(createProduct, {
-          ...productDetail,
+          title,
+          language,
+          monetary_unit,
+          link,
+          mobile_link,
+          imageLink,
+          description,
+          product_type,
+          product_type_id,
+          lifestyle_image_link,
+          additional_image_link,
+          google_product_category,
+          google_product_category_id,
+          product_main_id: id,
+          title_main,
+          color,
+          material,
+          price,
+          salePrice,
+          product_detail,
+          product_highlight,
+          product_height,
+          product_length,
+          product_width,
+          product_weight,
+          availability,
+          offer_id,
+          gtin,
+          brand,
         });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
@@ -379,7 +472,8 @@ export default {
       }
     },
     *queryProductAll({ payload: data }, { call, put, select }) {
-      const { pagination, language } = yield select((state) => state.product);
+      const { pagination, searchParams } = yield select((state) => state.product);
+      const { language } = searchParams;
       const { current, pageSize } = pagination;
       if (current && pageSize && language) {
         const result = yield call(queryProductAll, { current, pageSize, language });
@@ -396,31 +490,51 @@ export default {
           message.warning({ content: result.msg });
         }
       } else {
-        message.warning({ content: '确实查询字段！' });
+        message.warning({ content: '缺少查询字段！' });
       }
     },
     /** 复合查询 */
     *queryProductMainAllCompos({ payload: data }, { call, put, select }) {
-      const { pagination, language } = yield select((state) => state.product);
+      const { pagination, searchParams } = yield select((state) => state.product);
+      const { language } = searchParams;
       const { current, pageSize } = pagination;
+      const resultSkuObj = {};
       if (current && pageSize && language) {
         const result = yield call(queryProductMainAllCompos, { current, pageSize, language });
         if (result && result.status && result.status === 200 && result.data.rows) {
           const updatePagination = Object.assign({}, pagination, { total: result.data.count });
-          /*
+          // queryProductAllCompos
+          const mainRows = result.data.rows;
+          mainRows &&
+            mainRows.length &&
+            mainRows.map(async (item: string | number) => {
+              resultSkuObj[item.id] = Object.assign({}, item, { skus: [] });
+            });
+          mainRows &&
+            mainRows.length &&
+            mainRows.map(async (item: string | number) => {
+              const resultSku = await queryProductAllCompos({ language, product_main_id: item.id });
+              if (resultSku && resultSku.status && resultSku.status === 200 && resultSku.data) {
+                resultSkuObj[item.id]['skus'] = resultSku.data;
+              } else {
+                resultSkuObj[item.id]['skus'] = [];
+              }
+            });
+          const productMainList = Object.values(resultSkuObj);
+          console.log('resultSkuObj:', resultSkuObj);
+          console.log('productMainList:', productMainList);
           yield put({
             type: 'update',
             payload: {
-              productList: result.data.rows,
+              productMainList,
               pagination: updatePagination,
             },
           });
-          */
         } else {
           message.warning({ content: result.msg });
         }
       } else {
-        message.warning({ content: '确实查询字段！' });
+        message.warning({ content: '缺少查询字段！' });
       }
     },
     *editProduct({ payload: data }, { call, put, select }) {
@@ -437,9 +551,15 @@ export default {
         description,
         product_main_id,
         product_type,
+        google_product_category,
+        title_main,
+        offer_id,
+        id,
       } = productDetail;
       if (
+        id &&
         title &&
+        title_main &&
         language &&
         monetary_unit &&
         link &&
@@ -447,14 +567,16 @@ export default {
         price &&
         description &&
         product_main_id &&
-        product_type
+        product_type &&
+        google_product_category &&
+        offer_id
       ) {
         const result = yield call(editProduct, { ...productDetail });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
           Modal.confirm({
             title: '编辑成功',
-            content: '编辑商品SKU,返回到列表页面',
+            content: '编辑商品SKU成功,返回到列表页面',
             onOk() {
               history.push('/product/productList');
             },

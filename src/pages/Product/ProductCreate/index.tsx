@@ -33,33 +33,27 @@ class ProductCreate extends Component {
     });
   };
   createMainModalCallbackOk = (currentProductMain) => {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
     const { currentOptionActionStatus } = this.state;
     console.log('currentProductMain:', currentProductMain);
     console.log('currentOptionActionStatus:', currentOptionActionStatus);
-    this.setState(
-      {
-        isCreateMainModalShow: false,
-      },
-      () => {
-        self.props.dispatch({
-          type: 'product/update',
-          payload: currentProductMain,
-        });
-        if (currentOptionActionStatus === 0) {
-          self.props.dispatch({
-            type: 'product/createProductMain',
-            payload: currentProductMain,
-          });
-        } else {
-          self.props.dispatch({
-            type: 'product/editProductMain',
-            payload: currentProductMain,
-          });
-        }
-      },
-    );
+    this.setState({
+      isCreateMainModalShow: false,
+    });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: currentProductMain,
+    });
+    if (currentOptionActionStatus === 0) {
+      this.props.dispatch({
+        type: 'product/createProductMain',
+        payload: currentProductMain,
+      });
+    } else {
+      this.props.dispatch({
+        type: 'product/editProductMain',
+        payload: currentProductMain,
+      });
+    }
   };
   // 添加新产品分类
   handelAddProductType = (item, type) => {
@@ -177,7 +171,7 @@ class ProductCreate extends Component {
     });
   }
 
-  mainTableColumns = () => {
+  tableColumnsMain = () => {
     return [
       {
         title: '商品名称',
@@ -273,7 +267,7 @@ class ProductCreate extends Component {
             <div className="content">
               <Table
                 dataSource={productMainList}
-                columns={this.mainTableColumns()}
+                columns={this.tableColumnsMain()}
                 pagination={{
                   position: ['bottomRight'],
                   current: pagination.current,

@@ -2,6 +2,7 @@ export default {
   'pages.layouts.userLayout.title': 'Ant Design 是西湖区最具影响力的 Web 设计规范',
   'pages.login.accountLogin.tab': '账号登录',
   'pages.login.accountLogin.errorMessage': '错误的用户名和密码',
+  'pages.login.accountRegister.errorMessage': '邮箱已被注册',
   'pages.login.failure': '登录失败，请重试！',
   'pages.login.success': '登录成功！',
   'pages.login.email.placeholder': 'Email:',

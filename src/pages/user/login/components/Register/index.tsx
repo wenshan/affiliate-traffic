@@ -78,7 +78,7 @@ const LoginMessage: React.FC<{
 };
 
 const Register: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({ status: 200 });
   const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
   const intl = useIntl();
@@ -107,10 +107,11 @@ const Register: React.FC = () => {
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+        history.push(urlParams.get('redirect') || '/Welcome');
         return;
+      } else {
+        setUserLoginState(result);
       }
-      setUserLoginState(result);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -135,7 +136,7 @@ const Register: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
+          title="Affiliate Traffic"
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
             auto_Login: true,
@@ -155,8 +156,8 @@ const Register: React.FC = () => {
           {status !== 200 && (
             <LoginMessage
               content={intl.formatMessage({
-                id: 'pages.login.accountLogin.errorMessage',
-                defaultMessage: '账户或密码错误(admin/ant.design)',
+                id: 'pages.login.accountRegister.errorMessage',
+                defaultMessage: '邮箱已经被注册',
               })}
             />
           )}

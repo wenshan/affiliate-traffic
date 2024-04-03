@@ -30,6 +30,12 @@ export const queryProductAll = async (params?: { [key: string]: any }) => {
     data: params,
   });
 };
+export const queryProductAllCompos = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/product/queryProductAllCompos', {
+    method: 'POST',
+    data: params,
+  });
+};
 /** 查询语言商品详情 */
 export const queryProductDetail = async (params?: { [key: string]: any }) => {
   return request<{ data: any }>('/api/product/queryProductDetail', {

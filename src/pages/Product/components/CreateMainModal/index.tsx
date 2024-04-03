@@ -14,11 +14,13 @@ class CreateMainModal extends Component {
       currentProductMain: {
         title: '',
         product_type: { key: '', title: '' },
+        product_type_id: '',
         offer_id: '',
         google_product_category: {
           key: 632,
           title: '五金/硬件',
         },
+        google_product_category_id: 632,
         gtin: '',
         brand: '',
       },
@@ -81,14 +83,19 @@ class CreateMainModal extends Component {
   };
   // 管理页面回调
   productTypeCallBackOk = (item) => {
-    const { currentProductMain } = this.state;
-    const newCurrentProductMain = Object.assign({}, currentProductMain, {
-      product_type: item[0],
-    });
-    this.setState({
-      isProductTypeShow: false,
-      currentProductMain: newCurrentProductMain,
-    });
+    if (item && item[0] && item[0].key) {
+      const { currentProductMain } = this.state;
+      const newCurrentProductMain = Object.assign({}, currentProductMain, {
+        product_type: item[0],
+        product_type_id: item[0].key,
+      });
+      this.setState({
+        isProductTypeShow: false,
+        currentProductMain: newCurrentProductMain,
+      });
+    } else {
+      message.warning({ content: '获取数据有问题' });
+    }
   };
 
   // 编辑 新增 确认回调
@@ -104,9 +111,11 @@ class CreateMainModal extends Component {
   };
   // GoogleProductCategory
   productCategoryCallBackOk = (option) => {
+    console.log('option:', option);
     const { currentProductMain } = this.state;
     const newCurrentProductMain = Object.assign({}, currentProductMain, {
       google_product_category: option,
+      google_product_category_id: option.key,
     });
     this.setState({
       isProductCategoryShow: false,
@@ -122,18 +131,30 @@ class CreateMainModal extends Component {
   handleOk = () => {
     const { currentProductMain } = this.state;
     console.log('currentProductMain:', currentProductMain);
-    for (let key in currentProductMain) {
-      if (key !== 'gtin' && key !== 'remark' && key !== 'imgSrc' && key !== 'id') {
-        if (!currentProductMain[key]) {
-          message.warning({
-            content: '必填字段不能为空~',
-          });
-          return;
-        }
+    const {
+      google_product_category,
+      google_product_category_id,
+      product_type,
+      product_type_id,
+      title,
+      offer_id,
+    } = currentProductMain;
+    if (
+      google_product_category &&
+      google_product_category_id &&
+      product_type &&
+      product_type_id &&
+      title &&
+      offer_id
+    ) {
+      if (this.props.callbackOk) {
+        this.props.callbackOk(currentProductMain);
       }
-    }
-    if (this.props.callbackOk) {
-      this.props.callbackOk(currentProductMain);
+    } else {
+      message.warning({
+        content: '必填字段不能为空~',
+      });
+      return;
     }
   };
   handleCancel = () => {
@@ -167,7 +188,7 @@ class CreateMainModal extends Component {
           <div className="content form-box">
             <div className="form-item">
               <span className="label">
-                <i>*</i> 商品名称:
+                <i>*</i> 主商品名称:
               </span>
               <Input
                 placeholder="商品名称"
@@ -219,7 +240,7 @@ class CreateMainModal extends Component {
                   size="small"
                   onClick={this.googleProductCategoryButtonHandle}
                 >
-                  商品类目
+                  选择Google 商品类目
                 </Button>
               </span>
             </div>
@@ -243,7 +264,7 @@ class CreateMainModal extends Component {
             </div>
           </div>
           <CustomProductType
-            dataSource={productTypeOption}
+            dataSource={{ productTypeOption, currentProductMain }}
             open={this.state.isProductTypeShow}
             callbackCancel={this.productTypeCallBackCancel}
             callbackOk={this.productTypeCallBackOk}

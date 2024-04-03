@@ -212,47 +212,49 @@ class Material extends Component {
     console.log('this.props:', this.props);
     const { currentFolderDirectory, imageList } = this.props.material;
     return (
-      <div className="material">
-        <div className="content">
-          <Row>
-            <Col span={4}>
-              <div className="folder-menu">
-                <dl>
-                  <dt>
-                    <FolderOpenOutlined /> 文件目录
-                  </dt>
-                  {this.folderMenuHtml()}
-                </dl>
-              </div>
-            </Col>
-            <Col span={20}>
-              <div className="container">
-                <div className="header">
-                  <Button icon={<FolderAddOutlined />} onClick={this.handelCreateFolder}>
-                    新建文件目录
-                  </Button>
-                  <UploadFile
-                    callbackOk={this.handelUploadOk}
-                    callbackFailed={this.handelUploadFailed}
-                    data={currentFolderDirectory}
-                  ></UploadFile>
+      <div className="page">
+        <div className="material">
+          <div className="content">
+            <Row>
+              <Col span={4}>
+                <div className="folder-menu">
+                  <dl>
+                    <dt>
+                      <FolderOpenOutlined /> 文件目录
+                    </dt>
+                    {this.folderMenuHtml()}
+                  </dl>
                 </div>
-                <ImgList
-                  dataSource={imageList || []}
-                  delMaterialCallback={this.delMaterialCallback}
-                  checked={['1085370435/22159932/limeet_logo_绿色.png']}
-                  onChangeCallback={this.handelCheckCallback}
-                ></ImgList>
-                <FolderDirectory
-                  open={this.state.folderOpenStatus}
-                  optionAction={this.state.optionAction}
-                  callbackOk={this.handelFolderOk}
-                  callbackCancel={this.handelFolderCancel}
-                  currentFolderDirectory={currentFolderDirectory}
-                ></FolderDirectory>
-              </div>
-            </Col>
-          </Row>
+              </Col>
+              <Col span={20}>
+                <div className="container">
+                  <div className="header">
+                    <Button icon={<FolderAddOutlined />} onClick={this.handelCreateFolder}>
+                      新建文件目录
+                    </Button>
+                    <UploadFile
+                      callbackOk={this.handelUploadOk}
+                      callbackFailed={this.handelUploadFailed}
+                      data={currentFolderDirectory}
+                    ></UploadFile>
+                  </div>
+                  <ImgList
+                    dataSource={imageList || []}
+                    delMaterialCallback={this.delMaterialCallback}
+                    checked={['1085370435/22159932/limeet_logo_绿色.png']}
+                    onChangeCallback={this.handelCheckCallback}
+                  ></ImgList>
+                  <FolderDirectory
+                    open={this.state.folderOpenStatus}
+                    optionAction={this.state.optionAction}
+                    callbackOk={this.handelFolderOk}
+                    callbackCancel={this.handelFolderCancel}
+                    currentFolderDirectory={currentFolderDirectory}
+                  ></FolderDirectory>
+                </div>
+              </Col>
+            </Row>
+          </div>
         </div>
       </div>
     );

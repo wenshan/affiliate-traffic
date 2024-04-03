@@ -26,20 +26,20 @@ class ProductCreateSku extends Component {
   }
   // 语言
   languageRadioHandle = (event) => {
+    const { value } = event.target;
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
-        language: event.target.value,
+        language: value,
       },
     });
   };
   // 货币单位
-  monetaryUnitSelectHandle = (event, option) => {
-    console.log(event, option);
+  monetaryUnitSelectHandle = (value) => {
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
-        monetary_unit: option,
+        monetary_unit: value,
       },
     });
   };

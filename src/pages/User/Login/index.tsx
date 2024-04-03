@@ -46,14 +46,14 @@ const LoginInit: React.FC = () => {
               key: 'login',
               label: intl.formatMessage({
                 id: 'pages.login.accountLogin.tab',
-                defaultMessage: '登录',
+                defaultMessage: '账号密码登录',
               }),
             },
             {
               key: 'register',
               label: intl.formatMessage({
                 id: 'pages.login.phoneLogin.tab',
-                defaultMessage: '注册',
+                defaultMessage: '注册新账户',
               }),
             },
           ]}

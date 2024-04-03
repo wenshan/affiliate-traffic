@@ -51,13 +51,6 @@ class ProductList extends Component {
         width: 60,
       },
       {
-        title: 'GTIN',
-        dataIndex: 'gtin',
-        key: 'gtin',
-        width: 90,
-        fixed: 'left',
-      },
-      {
         title: '价格',
         dataIndex: 'price',
         key: 'price',
@@ -90,6 +83,12 @@ class ProductList extends Component {
         dataIndex: 'description',
         key: 'description',
         width: 220,
+      },
+      {
+        title: 'GTIN',
+        dataIndex: 'gtin',
+        key: 'gtin',
+        width: 90,
       },
       {
         title: '链接',
@@ -131,7 +130,11 @@ class ProductList extends Component {
         key: 'product_type',
         width: 90,
         render: (text, record) => {
-          return record.label;
+          if (record.product_type && record.product_type.title) {
+            return record.product_type.title;
+          } else {
+            return '-';
+          }
         },
       },
       {
@@ -139,6 +142,13 @@ class ProductList extends Component {
         dataIndex: 'google_product_category',
         key: 'google_product_category',
         width: 110,
+        render: (text, record) => {
+          if (record.google_product_category && record.google_product_category.title) {
+            return record.google_product_category.title;
+          } else {
+            return '-';
+          }
+        },
       },
       {
         title: '附加图片',

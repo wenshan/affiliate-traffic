@@ -158,9 +158,11 @@ class CustomProductType extends Component {
   };
 
   render() {
+    const { productTypeOption, currentProductMain } = this.props.dataSource;
     const rowSelection = {
       type: 'radio',
       onChange: this.onChangeSelectedRows,
+      getCheckboxProps: currentProductMain.product_type_id,
     };
 
     return (
@@ -173,7 +175,7 @@ class CustomProductType extends Component {
           onCancel={this.handleCancel}
         >
           <Table
-            dataSource={this.props.dataSource}
+            dataSource={productTypeOption}
             columns={this.columns()}
             pagination={false}
             rowSelection={rowSelection}
