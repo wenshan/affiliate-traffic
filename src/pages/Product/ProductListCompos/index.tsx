@@ -96,13 +96,13 @@ class ProductListCompos extends Component {
     return [
       {
         title: '主图',
-        dataIndex: 'imageLink',
-        key: 'imageLink',
+        dataIndex: 'image_link',
+        key: 'image_link',
         fixed: 'left',
         width: 60,
         render: (text, record) => {
-          if (record && record.imageLink) {
-            return <img src={record.imageLink} width={50}></img>;
+          if (record && record.image_link) {
+            return <img src={record.image_link} width={50}></img>;
           } else {
             return '-';
           }
@@ -131,13 +131,13 @@ class ProductListCompos extends Component {
       },
       {
         title: '售卖价格',
-        dataIndex: 'salePrice',
-        key: 'salePrice',
+        dataIndex: 'sale_price',
+        key: 'sale_price',
         fixed: 'left',
         width: 100,
         render: (text, record) => {
-          if (record && record.salePrice && record.monetary_unit.value) {
-            return `${record.salePrice} ${record.monetary_unit.value}`;
+          if (record && record.sale_price && record.monetary_unit.value) {
+            return `${record.sale_price} ${record.monetary_unit.value}`;
           } else {
             return '-';
           }

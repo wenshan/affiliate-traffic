@@ -87,7 +87,7 @@ export default {
       description: '',
       link: '',
       mobile_link: '',
-      imageLink: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+      image_link: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
       additional_image_link: [],
       lifestyle_image_link: [],
       google_product_category: '',
@@ -95,7 +95,7 @@ export default {
       color: '',
       material: '',
       price: '',
-      salePrice: '',
+      sale_price: '',
       product_detail: [], // 商品属性
       product_highlight: '',
       product_height: '',
@@ -388,13 +388,13 @@ export default {
         monetary_unit,
         link,
         mobile_link,
-        imageLink,
+        image_link,
         lifestyle_image_link,
         additional_image_link,
         color,
         material,
         price,
-        salePrice,
+        sale_price,
         product_detail,
         product_highlight,
         product_length,
@@ -410,7 +410,7 @@ export default {
         language &&
         monetary_unit &&
         link &&
-        imageLink &&
+        image_link &&
         price &&
         description &&
         id &&
@@ -424,7 +424,7 @@ export default {
           monetary_unit,
           link,
           mobile_link,
-          imageLink,
+          image_link,
           description,
           product_type,
           product_type_id,
@@ -437,7 +437,7 @@ export default {
           color,
           material,
           price,
-          salePrice,
+          sale_price,
           product_detail,
           product_highlight,
           product_height,
@@ -546,7 +546,7 @@ export default {
         language,
         monetary_unit,
         link,
-        imageLink,
+        image_link,
         price,
         description,
         product_main_id,
@@ -563,7 +563,7 @@ export default {
         language &&
         monetary_unit &&
         link &&
-        imageLink &&
+        image_link &&
         price &&
         description &&
         product_main_id &&

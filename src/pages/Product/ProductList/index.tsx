@@ -1,5 +1,6 @@
+import { RedoOutlined, SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Modal, Select, Table } from 'antd';
+import { Button, Input, Modal, Select, Space, Table } from 'antd';
 import { Component, JSX, Key } from 'react';
 import { connect, history } from 'umi';
 
@@ -24,13 +25,13 @@ class ProductList extends Component {
     return [
       {
         title: '主图',
-        dataIndex: 'imageLink',
-        key: 'imageLink',
+        dataIndex: 'image_link',
+        key: 'image_link',
         fixed: 'left',
         width: 60,
         render: (text, record) => {
-          if (record && record.imageLink) {
-            return <img src={record.imageLink} width={50}></img>;
+          if (record && record.image_link) {
+            return <img src={record.image_link} width={50}></img>;
           } else {
             return '-';
           }
@@ -66,13 +67,13 @@ class ProductList extends Component {
       },
       {
         title: '售卖价格',
-        dataIndex: 'salePrice',
-        key: 'salePrice',
+        dataIndex: 'sale_price',
+        key: 'sale_price',
         fixed: 'left',
         width: 100,
         render: (text, record) => {
-          if (record && record.salePrice && record.monetary_unit.value) {
-            return `${record.salePrice} ${record.monetary_unit.value}`;
+          if (record && record.sale_price && record.monetary_unit.value) {
+            return `${record.sale_price} ${record.monetary_unit.value}`;
           } else {
             return '-';
           }
@@ -291,6 +292,37 @@ class ProductList extends Component {
       },
     ];
   };
+  searchLanguageSelectHandle = (value) => {
+    const { searchParams } = this.props.product;
+    const newSearchParams = Object.assign({}, searchParams, { language: value });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        searchParams: newSearchParams,
+      },
+    });
+  };
+  searchTitleInputHandle = (event) => {
+    const { value } = event.target;
+    const { searchParams } = this.props.product;
+    const newSearchParams = Object.assign({}, searchParams, { title: value });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        searchParams: newSearchParams,
+      },
+    });
+  };
+  searchProductTypeSelectHandle = (value) => {
+    const { searchParams } = this.props.product;
+    const newSearchParams = Object.assign({}, searchParams, { product_type_id: value });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        searchParams: newSearchParams,
+      },
+    });
+  };
   handelTableView = (record) => {
     console.log(record);
   };
@@ -327,6 +359,20 @@ class ProductList extends Component {
 
   // 翻页
   handelTablePagination = () => {};
+  languageRadioHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        language: value,
+      },
+    });
+  };
+  // 刷新 google token
+  handelRefreshToken = () => {
+    this.props.dispatch({
+      type: 'login/googleGetToken',
+    });
+  };
   componentDidMount() {
     this.props.dispatch({
       type: 'product/initQueryParams',
@@ -339,32 +385,53 @@ class ProductList extends Component {
       type: 'product/queryProductMainAllCompos',
     });
   }
-  languageRadioHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        language: value,
-      },
-    });
-  };
 
   render() {
-    const { productList, languageOption, pagination, language } = this.props.product;
+    const { productList, languageOption, pagination, searchParams, productTypeOption } =
+      this.props.product;
     return (
       <PageContainer>
         <div className="page">
           <div className="product-list">
             <div className="header">
-              <div className="form-item">
-                <span className="label">选择语言:</span>
-                <Select
-                  defaultValue={language}
-                  value={language}
-                  style={{ width: 120 }}
-                  onChange={this.languageRadioHandle}
-                  options={languageOption}
-                />
-              </div>
+              <Space size="large" direction="vertical">
+                <Button type="primary" icon={<RedoOutlined />} onClick={this.handelRefreshToken}>
+                  refresh google token
+                </Button>
+                <div className="form-item">
+                  <span className="label">选择语言:</span>
+                  <Select
+                    defaultValue={searchParams.language}
+                    value={searchParams.language}
+                    style={{ width: 120 }}
+                    onChange={this.searchLanguageSelectHandle}
+                    options={languageOption}
+                  />
+                </div>
+                <div className="form-item">
+                  <span className="label">自定商品分类:</span>
+                  <Select
+                    value={searchParams.product_type_id}
+                    style={{ width: 150 }}
+                    onChange={this.searchProductTypeSelectHandle}
+                    options={productTypeOption}
+                  />
+                </div>
+                <div className="form-item">
+                  <span className="label">商品名称:</span>
+                  <Input
+                    placeholder="商品名称"
+                    style={{ width: 200 }}
+                    value={searchParams.title}
+                    onChange={this.searchTitleInputHandle}
+                  />
+                </div>
+                <div className="form-item">
+                  <Button type="primary" icon={<SearchOutlined />}>
+                    Search
+                  </Button>
+                </div>
+              </Space>
             </div>
             <div className="content">
               <Table

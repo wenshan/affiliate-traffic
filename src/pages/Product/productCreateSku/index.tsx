@@ -3,6 +3,7 @@ import { Button, Image, Input, Radio, Select, Table } from 'antd';
 import { Component, JSX } from 'react';
 import { connect } from 'umi';
 import ImageSelectModal from '../components/ImageSelectModal';
+import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
 
 import './index.less';
@@ -20,7 +21,7 @@ class ProductCreateSku extends Component {
     this.state = {
       isProductAttributeModal: false,
       isProductImageModal: false,
-      currentImageProductType: 'imageLink',
+      currentImageProductType: 'image_link',
       imageLimitNum: 20,
     };
   }
@@ -89,7 +90,7 @@ class ProductCreateSku extends Component {
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
-        salePrice: value,
+        sale_price: value,
       },
     });
   };
@@ -100,6 +101,16 @@ class ProductCreateSku extends Component {
       type: 'product/updateProduct',
       payload: {
         product_highlight: value,
+      },
+    });
+  };
+  // lifestyle_image_link 生活风格图片链接
+  productLifestyleImageLinkInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        lifestyle_image_link: value,
       },
     });
   };
@@ -270,11 +281,11 @@ class ProductCreateSku extends Component {
         imageSrc.push(item.url);
       });
 
-    if (currentImageProductType === 'imageLink') {
+    if (currentImageProductType === 'image_link') {
       this.props.dispatch({
         type: 'product/updateProduct',
         payload: {
-          imageLink: imageSrc[0],
+          image_link: imageSrc[0],
         },
       });
     }
@@ -286,15 +297,6 @@ class ProductCreateSku extends Component {
         },
       });
     }
-    if (currentImageProductType === 'lifestyle_image_link') {
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          lifestyle_image_link: imageSrc,
-        },
-      });
-    }
-
     this.setState({
       isProductImageModal: false,
     });
@@ -399,7 +401,7 @@ class ProductCreateSku extends Component {
     const {
       language,
       monetary_unit,
-      imageLink,
+      image_link,
       additional_image_link,
       lifestyle_image_link,
       link,
@@ -407,7 +409,7 @@ class ProductCreateSku extends Component {
       description,
       title,
       price,
-      salePrice,
+      sale_price,
       color,
       material,
       product_highlight,
@@ -423,8 +425,10 @@ class ProductCreateSku extends Component {
       <PageContainer>
         <div className="page">
           <div className="product-sku">
+            <div className="header">
+              <div className="sub-header">基本商品数据</div>
+            </div>
             <div className="content form-box">
-              <div className="header"></div>
               <div className="form-item">
                 <span className="label">
                   <i>*</i> 选择语言:
@@ -436,15 +440,31 @@ class ProductCreateSku extends Component {
                 ></Radio.Group>
               </div>
               <div className="form-item">
+                <LabelHelpTip keyLabel="title"></LabelHelpTip>
+                <Input
+                  placeholder="商品名称"
+                  style={{ width: 350 }}
+                  value={title}
+                  onChange={this.titleInputHandle}
+                />
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="description"></LabelHelpTip>
+                <TextArea
+                  rows={4}
+                  style={{ width: 350 }}
+                  value={description}
+                  onChange={this.descriptionTextAreaHandle}
+                />
+              </div>
+              <div className="form-item">
                 <div className="line-box">
-                  <span className="label">
-                    <i>*</i> 商品主图:
-                  </span>
+                  <LabelHelpTip keyLabel="image_link"></LabelHelpTip>
                   <Button
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('imageLink', 1);
+                      this.imageSelectModel('image_link', 1);
                     }}
                   >
                     添加主图
@@ -453,14 +473,14 @@ class ProductCreateSku extends Component {
                 <div className="line-box main-img">
                   <Image
                     width={180}
-                    src={imageLink}
+                    src={image_link}
                     fallback="data:image/png;base64,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"
                   />
                 </div>
               </div>
               <div className="form-item">
                 <div className="line-box">
-                  <span className="label">商品附加图片:</span>
+                  <LabelHelpTip keyLabel="additional_image_link"></LabelHelpTip>
                   <Button
                     type="primary"
                     size="small"
@@ -476,37 +496,7 @@ class ProductCreateSku extends Component {
                 </div>
               </div>
               <div className="form-item">
-                <div className="line-box">
-                  <span className="label">添加生活风格图:</span>
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() => {
-                      this.imageSelectModel('lifestyle_image_link', 20);
-                    }}
-                  >
-                    添加生活风格图
-                  </Button>
-                </div>
-                <div className="line-box">
-                  <div className="add-img-list">{this.imageRenderView(lifestyle_image_link)}</div>
-                </div>
-              </div>
-              <div className="form-item">
-                <span className="label">
-                  <i>*</i> 商品名称:
-                </span>
-                <Input
-                  placeholder="商品名称"
-                  style={{ width: 350 }}
-                  value={title}
-                  onChange={this.titleInputHandle}
-                />
-              </div>
-              <div className="form-item">
-                <span className="label">
-                  <i>*</i> 商品着陆页:
-                </span>
+                <LabelHelpTip keyLabel="link"></LabelHelpTip>
                 <Input
                   placeholder="商品着陆页"
                   style={{ width: 350 }}
@@ -515,7 +505,7 @@ class ProductCreateSku extends Component {
                 />
               </div>
               <div className="form-item">
-                <span className="label">手机端着陆页:</span>
+                <LabelHelpTip keyLabel="mobile_link"></LabelHelpTip>
                 <Input
                   placeholder="商品着陆页"
                   style={{ width: 350 }}
@@ -523,6 +513,11 @@ class ProductCreateSku extends Component {
                   onChange={this.mobileLinkInputHandle}
                 />
               </div>
+            </div>
+            <div className="header">
+              <div className="sub-header">价格和库存状况</div>
+            </div>
+            <div className="content form-box">
               <div className="form-item">
                 <span className="label">
                   <i>*</i> 选择货币单位:
@@ -535,9 +530,7 @@ class ProductCreateSku extends Component {
                 />
               </div>
               <div className="form-item">
-                <span className="label">
-                  <i>*</i>商品价格:
-                </span>
+                <LabelHelpTip keyLabel="price"></LabelHelpTip>
                 <Input
                   placeholder="价格"
                   style={{ width: 120 }}
@@ -547,66 +540,32 @@ class ProductCreateSku extends Component {
                 />
               </div>
               <div className="form-item">
-                <span className="label">商品促销价格:</span>
+                <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
                 <Input
                   placeholder="售卖价格"
                   style={{ width: 120 }}
-                  value={salePrice}
+                  value={sale_price}
                   onChange={this.salePriceInputHandle}
                   suffix={monetary_unit.value}
                 />
               </div>
               <div className="form-item">
-                <span className="label" style={{ verticalAlign: 'top' }}>
-                  <i>*</i>商品描述:
-                </span>
-                <TextArea
-                  rows={4}
-                  style={{ width: 350 }}
-                  value={description}
-                  onChange={this.descriptionTextAreaHandle}
-                />
+                <LabelHelpTip keyLabel="availability"></LabelHelpTip>
+                <Radio.Group value={availability} onChange={this.handelRadioAvailability}>
+                  <Radio value="in_stock"> 有货 </Radio>
+                  <Radio value="out_of_stock"> 缺货 </Radio>
+                </Radio.Group>
               </div>
+            </div>
+            <div className="header">
+              <div className="sub-header">详细商品描述</div>
+            </div>
+            <div className="content form-box">
+              {/** 商品组 ID [item_group_id] */}
+              {/* 年龄段 [age_group] */}
+              {/* 颜色 [color] */}
               <div className="form-item">
-                <span className="label">商品亮点:</span>
-                <Input
-                  placeholder="商品亮点"
-                  style={{ width: 350 }}
-                  value={product_highlight}
-                  onChange={this.productHighlightInputHandle}
-                />
-              </div>
-              <div className="form-item">
-                <div className="line-box">
-                  <span className="label" style={{ verticalAlign: 'top' }}>
-                    商品属性:
-                  </span>
-                  <Button type="primary" size="small" onClick={this.productAttributeButtonHandle}>
-                    属性管理
-                  </Button>
-                </div>
-                <div className="line-box">
-                  <div className="table-box">
-                    <Table
-                      dataSource={product_detail}
-                      columns={this.columnsProductAttribute()}
-                      pagination={false}
-                      style={{ width: 350 }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="form-item">
-                <span className="label">商品材料:</span>
-                <Input
-                  placeholder="商品材料"
-                  style={{ width: 350 }}
-                  value={material}
-                  onChange={this.materialInputHandle}
-                />
-              </div>
-              <div className="form-item">
-                <span className="label">商品颜色:</span>
+                <LabelHelpTip keyLabel="color"></LabelHelpTip>
                 <Input
                   placeholder="商品颜色"
                   style={{ width: 350 }}
@@ -614,13 +573,21 @@ class ProductCreateSku extends Component {
                   onChange={this.colorInputHandle}
                 />
               </div>
+              {/* 适用性别 [gender] */}
+              {/* 材质 [material] */}
               <div className="form-item">
-                <span className="label">商品是否缺货:</span>
-                <Radio.Group value={availability} onChange={this.handelRadioAvailability}>
-                  <Radio value="in_stock"> 有货 </Radio>
-                  <Radio value="out_of_stock"> 缺货 </Radio>
-                </Radio.Group>
+                <LabelHelpTip keyLabel="material"></LabelHelpTip>
+                <Input
+                  placeholder="商品材料"
+                  style={{ width: 350 }}
+                  value={material}
+                  onChange={this.materialInputHandle}
+                />
               </div>
+              {/* 图案 [pattern] */}
+              {/* 尺寸 [size] */}
+              {/**== 尺码类型 [size_type] */}
+              {/**== 尺码体系 [size_system] */}
               <div className="form-item">
                 <span className="label">商品尺寸:</span>
                 长:
@@ -646,7 +613,7 @@ class ProductCreateSku extends Component {
                 />
               </div>
               <div className="form-item">
-                <span className="label">商品重量:</span>
+                <LabelHelpTip keyLabel="product_weight"></LabelHelpTip>
                 <Input
                   placeholder="商品重量"
                   style={{ width: 350 }}
@@ -654,6 +621,55 @@ class ProductCreateSku extends Component {
                   onChange={this.productWeightInputHandle}
                 />
               </div>
+              <div className="form-item">
+                <div className="line-box">
+                  <LabelHelpTip keyLabel="product_detail"></LabelHelpTip>
+                  <Button type="primary" size="small" onClick={this.productAttributeButtonHandle}>
+                    属性管理
+                  </Button>
+                </div>
+                <div className="line-box">
+                  <div className="table-box">
+                    <Table
+                      dataSource={product_detail}
+                      columns={this.columnsProductAttribute()}
+                      pagination={false}
+                      style={{ width: 350 }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="product_highlight"></LabelHelpTip>
+                <Input
+                  placeholder="商品亮点"
+                  style={{ width: 350 }}
+                  value={product_highlight}
+                  onChange={this.productHighlightInputHandle}
+                />
+              </div>
+            </div>
+            <div className="header">
+              <div className="sub-header">购物广告系列和其他配置</div>
+            </div>
+            <div className="content form-box">
+              <div className="form-item">
+                <div className="line-box">
+                  <LabelHelpTip keyLabel="lifestyle_image_link"></LabelHelpTip>
+                  <Input
+                    placeholder="生活风格图片链接"
+                    style={{ width: 350 }}
+                    value={lifestyle_image_link}
+                    onChange={this.productLifestyleImageLinkInputHandle}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="header">
+              <div className="sub-header">目标平台</div>
+            </div>
+            <div className="content form-box"></div>
+            <div className="content form-box">
               <div className="form-item">
                 <span className="label"></span>
                 <Button

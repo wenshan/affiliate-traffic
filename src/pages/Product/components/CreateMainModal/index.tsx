@@ -185,6 +185,9 @@ class CreateMainModal extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
+          <div className="header">
+            <div className="sub-header">多语言通用的商品类别和标识码</div>
+          </div>
           <div className="content form-box">
             <div className="form-item">
               <span className="label">

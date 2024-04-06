@@ -13,7 +13,7 @@ const instance = axios.create({
   timeout: 1000 * 60,
   headers: {
     'Access-Control-Allow-Credentials': true,
-    'Access-Control-Allow-Origin': 'http://127.0.0.1:8080',
+    'Access-Control-Allow-Origin': 'http://127.0.0.1:8000',
     'Access-Control-Allow-Methods': 'DELETE, HEAD, GET, OPTIONS, POST, PUT',
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Headers':

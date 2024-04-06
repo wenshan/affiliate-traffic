@@ -85,7 +85,7 @@ class ImageSelectModal extends Component {
     let html = '';
     const { selectedType } = this.props;
     // eslint-disable-next-line eqeqeq
-    if (selectedType == 'imageLink') {
+    if (selectedType == 'image_link') {
       html = '选择商品主图（选择1张图片）';
       // eslint-disable-next-line eqeqeq
     } else if (selectedType == 'additionalImageLinks') {
