@@ -58,8 +58,8 @@ class ProductList extends Component {
         fixed: 'left',
         width: 100,
         render: (text, record) => {
-          if (record && record.price && record.monetary_unit.value) {
-            return `${record.price} ${record.monetary_unit.value}`;
+          if (record && record.price && record.monetary_unit) {
+            return `${record.price} ${record.monetary_unit}`;
           } else {
             return '-';
           }
@@ -72,8 +72,8 @@ class ProductList extends Component {
         fixed: 'left',
         width: 100,
         render: (text, record) => {
-          if (record && record.sale_price && record.monetary_unit.value) {
-            return `${record.sale_price} ${record.monetary_unit.value}`;
+          if (record && record.sale_price && record.monetary_unit) {
+            return `${record.sale_price} ${record.monetary_unit}`;
           } else {
             return '-';
           }
@@ -114,9 +114,14 @@ class ProductList extends Component {
         key: 'mobile_link',
         width: 90,
         render: (text, record) => {
-          if (record.link) {
+          if (record.mobile_link) {
             return (
-              <a href={record.link} title={record.link} target="_blank" rel="noreferrer">
+              <a
+                href={record.mobile_link}
+                title={record.mobile_link}
+                target="_blank"
+                rel="noreferrer"
+              >
                 链接
               </a>
             );
@@ -172,23 +177,76 @@ class ProductList extends Component {
         title: '生活风格图',
         dataIndex: 'lifestyle_image_link',
         key: 'lifestyle_image_link',
-        width: 200,
-        render: (text: any, record: { lifestyle_image_link: string[] }) => {
-          const html: JSX.Element[] = [];
-          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          record &&
-            record.lifestyle_image_link &&
-            record.lifestyle_image_link.length &&
-            record.lifestyle_image_link.map((item: string, idx: Key) => {
-              html.push(<img key={idx} src={item} width={50}></img>);
-            });
-          return html;
+        width: 90,
+        render: (text, record) => {
+          if (record.lifestyle_image_link) {
+            return (
+              <a
+                href={record.lifestyle_image_link}
+                title={record.lifestyle_image_link}
+                target="_blank"
+                rel="noreferrer"
+              >
+                链接
+              </a>
+            );
+          } else {
+            return '-';
+          }
         },
+      },
+      {
+        title: '分组ID',
+        dataIndex: 'item_group_id',
+        key: 'item_group_id',
+        width: 90,
       },
       {
         title: '颜色',
         dataIndex: 'color',
         key: 'color',
+        width: 90,
+      },
+      {
+        title: '尺寸',
+        dataIndex: 'size',
+        key: 'size',
+        width: 200,
+        render: (text: any, record: any) => {
+          if (record.size && record.size_type && record.size_system) {
+            return (
+              <>
+                <p>{`尺寸: ${record.size}`}</p>
+                <p>{`尺码类型: ${record.size_type} 尺码体系: ${record.size_system}`}</p>
+              </>
+            );
+          } else {
+            return '-';
+          }
+        },
+      },
+      {
+        title: '适用人群',
+        dataIndex: 'age_group',
+        key: 'age_group',
+        width: 120,
+        render: (text: any, record: any) => {
+          if (record.age_group && record.gender) {
+            return (
+              <>
+                <p>{`年龄: ${record.age_group}`}</p>
+                <p>{`性别: ${record.gender}`}</p>
+              </>
+            );
+          } else {
+            return '-';
+          }
+        },
+      },
+      {
+        title: '图案',
+        dataIndex: 'pattern',
+        key: 'pattern',
         width: 90,
       },
       {
@@ -218,17 +276,6 @@ class ProductList extends Component {
         dataIndex: 'product_highlight',
         key: 'product_highlight',
         width: 200,
-      },
-      {
-        title: '商品尺寸',
-        dataIndex: 'color',
-        key: 'color',
-        width: 200,
-        render: (text: any, record: any) => {
-          return (
-            <div>{`${record.product_length}x${record.product_width}x${record.product_height}`}</div>
-          );
-        },
       },
       {
         title: '库存',

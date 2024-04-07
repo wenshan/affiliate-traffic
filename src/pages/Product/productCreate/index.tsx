@@ -86,16 +86,25 @@ class ProductCreate extends Component {
   // table
   handelTableCreateSku = (record) => {
     console.log('record:', record);
+    const { currentProductMain } = this.props.product;
+    const newCurrentProductMain = Object.assign({}, currentProductMain, record);
     this.props.dispatch({
       type: 'product/update',
       payload: {
-        currentProductMain: record,
+        currentProductMain: newCurrentProductMain,
       },
     });
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
         product_main_id: record.id,
+        title_main: record.title,
+        gtin: record.gtin,
+        offer_id: record.offer_id,
+        product_type: record.product_type,
+        product_type_id: record.product_type_id,
+        google_product_category: record.google_product_category,
+        google_product_category_id: record.google_product_category_id,
       },
     });
     history.push(

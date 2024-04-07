@@ -200,26 +200,6 @@ class ProductCreateSku extends Component {
       },
     });
   };
-  // 材料
-  materialInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        material: value,
-      },
-    });
-  };
-  // 颜色
-  colorInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        color: value,
-      },
-    });
-  };
 
   productAttributeButtonHandle = () => {
     this.setState({
@@ -377,6 +357,92 @@ class ProductCreateSku extends Component {
       },
     });
   };
+  // 商品组 ID [item_group_id]
+  itemGroupIdInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        item_group_id: value,
+      },
+    });
+  };
+  // 颜色 [color]
+  colorInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        color: value,
+      },
+    });
+  };
+  // 年龄段 [age_group]
+  ageGroupSelectHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        age_group: value,
+      },
+    });
+  };
+  // 适用性别 [gender]
+  genderSelectHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        age_group: value,
+      },
+    });
+  };
+  // 材质 [material]
+  materialInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        material: value,
+      },
+    });
+  };
+  // 图案 [pattern]
+  patternInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        pattern: value,
+      },
+    });
+  };
+  // 尺寸 [size]
+  sizeInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        size: value,
+      },
+    });
+  };
+  // 尺码类型 [size_type]
+  sizeTypeSelectHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        size_type: value,
+      },
+    });
+  };
+  // 尺码体系 [size_system]
+  sizeSystemSelectHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        size_system: value,
+      },
+    });
+  };
 
   componentDidMount() {
     this.props.dispatch({
@@ -394,6 +460,10 @@ class ProductCreateSku extends Component {
       productDetail,
       productAttributeOption,
       product_sku_option_status,
+      sizeTypeOption,
+      sizeSystemOption,
+      genderOption,
+      ageGroupOption,
     } = this.props.product;
     const { folderDirectory, imageList } = this.props.material;
     console.log('productDetail:', productDetail);
@@ -414,11 +484,15 @@ class ProductCreateSku extends Component {
       material,
       product_highlight,
       availability,
-      product_width,
-      product_height,
-      product_length,
       product_weight,
       product_detail,
+      item_group_id,
+      age_group,
+      gender,
+      pattern,
+      size,
+      size_type,
+      size_system,
     } = productDetail;
     console.log('product_detail:', product_detail);
     return (
@@ -472,7 +546,7 @@ class ProductCreateSku extends Component {
                 </div>
                 <div className="line-box main-img">
                   <Image
-                    width={180}
+                    width={100}
                     src={image_link}
                     fallback="data:image/png;base64,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"
                   />
@@ -485,7 +559,7 @@ class ProductCreateSku extends Component {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('additional_image_link', 5);
+                      this.imageSelectModel('additional_image_link', 10);
                     }}
                   >
                     添加附属图片
@@ -523,7 +597,7 @@ class ProductCreateSku extends Component {
                   <i>*</i> 选择货币单位:
                 </span>
                 <Select
-                  value={monetary_unit.value}
+                  value={monetary_unit}
                   style={{ width: 120 }}
                   onChange={this.monetaryUnitSelectHandle}
                   options={monetaryUnitOption}
@@ -536,7 +610,7 @@ class ProductCreateSku extends Component {
                   style={{ width: 120 }}
                   value={price}
                   onChange={this.priceInputHandle}
-                  suffix={monetary_unit.value}
+                  suffix={monetary_unit}
                 />
               </div>
               <div className="form-item">
@@ -546,7 +620,7 @@ class ProductCreateSku extends Component {
                   style={{ width: 120 }}
                   value={sale_price}
                   onChange={this.salePriceInputHandle}
-                  suffix={monetary_unit.value}
+                  suffix={monetary_unit}
                 />
               </div>
               <div className="form-item">
@@ -558,11 +632,19 @@ class ProductCreateSku extends Component {
               </div>
             </div>
             <div className="header">
-              <div className="sub-header">详细商品描述</div>
+              <div className="sub-header">详细商品描述&创建商品组合</div>
             </div>
             <div className="content form-box">
               {/** 商品组 ID [item_group_id] */}
-              {/* 年龄段 [age_group] */}
+              <div className="form-item">
+                <LabelHelpTip keyLabel="item_group_id"></LabelHelpTip>
+                <Input
+                  placeholder="商品组 ID"
+                  style={{ width: 120 }}
+                  value={item_group_id}
+                  onChange={this.itemGroupIdInputHandle}
+                />
+              </div>
               {/* 颜色 [color] */}
               <div className="form-item">
                 <LabelHelpTip keyLabel="color"></LabelHelpTip>
@@ -573,7 +655,26 @@ class ProductCreateSku extends Component {
                   onChange={this.colorInputHandle}
                 />
               </div>
+              {/* 年龄段 [age_group] */}
+              <div className="form-item">
+                <LabelHelpTip keyLabel="age_group"></LabelHelpTip>
+                <Select
+                  value={age_group}
+                  style={{ width: 120 }}
+                  onChange={this.ageGroupSelectHandle}
+                  options={ageGroupOption}
+                />
+              </div>
               {/* 适用性别 [gender] */}
+              <div className="form-item">
+                <LabelHelpTip keyLabel="gender"></LabelHelpTip>
+                <Select
+                  value={gender}
+                  style={{ width: 120 }}
+                  onChange={this.genderSelectHandle}
+                  options={genderOption}
+                />
+              </div>
               {/* 材质 [material] */}
               <div className="form-item">
                 <LabelHelpTip keyLabel="material"></LabelHelpTip>
@@ -585,33 +686,41 @@ class ProductCreateSku extends Component {
                 />
               </div>
               {/* 图案 [pattern] */}
-              {/* 尺寸 [size] */}
-              {/**== 尺码类型 [size_type] */}
-              {/**== 尺码体系 [size_system] */}
               <div className="form-item">
-                <span className="label">商品尺寸:</span>
-                长:
+                <LabelHelpTip keyLabel="pattern"></LabelHelpTip>
                 <Input
-                  placeholder="长"
-                  style={{ width: 100 }}
-                  value={product_length}
-                  onChange={this.productLengthInputHandle}
-                />
-                宽:
-                <Input
-                  placeholder="宽"
-                  style={{ width: 100 }}
-                  value={product_width}
-                  onChange={this.productWidthInputHandle}
-                />
-                高:
-                <Input
-                  placeholder="高"
-                  style={{ width: 100 }}
-                  value={product_height}
-                  onChange={this.productHeightInputHandle}
+                  placeholder="商品图案"
+                  style={{ width: 350 }}
+                  value={pattern}
+                  onChange={this.patternInputHandle}
                 />
               </div>
+              {/* 尺寸 [size] */}
+              <div className="form-item">
+                <LabelHelpTip keyLabel="size"></LabelHelpTip>
+                <Input
+                  placeholder="商品尺寸"
+                  style={{ width: 150 }}
+                  value={size}
+                  onChange={this.sizeInputHandle}
+                />
+                <LabelHelpTip keyLabel="size_type"></LabelHelpTip>
+                <Select
+                  value={size_type}
+                  style={{ width: 80 }}
+                  onChange={this.sizeTypeSelectHandle}
+                  options={sizeTypeOption}
+                />
+                <LabelHelpTip keyLabel="size_system"></LabelHelpTip>
+                <Select
+                  value={size_system}
+                  style={{ width: 80 }}
+                  onChange={this.sizeSystemSelectHandle}
+                  options={sizeSystemOption}
+                />
+              </div>
+              {/**== 尺码类型 [size_type] */}
+              {/**== 尺码体系 [size_system] */}
               <div className="form-item">
                 <LabelHelpTip keyLabel="product_weight"></LabelHelpTip>
                 <Input

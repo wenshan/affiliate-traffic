@@ -73,8 +73,49 @@ export default {
         attribute_value: '1323',
       },
     ],
+    ageGroupOption: [
+      { value: 'newborn', label: '新生儿' },
+      { value: 'infant', label: '婴儿' },
+      { value: 'toddler', label: '幼儿' },
+      { value: 'kids', label: '儿童' },
+      { value: 'adult', label: '成人' },
+    ],
+    genderOption: [
+      { value: 'male', label: '男性' },
+      { value: 'female', label: '女性' },
+      { value: 'unisex', label: '女性' },
+    ],
+    sizeSystemOption: [
+      { value: 'US', label: 'US' },
+      { value: 'UK', label: 'UK' },
+      { value: 'EU', label: 'EU' },
+      { value: 'DE', label: 'DE' },
+      { value: 'FR', label: 'FR' },
+      { value: 'JP', label: 'JP' },
+      { value: 'CN', label: 'CN' },
+      { value: 'IT', label: 'IT' },
+      { value: 'BR', label: 'BR' },
+      { value: 'MEX', label: 'MEX' },
+      { value: 'AU', label: 'AU' },
+    ],
+    sizeTypeOption: [
+      { value: 'regular', label: '标准' },
+      { value: 'petite', label: '小号' },
+      { value: 'maternity', label: '孕妇 ' },
+      { value: 'big', label: '大' },
+      { value: 'tall', label: '高' },
+      { value: 'plus', label: '加大' },
+    ],
     productList: [],
     productDetail: {
+      product_id: '',
+      item_group_id: '',
+      age_group: 'adult',
+      gender: 'unisex',
+      pattern: '',
+      size: '',
+      size_type: 'regular',
+      size_system: 'US',
       gtin: '',
       brand: '',
       offer_id: '',
@@ -84,6 +125,7 @@ export default {
       product_type_id: '',
       monetary_unit: 'USD',
       title: '',
+      title_main: '',
       description: '',
       link: '',
       mobile_link: '',
@@ -157,7 +199,17 @@ export default {
       }
     },
     *editProductMain({ payload: data }, { call, put, select }) {
-      const { id, title, offer_id, google_product_category, gtin, product_type, brand } = data;
+      const {
+        id,
+        title,
+        offer_id,
+        google_product_category,
+        google_product_category_id,
+        gtin,
+        product_type,
+        product_type_id,
+        brand,
+      } = data;
       if (
         title &&
         google_product_category &&
@@ -251,6 +303,8 @@ export default {
         } else {
           message.error({ content: result.msg });
         }
+      } else {
+        message.error({ content: '缺少参数title' });
       }
     },
     *editType({ payload: data }, { call, put, select }) {

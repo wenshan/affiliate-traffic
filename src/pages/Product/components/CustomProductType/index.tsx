@@ -8,7 +8,7 @@ class CustomProductType extends Component {
     super(props);
     this.state = {
       addOpen: false,
-      optionAddStatus: 0,
+      optionAddStatus: 0, // 0 新增 1编辑
       currentProductType: {
         title: '',
       },
@@ -162,7 +162,7 @@ class CustomProductType extends Component {
     const rowSelection = {
       type: 'radio',
       onChange: this.onChangeSelectedRows,
-      getCheckboxProps: currentProductMain.product_type_id,
+      defaultSelectedRowKeys: [currentProductMain.product_type_id] || [],
     };
 
     return (

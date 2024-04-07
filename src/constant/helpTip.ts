@@ -90,6 +90,14 @@ export default {
     required: true,
     link: '',
   },
+  offer_id: {
+    title: '商品货号',
+    des: '实际生产商品的货号，同类一个商品货号，但有多个组合',
+    rule: '',
+    exam: 'LT0090、LT0090-01',
+    required: true,
+    link: '',
+  },
   gtin: {
     title: 'GTIN',
     des: '商品的全球贸易项目代码 (GTIN)。支持UPC、EAN、JAN、ISBN、ITF-14',

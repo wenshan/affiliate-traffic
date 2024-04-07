@@ -2,6 +2,7 @@ import { Button, Input, Modal, message } from 'antd';
 import { Component } from 'react';
 import CustomProductType from '../CustomProductType';
 import GoogleProductCategory from '../GoogleProductCategory';
+import LabelHelpTip from '../LabelHelpTip';
 
 import './index.less';
 
@@ -194,7 +195,7 @@ class CreateMainModal extends Component {
                 <i>*</i> 主商品名称:
               </span>
               <Input
-                placeholder="商品名称"
+                placeholder="主商品名称"
                 style={{ width: 350 }}
                 value={title}
                 onChange={this.titleHandleInput}
@@ -217,9 +218,7 @@ class CreateMainModal extends Component {
               </span>
             </div>
             <div className="form-item">
-              <span className="label">
-                <i>*</i> 商品货号:
-              </span>
+              <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
               <Input
                 placeholder="商品货号"
                 style={{ width: 350 }}
@@ -228,9 +227,7 @@ class CreateMainModal extends Component {
               />
             </div>
             <div className="form-item">
-              <span className="label">
-                <i>*</i> 选择Google商品类目:
-              </span>
+              <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
               <Input
                 placeholder="选择Google 商品类目"
                 style={{ width: 350 }}
@@ -248,7 +245,7 @@ class CreateMainModal extends Component {
               </span>
             </div>
             <div className="form-item">
-              <span className="label">商品GTIN码:</span>
+              <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
               <Input
                 placeholder="商品GTIN码"
                 style={{ width: 350 }}
@@ -257,7 +254,7 @@ class CreateMainModal extends Component {
               />
             </div>
             <div className="form-item">
-              <span className="label">品牌名称:</span>
+              <LabelHelpTip keyLabel="brand"></LabelHelpTip>
               <Input
                 placeholder="品牌名称"
                 style={{ width: 350 }}
