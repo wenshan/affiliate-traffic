@@ -25,7 +25,10 @@ const Tool = {
   trim(s) {
     return s.replace(/(^\s*)|(\s*$)/g, '');
   },
-
+  // 数组判断
+  isArray(value) {
+    return value && Object.prototype.toString.call(value) === '[object Array]';
+  },
   /**
    * 字符串超出一定长度后替换为省略符，例如"..."
    * @param {string} str - 源字符串
@@ -106,8 +109,8 @@ const Tool = {
   },
 
   /*
-  * 格式价格
-  */
+   * 格式价格
+   */
   formatPrice(price, type = 2) {
     if (typeof price !== 'number' || Number.isNaN(price)) {
       return '￥0.00';
@@ -159,7 +162,7 @@ const Tool = {
     const pairs = search.replace('?', '').split('&');
     const obj = {};
     for (let i = 0; i < pairs.length; i++) {
-      const [ key, value ] = pairs[i].split('=');
+      const [key, value] = pairs[i].split('=');
       if (!obj[key]) {
         obj[key] = value;
       }
@@ -192,11 +195,11 @@ const Tool = {
   // 判断是否是isIphoneX
   isIphoneX() {
     if (window.screen) {
-      return /iphone/gi.test(navigator.userAgent) && (screen.height == 812 && screen.width == 375);
+      return /iphone/gi.test(navigator.userAgent) && screen.height == 812 && screen.width == 375;
     } else {
       return false;
     }
-  }
+  },
 };
 
 export default Tool;

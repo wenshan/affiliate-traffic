@@ -118,8 +118,22 @@ class ProductAttribute extends Component {
 
   onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
     console.log(selectedRowKeys, selectedRows);
+    const newSelectedRows = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    selectedRows &&
+      selectedRows.length &&
+      selectedRows.map((item: { attribute_name: any; attribute_value: any }) => {
+        if (item.attribute_name && item.attribute_value) {
+          newSelectedRows.push(
+            Object.assign(
+              {},
+              { attribute_name: item.attribute_name, attribute_value: item.attribute_value },
+            ),
+          );
+        }
+      });
     this.setState({
-      selectedRowsProductAttr: selectedRows,
+      selectedRowsProductAttr: newSelectedRows,
       selectedRowKeys,
     });
   };

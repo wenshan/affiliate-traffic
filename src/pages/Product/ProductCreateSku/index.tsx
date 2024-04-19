@@ -1,7 +1,9 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Image, Input, Radio, Select, Table } from 'antd';
+import { Button, Image, Input, Radio, Select, Table, message } from 'antd';
 import { Component, JSX } from 'react';
 import { connect } from 'umi';
+import Tool from '../../../utils/tool.js';
+import CustomProductType from '../components/CustomProductType';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
@@ -23,6 +25,7 @@ class ProductCreateSku extends Component {
       isProductImageModal: false,
       currentImageProductType: 'image_link',
       imageLimitNum: 20,
+      isProductTypeShow: false,
     };
   }
   // 语言
@@ -265,7 +268,7 @@ class ProductCreateSku extends Component {
       this.props.dispatch({
         type: 'product/updateProduct',
         payload: {
-          image_link: imageSrc[0],
+          image_link: imageSrc,
         },
       });
     }
@@ -310,18 +313,27 @@ class ProductCreateSku extends Component {
 
   imageRenderView = (data: string[]) => {
     const html: JSX.Element[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions, array-callback-return
-    data &&
-      data.length &&
+    if (data && Tool.isArray(data) && data.length) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.map((item: string) => {
         html.push(
           <>
-            <div className="add-img-item" key={item.keys}>
+            <div className="add-img-item" key={item}>
               <Image width={100} src={item} />
             </div>
           </>,
         );
       });
+    } else {
+      html.push(
+        <>
+          <div className="add-img-item">
+            <Image width={100} src={data} />
+          </div>
+        </>,
+      );
+    }
+
     return html;
   };
   // 提交创建SKU
@@ -443,7 +455,71 @@ class ProductCreateSku extends Component {
       },
     });
   };
-
+  // 自定义商品分类
+  productTypeButtonHandle = () => {
+    const { productDetail } = this.props.product;
+    const { language } = productDetail;
+    if (language) {
+      this.setState({
+        isProductTypeShow: true,
+      });
+      this.props.dispatch({
+        type: 'product/queryType',
+      });
+    } else {
+      message.warning({ content: '请先选择语言' });
+    }
+  };
+  // CustomProductType
+  productTypeCallBackCancel = () => {
+    this.setState({
+      isProductTypeShow: false,
+    });
+  };
+  // 管理页面回调
+  productTypeCallBackOk = (item: { key: any }[]) => {
+    if (item && item[0] && item[0].key) {
+      this.setState({
+        isProductTypeShow: false,
+      });
+      this.props.dispatch({
+        type: 'product/updateProduct',
+        payload: {
+          product_type: item[0],
+          product_type_id: item[0].key,
+        },
+      });
+    } else {
+      message.warning({ content: '获取数据有问题' });
+    }
+  };
+  // 删除商品分类
+  handelDelProductType = (item) => {
+    this.props.dispatch({
+      type: 'product/delType',
+      payload: {
+        ...item,
+      },
+    });
+  };
+  // 添加新产品分类
+  handelAddProductType = (item, type) => {
+    if (type) {
+      this.props.dispatch({
+        type: 'product/editType',
+        payload: {
+          ...item,
+        },
+      });
+    } else {
+      this.props.dispatch({
+        type: 'product/cerateType',
+        payload: {
+          ...item,
+        },
+      });
+    }
+  };
   componentDidMount() {
     this.props.dispatch({
       type: 'product/initQueryParams',
@@ -451,6 +527,11 @@ class ProductCreateSku extends Component {
     this.props.dispatch({
       type: 'product/queryAttr',
     });
+    /*
+    this.props.dispatch({
+      type: 'product/queryType',
+    });
+    */
   }
 
   render() {
@@ -464,6 +545,7 @@ class ProductCreateSku extends Component {
       sizeSystemOption,
       genderOption,
       ageGroupOption,
+      productTypeOption,
     } = this.props.product;
     const { folderDirectory, imageList } = this.props.material;
     console.log('productDetail:', productDetail);
@@ -475,6 +557,7 @@ class ProductCreateSku extends Component {
       additional_image_link,
       lifestyle_image_link,
       link,
+      product_type,
       mobile_link,
       description,
       title,
@@ -494,7 +577,6 @@ class ProductCreateSku extends Component {
       size_type,
       size_system,
     } = productDetail;
-    console.log('product_detail:', product_detail);
     return (
       <PageContainer>
         <div className="page">
@@ -512,6 +594,22 @@ class ProductCreateSku extends Component {
                   onChange={this.languageRadioHandle}
                   options={languageOption}
                 ></Radio.Group>
+              </div>
+              <div className="form-item">
+                <span className="label">
+                  <i>*</i> 自定商品分类:
+                </span>
+                <Input
+                  placeholder="自定商品分类"
+                  style={{ width: 350 }}
+                  value={product_type && product_type.title}
+                  disabled
+                />
+                <span className="operate">
+                  <Button type="primary" size="small" onClick={this.productTypeButtonHandle}>
+                    管理自定商品分类
+                  </Button>
+                </span>
               </div>
               <div className="form-item">
                 <LabelHelpTip keyLabel="title"></LabelHelpTip>
@@ -538,18 +636,14 @@ class ProductCreateSku extends Component {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('image_link', 1);
+                      this.imageSelectModel('image_link', 5);
                     }}
                   >
                     添加主图
                   </Button>
                 </div>
-                <div className="line-box main-img">
-                  <Image
-                    width={100}
-                    src={image_link}
-                    fallback="data:image/png;base64,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"
-                  />
+                <div className="line-box">
+                  <div className="add-img-list">{this.imageRenderView(image_link)}</div>
                 </div>
               </div>
               <div className="form-item">
@@ -812,6 +906,14 @@ class ProductCreateSku extends Component {
           selectedType={this.state.currentImageProductType}
           imageLimitNum={this.state.imageLimitNum}
         ></ImageSelectModal>
+        <CustomProductType
+          dataSource={{ productTypeOption, product_type }}
+          open={this.state.isProductTypeShow}
+          callbackCancel={this.productTypeCallBackCancel}
+          callbackOk={this.productTypeCallBackOk}
+          callbackAddOk={this.handelAddProductType}
+          callbackDelOk={this.handelDelProductType}
+        ></CustomProductType>
       </PageContainer>
     );
   }

@@ -55,33 +55,6 @@ class ProductCreate extends Component {
       });
     }
   };
-  // 添加新产品分类
-  handelAddProductType = (item, type) => {
-    if (type) {
-      this.props.dispatch({
-        type: 'product/editType',
-        payload: {
-          ...item,
-        },
-      });
-    } else {
-      this.props.dispatch({
-        type: 'product/cerateType',
-        payload: {
-          ...item,
-        },
-      });
-    }
-  };
-  // 删除商品分类
-  handelDelProductType = (item) => {
-    this.props.dispatch({
-      type: 'product/delType',
-      payload: {
-        ...item,
-      },
-    });
-  };
 
   // table
   handelTableCreateSku = (record) => {
@@ -175,9 +148,6 @@ class ProductCreate extends Component {
     this.props.dispatch({
       type: 'product/queryProductMainAll',
     });
-    this.props.dispatch({
-      type: 'product/queryType',
-    });
   }
 
   tableColumnsMain = () => {
@@ -186,14 +156,6 @@ class ProductCreate extends Component {
         title: '商品名称',
         dataIndex: 'title',
         key: 'title',
-      },
-      {
-        title: '自定商品分类',
-        dataIndex: 'product_type',
-        key: 'product_type',
-        render: (text: any, record: any) => {
-          return (record.product_type && record.product_type.title) || '-';
-        },
       },
       {
         title: '商品货号',
@@ -293,8 +255,6 @@ class ProductCreate extends Component {
                 callbackCancel={this.createMainModalCallbackCancel}
                 callbackOk={this.createMainModalCallbackOk}
                 optionAction={currentOptionActionStatus}
-                callbackAddProductType={this.handelAddProductType}
-                callbackDelProductType={this.handelDelProductType}
               ></CreateMainModal>
             </div>
           </div>

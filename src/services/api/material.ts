@@ -44,6 +44,13 @@ export const delMaterial = async (params?: { [key: string]: any }) => {
     data: params,
   });
 };
+// 彻底删除
+export const delRemoteMaterial = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/material/delRemoteMaterial', {
+    method: 'POST',
+    data: params,
+  });
+};
 
 /** 获取规则列表 GET /api/rule */
 export async function rule(

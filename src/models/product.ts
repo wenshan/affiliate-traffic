@@ -55,8 +55,6 @@ export default {
     currentProductMain: {
       id: '',
       title: '',
-      product_type: { key: '', title: '' },
-      product_type_id: '',
       offer_id: '',
       google_product_category: {
         key: 632,
@@ -294,8 +292,10 @@ export default {
     // 商品分类
     *cerateType({ payload: data }, { call, put, select }) {
       const { title } = data;
-      if (title) {
-        const result = yield call(cerateType, { title });
+      const { productDetail } = yield select((state) => state.product);
+      const { language } = productDetail;
+      if (title && language) {
+        const result = yield call(cerateType, { title, language });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryType' });
           message.success({ content: '添加商品分类成功' });
@@ -308,8 +308,10 @@ export default {
       }
     },
     *editType({ payload: data }, { call, put, select }) {
-      const { key, title } = data;
-      if (key && title) {
+      const { id, key, title } = data;
+      const { productDetail } = yield select((state) => state.product);
+      const { language } = productDetail;
+      if (id && key && title && language) {
         const result = yield call(editType, { ...data });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryType' });
@@ -328,24 +330,22 @@ export default {
       }
     },
     *queryType({ payload: data }, { call, put, select }) {
-      const { currentProductMain } = yield select((state) => state.product);
-      const result = yield call(queryType);
-      if (result && result.status && result.status === 200 && result.data.rows) {
-        const newCurrentProductMain = Object.assign({}, currentProductMain, {
-          product_type: result.data.rows[0],
-          product_type_id: result.data.rows[0].key,
-        });
-        const productTypeOption: ({ title: any; key: any } & { label: any; value: any })[] = [];
-        result.data.rows.map((item: { title: any; key: any }) => {
-          productTypeOption.push(Object.assign({}, item, { label: item.title, value: item.key }));
-        });
-        yield put({
-          type: 'update',
-          payload: {
-            productTypeOption,
-            currentProductMain: newCurrentProductMain,
-          },
-        });
+      const { productDetail } = yield select((state) => state.product);
+      const { language } = productDetail;
+      if (language) {
+        const result = yield call(queryType, { language });
+        if (result && result.status && result.status === 200 && result.data.rows) {
+          const productTypeOption: ({ title: any; key: any } & { label: any; value: any })[] = [];
+          result.data.rows.map((item: { title: any; key: any }) => {
+            productTypeOption.push(Object.assign({}, item, { label: item.title, value: item.key }));
+          });
+          yield put({
+            type: 'update',
+            payload: {
+              productTypeOption,
+            },
+          });
+        }
       }
     },
     // 商品属性

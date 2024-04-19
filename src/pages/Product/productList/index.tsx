@@ -30,8 +30,8 @@ class ProductList extends Component {
         fixed: 'left',
         width: 60,
         render: (text, record) => {
-          if (record && record.image_link) {
-            return <img src={record.image_link} width={50}></img>;
+          if (record && record.image_link[0]) {
+            return <img src={record.image_link[0]} width={50}></img>;
           } else {
             return '-';
           }

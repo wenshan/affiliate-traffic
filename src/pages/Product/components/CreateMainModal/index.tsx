@@ -1,6 +1,5 @@
 import { Button, Input, Modal, message } from 'antd';
 import { Component } from 'react';
-import CustomProductType from '../CustomProductType';
 import GoogleProductCategory from '../GoogleProductCategory';
 import LabelHelpTip from '../LabelHelpTip';
 
@@ -10,12 +9,9 @@ class CreateMainModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isProductTypeShow: false,
       isProductCategoryShow: false,
       currentProductMain: {
         title: '',
-        product_type: { key: '', title: '' },
-        product_type_id: '',
         offer_id: '',
         google_product_category: {
           key: 632,
@@ -25,7 +21,6 @@ class CreateMainModal extends Component {
         gtin: '',
         brand: '',
       },
-      productTypeOption: [],
     };
   }
   // 商品名称
@@ -47,11 +42,6 @@ class CreateMainModal extends Component {
     });
   };
 
-  productTypeButtonHandle = () => {
-    this.setState({
-      isProductTypeShow: true,
-    });
-  };
   // 商品货号
   offerIdInputHandle = (e) => {
     const { value } = e.target;
@@ -75,40 +65,6 @@ class CreateMainModal extends Component {
     this.setState({
       currentProductMain: newCurrentProductMain,
     });
-  };
-  // CustomProductType
-  productTypeCallBackCancel = () => {
-    this.setState({
-      isProductTypeShow: false,
-    });
-  };
-  // 管理页面回调
-  productTypeCallBackOk = (item) => {
-    if (item && item[0] && item[0].key) {
-      const { currentProductMain } = this.state;
-      const newCurrentProductMain = Object.assign({}, currentProductMain, {
-        product_type: item[0],
-        product_type_id: item[0].key,
-      });
-      this.setState({
-        isProductTypeShow: false,
-        currentProductMain: newCurrentProductMain,
-      });
-    } else {
-      message.warning({ content: '获取数据有问题' });
-    }
-  };
-
-  // 编辑 新增 确认回调
-  productTypeAddCallBackOk = (item, type) => {
-    if (this.props.callbackAddProductType) {
-      this.props.callbackAddProductType(item, type);
-    }
-  };
-  productTypeDelCallBackOk = (item) => {
-    if (this.props.callbackDelProductType) {
-      this.props.callbackDelProductType(item);
-    }
   };
   // GoogleProductCategory
   productCategoryCallBackOk = (option) => {
@@ -168,15 +124,13 @@ class CreateMainModal extends Component {
     if (nextProps.dataSource !== this.props.dataSource) {
       this.setState({
         currentProductMain: nextProps.dataSource.currentProductMain,
-        productTypeOption: nextProps.dataSource.productTypeOption,
       });
     }
   }
 
   render() {
-    const { currentProductMain, productTypeOption } = this.state;
-    const { title, product_type, offer_id, google_product_category, gtin, brand } =
-      currentProductMain;
+    const { currentProductMain } = this.state;
+    const { title, offer_id, google_product_category, gtin, brand } = currentProductMain;
     return (
       <div className="custom-product-type">
         <Modal
@@ -200,22 +154,6 @@ class CreateMainModal extends Component {
                 value={title}
                 onChange={this.titleHandleInput}
               />
-            </div>
-            <div className="form-item">
-              <span className="label">
-                <i>*</i> 自定商品分类:
-              </span>
-              <Input
-                placeholder="自定商品分类"
-                style={{ width: 350 }}
-                value={product_type && product_type.title}
-                disabled
-              />
-              <span className="operate">
-                <Button type="primary" size="small" onClick={this.productTypeButtonHandle}>
-                  管理自定商品分类
-                </Button>
-              </span>
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
@@ -263,14 +201,6 @@ class CreateMainModal extends Component {
               />
             </div>
           </div>
-          <CustomProductType
-            dataSource={{ productTypeOption, currentProductMain }}
-            open={this.state.isProductTypeShow}
-            callbackCancel={this.productTypeCallBackCancel}
-            callbackOk={this.productTypeCallBackOk}
-            callbackAddOk={this.productTypeAddCallBackOk}
-            callbackDelOk={this.productTypeDelCallBackOk}
-          ></CustomProductType>
           <GoogleProductCategory
             open={this.state.isProductCategoryShow}
             callbackCancel={this.productCategoryCallBackCancel}

@@ -45,7 +45,6 @@ class LabelHelpTip extends Component {
   };
 
   render() {
-    console.log('this.props:', this.props.keyLabel);
     if (!this.props.keyLabel) {
       return;
     }

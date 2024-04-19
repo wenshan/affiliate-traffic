@@ -51,7 +51,7 @@ class ImgList extends Component {
           checkedData.push(Object.assign({}, item, { current: true }));
         } else {
           imageList[idx] = Object.assign({}, item, { current: false });
-          checkedData.push(item);
+          // checkedData.push(item);
         }
       });
     } else {

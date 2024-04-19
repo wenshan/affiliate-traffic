@@ -68,7 +68,7 @@ class Material extends Component {
       folderOpenStatus: true,
     });
   };
-  handleClickDropdownEdit = (currentItem) => {
+  handleClickDropdownEdit = (currentItem: any) => {
     this.setState(
       {
         optionAction: 1,
@@ -134,7 +134,7 @@ class Material extends Component {
     const { folderDirectory } = this.props.material;
     if (folderDirectory && folderDirectory.length > 0) {
       // eslint-disable-next-line array-callback-return
-      folderDirectory.map((item) => {
+      folderDirectory.map((item: any) => {
         if (item.is_default) {
           html.push(
             <dd
@@ -174,24 +174,42 @@ class Material extends Component {
     return html;
   };
 
-  delMaterialCallback = (item) => {
+  delMaterialCallback = (item: any) => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    Modal.confirm({
-      title: '确认删除',
-      content: '删除当前的素材',
-      onOk() {
-        self.props.dispatch({
-          type: 'material/delMaterial',
-          payload: {
-            ...item,
-          },
-        });
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
+    if (item.status === 1) {
+      Modal.confirm({
+        title: '确认删除',
+        content: '彻底删除服务文件，资源地址将失去访问',
+        onOk() {
+          self.props.dispatch({
+            type: 'material/delRemoteMaterial',
+            payload: {
+              ...item,
+            },
+          });
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    } else {
+      Modal.confirm({
+        title: '确认删除',
+        content: '删除当前的素材',
+        onOk() {
+          self.props.dispatch({
+            type: 'material/delMaterial',
+            payload: {
+              ...item,
+            },
+          });
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    }
   };
   handelUploadOk = () => {
     this.props.dispatch({
@@ -209,7 +227,6 @@ class Material extends Component {
     });
   }
   render() {
-    console.log('this.props:', this.props);
     const { currentFolderDirectory, imageList } = this.props.material;
     return (
       <div className="page">

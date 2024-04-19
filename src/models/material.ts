@@ -5,6 +5,7 @@ import {
   createFolder,
   delFolder,
   delMaterial,
+  delRemoteMaterial,
   editFolder,
   queryFolder,
   queryFolderMaterial,
@@ -57,7 +58,18 @@ export default {
     *queryFolder({ payload }, { call, put, select }) {
       const result = yield call(queryFolder);
       if (result.status === 200 && result.data && result.data.rows) {
-        yield put({ type: 'update', payload: { folderDirectory: result.data.rows } });
+        // 已删除文件放在最后排序
+        const rows = result.data.rows;
+        const newRows: { key: string }[] = [];
+        rows &&
+          rows.length &&
+          rows.map((item: { key: string }) => {
+            if (item.key !== '11111111') {
+              newRows.push(item);
+            }
+          });
+        newRows.push(rows[1]);
+        yield put({ type: 'update', payload: { folderDirectory: newRows } });
         yield put({ type: 'update', payload: { currentFolderDirectory: result.data.rows[0] } });
         // 初始化默认文件夹素材
         yield put({ type: 'queryFolderMaterial', payload: { ...result.data.rows[0] } });
@@ -104,9 +116,17 @@ export default {
       }
     },
     *delMaterial({ payload: data }, { call, put, select }) {
+      const { currentFolderDirectory } = yield select((state: { material: any }) => state.material);
       const result = yield call(delMaterial, data);
       if (result.status === 200 && result.data) {
-        yield put({ type: 'queryFolder' });
+        yield put({ type: 'queryFolderMaterial', payload: currentFolderDirectory });
+      }
+    },
+    *delRemoteMaterial({ payload: data }, { call, put, select }) {
+      const { currentFolderDirectory } = yield select((state: { material: any }) => state.material);
+      const result = yield call(delRemoteMaterial, data);
+      if (result.status === 200 && result.data) {
+        yield put({ type: 'queryFolderMaterial', payload: currentFolderDirectory });
       }
     },
   },

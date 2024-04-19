@@ -73,6 +73,7 @@ export default {
     des: 'Google 为商品定义的商品类别',
     rule: '只添加一种类别。添加最相关的类别。添加类别的完整路径或数字形式的类别 ID（但不要同时添加两者）。建议使用类别 ID。',
     exam: '服饰与配饰 > 服装 > 外衣 > 外套与夹克',
+    required: true,
     link: '',
   },
   product_type: {

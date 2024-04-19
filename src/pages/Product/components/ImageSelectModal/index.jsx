@@ -75,6 +75,7 @@ class ImageSelectModal extends Component {
   };
   // 图片素材操作
   handelCheckCallback = (items) => {
+    console.log('items:', items);
     this.setState({
       selectedMaterial: items,
     });

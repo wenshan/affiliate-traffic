@@ -1,4 +1,4 @@
-import { Input, Modal, Table, message } from 'antd';
+import { Button, Input, Modal, Table, message } from 'antd';
 import { Component } from 'react';
 
 import './index.less';
@@ -127,7 +127,7 @@ class CustomProductType extends Component {
               <span
                 className="tx"
                 onClick={() => {
-                  this.handelTableAdd(record);
+                  this.handelTableAdd();
                 }}
               >
                 添加
@@ -158,11 +158,11 @@ class CustomProductType extends Component {
   };
 
   render() {
-    const { productTypeOption, currentProductMain } = this.props.dataSource;
+    const { productTypeOption, product_type } = this.props.dataSource;
     const rowSelection = {
       type: 'radio',
       onChange: this.onChangeSelectedRows,
-      defaultSelectedRowKeys: [currentProductMain.product_type_id] || [],
+      defaultSelectedRowKeys: [product_type.key] || [],
     };
 
     return (
@@ -174,6 +174,13 @@ class CustomProductType extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
+          {productTypeOption && !productTypeOption.length && (
+            <div className="add-action">
+              <Button type="primary" size="small" onClick={this.handelTableAdd}>
+                初始化添加自定义分组
+              </Button>
+            </div>
+          )}
           <Table
             dataSource={productTypeOption}
             columns={this.columns()}
