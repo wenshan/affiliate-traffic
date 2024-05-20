@@ -55,4 +55,7 @@ export default {
   'menu.product.productEdit': '编辑商品',
   'menu.product.productList': '商品列表',
   'menu.product.productCreateSku': '创建SKU商品',
+  'menu.community': '西子翠苑',
+  'menu.community.dashboard': '数据面板',
+  'menu.community.tableList': '数据检索',
 };

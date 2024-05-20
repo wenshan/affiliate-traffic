@@ -34,14 +34,14 @@ export default {
     imageList: [],
     currentFolderDirectory: {
       label: '默认分组',
-      key: '0',
+      key: '00000000',
       is_default: true,
       active: true,
     },
     folderDirectory: [
       {
         label: '默认分组',
-        key: '0',
+        key: '00000000',
         is_default: true,
         active: true,
         data: {
@@ -69,6 +69,7 @@ export default {
             }
           });
         newRows.push(rows[1]);
+        console.log('newRows:', newRows);
         yield put({ type: 'update', payload: { folderDirectory: newRows } });
         yield put({ type: 'update', payload: { currentFolderDirectory: result.data.rows[0] } });
         // 初始化默认文件夹素材
@@ -98,14 +99,16 @@ export default {
     *queryFolderMaterial({ payload: data }, { call, put, select }) {
       const { folderDirectory, currentFolderDirectory } = yield select((state) => state.material);
       const result = yield call(queryFolderMaterial, data);
-      if (result.status === 200 && result.data) {
-        console.log('queryFolderMaterial:', result);
+      if (result.status === 200 && result.data && data && data.key) {
+        console.log('folderDirectory:', folderDirectory);
         // eslint-disable-next-line array-callback-return
-        folderDirectory.map((item, idx) => {
-          if (item.key === data.key) {
+        folderDirectory.map((item: { key: any }, idx: string | number) => {
+          console.log('item:', item);
+          if (folderDirectory[idx] && item && Number(item.key) === Number(data.key)) {
             folderDirectory[idx] = Object.assign({}, item, { data: result.data });
           }
         });
+        console.log('folderDirectory:', folderDirectory);
         yield put({
           type: 'update',
           payload: {

@@ -1,5 +1,5 @@
 import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
-import { Button, Col, Modal, Row } from 'antd';
+import { Button, Col, Modal, Row, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'umi';
 import FolderDirectory from './components/FolderDirectory';
@@ -132,31 +132,31 @@ class Material extends Component {
   folderMenuHtml = () => {
     const html: React.JSX.Element[] = [];
     const { folderDirectory } = this.props.material;
-    if (folderDirectory && folderDirectory.length > 0) {
+    if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
       // eslint-disable-next-line array-callback-return
       folderDirectory.map((item: any) => {
-        if (item.is_default) {
+        if (item && item.is_default) {
           html.push(
             <dd
-              className={item.active ? 'active' : ''}
+              className={item && item.active ? 'active' : ''}
               key={item.key}
               onClick={() => {
                 this.handleClickFolderMenu(item);
               }}
             >
-              {item.label}
+              {item && item.label}
             </dd>,
           );
         } else {
           html.push(
             <dd
-              className={item.active ? 'active' : ''}
+              className={item && item.active ? 'active' : ''}
               key={item.key}
               onClick={() => {
                 this.handleClickFolderMenu(item);
               }}
             >
-              {item.label}{' '}
+              {item && item.label}{' '}
               <div className="span">
                 <div className="dropdown">
                   <ul>
@@ -211,12 +211,15 @@ class Material extends Component {
       });
     }
   };
-  handelUploadOk = () => {
+  handelUploadOk = (file) => {
+    message.error(`${file.name} 上传成功！`);
     this.props.dispatch({
       type: 'material/queryFolder',
     });
   };
-  handelUploadFailed = () => {};
+  handelUploadFailed = () => {
+    message.error('上传失败，请重试！');
+  };
   handelCheckCallback = (items) => {
     console.log('items:', items);
   };
@@ -261,13 +264,17 @@ class Material extends Component {
                     checked={['1085370435/22159932/limeet_logo_绿色.png']}
                     onChangeCallback={this.handelCheckCallback}
                   ></ImgList>
-                  <FolderDirectory
-                    open={this.state.folderOpenStatus}
-                    optionAction={this.state.optionAction}
-                    callbackOk={this.handelFolderOk}
-                    callbackCancel={this.handelFolderCancel}
-                    currentFolderDirectory={currentFolderDirectory}
-                  ></FolderDirectory>
+                  {currentFolderDirectory &&
+                    currentFolderDirectory.label &&
+                    currentFolderDirectory.key && (
+                      <FolderDirectory
+                        open={this.state.folderOpenStatus}
+                        optionAction={this.state.optionAction}
+                        callbackOk={this.handelFolderOk}
+                        callbackCancel={this.handelFolderCancel}
+                        currentFolderDirectory={currentFolderDirectory}
+                      ></FolderDirectory>
+                    )}
                 </div>
               </Col>
             </Row>

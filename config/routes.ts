@@ -52,19 +52,28 @@ export default [
         component: './Product/ProductCreateSku',
       },
       {
-        name: 'productEdit',
-        path: '/product/productEdit',
-        component: './Product/ProductEdit',
-      },
-      {
         name: 'productList',
         path: '/product/ProductList',
         component: './Product/ProductList',
       },
+    ],
+  },
+  {
+    name: 'community',
+    path: '/community',
+    icon: 'profile',
+    // access: 'canAdmin',
+    layout: true,
+    routes: [
       {
-        name: 'productList',
-        path: '/product/ProductListCompos',
-        component: './Product/ProductListCompos',
+        name: 'dashboard',
+        path: '/community/Dashboard',
+        component: './Community/Dashboard',
+      },
+      {
+        name: 'tableList',
+        path: '/community/TableList',
+        component: './Community/TableList',
       },
     ],
   },
@@ -85,12 +94,14 @@ export default [
       },
     ],
   },
+  /*
   {
     name: 'list.table-list',
     icon: 'table',
     path: '/list',
     component: './TableList',
   },
+  */
   {
     path: '/',
     redirect: '/Welcome',

@@ -95,18 +95,31 @@ declare namespace API {
   };
 
   type RuleListItem = {
+    id?: number;
     key?: number;
-    disabled?: boolean;
-    href?: string;
-    avatar?: string;
+    userid?: number;
+    roomid?: string;
+    areas?: string;
+    region?: string;
+    build?: number;
+    unit?: number;
+    room?: number;
+    is_certification?: number;
     name?: string;
-    owner?: string;
-    desc?: string;
-    callNo?: number;
-    status?: number;
+    owner?: number;
+    contractId?: string;
+    contractPath?: string;
+    signatureFile?: string;
+    is_checkSignature?: number;
+    is_submitConfirmation?: number;
+    submitConfirmation?: number;
+    is_submitContractUnwilling?: number;
+    mobile?: number;
+    is_checkMobile?: number;
+    propertyType?: number;
+    feedback?: string;
     updatedAt?: string;
     createdAt?: string;
-    progress?: number;
   };
 
   type ruleParams = {

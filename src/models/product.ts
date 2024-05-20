@@ -32,8 +32,9 @@ export default {
     },
     searchParams: {
       language: 'en-US',
-      title: '',
-      product_type_id: '',
+      keyword: '',
+      product_type_id: 0,
+      productTypeOption: [],
     },
     product_sku_option_status: 0,
     languageOption: [
@@ -348,6 +349,39 @@ export default {
         }
       }
     },
+    *queryTypeSearch({ payload: data }, { call, put, select }) {
+      const { searchParams } = yield select((state) => state.product);
+      const { language } = searchParams;
+      if (language) {
+        const result = yield call(queryType, { language });
+        if (result && result.status && result.status === 200 && result.data.rows) {
+          const productTypeOption: { label: any; value: any }[] = [];
+          productTypeOption.push({
+            label: 'All',
+            value: 0,
+          });
+          let product_type_id = 0;
+          result.data.rows.map((item: { title: any; key: any }) => {
+            productTypeOption.push(Object.assign({}, item, { label: item.title, value: item.key }));
+          });
+          /*
+          if (result.data.rows && result.data.rows[0]) {
+            product_type_id = result.data.rows[0].key;
+          }
+          */
+          const newsSearchParams = Object.assign({}, searchParams, {
+            product_type_id,
+            productTypeOption,
+          });
+          yield put({
+            type: 'update',
+            payload: {
+              searchParams: newsSearchParams,
+            },
+          });
+        }
+      }
+    },
     // 商品属性
     *cerateAttr({ payload: data }, { call, put, select }) {
       const { productDetail, currentProductMain } = yield select((state) => state.product);
@@ -527,10 +561,16 @@ export default {
     },
     *queryProductAll({ payload: data }, { call, put, select }) {
       const { pagination, searchParams } = yield select((state) => state.product);
-      const { language } = searchParams;
+      const { language, keyword, product_type_id } = searchParams;
       const { current, pageSize } = pagination;
       if (current && pageSize && language) {
-        const result = yield call(queryProductAll, { current, pageSize, language });
+        const result = yield call(queryProductAll, {
+          current,
+          pageSize,
+          language,
+          keyword,
+          product_type_id,
+        });
         if (result && result.status && result.status === 200 && result.data.rows) {
           const updatePagination = Object.assign({}, pagination, { total: result.data.count });
           yield put({

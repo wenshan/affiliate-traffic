@@ -77,8 +77,8 @@ export async function getNotices(options?: { [key: string]: any }) {
   });
 }
 
-/** 获取规则列表 GET /api/rule */
-export async function rule(
+/** 社区获取列表 */
+export async function getUserTableList(
   params: {
     // query
     /** 当前的页码 */
@@ -88,13 +88,29 @@ export async function rule(
   },
   options?: { [key: string]: any },
 ) {
-  return request<API.RuleList>('/api/rule', {
-    method: 'GET',
+  return request<API.RuleList>('/api/community/getUserTableList', {
+    method: 'POST',
     data: params,
   });
 }
 
-/** 更新规则 PUT /api/rule */
+/** 社区导出ex表格 */
+export async function downloadXlsx() {
+  return request('/api/community/downloadXlsx', {
+    method: 'POST',
+    data: {},
+  });
+}
+
+/** 社区 电子签名审核 */
+export async function verifySignature(options: { [key: string]: any }) {
+  return request('/api/community/verifySignature', {
+    method: 'POST',
+    data: options,
+  });
+}
+
+/** 新建规则 POST /api/rule */
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',

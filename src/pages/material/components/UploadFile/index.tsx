@@ -1,6 +1,6 @@
 import { uploadFileURL } from '@/services/api/uploadFile';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Upload } from 'antd';
+import { Button, Upload, message } from 'antd';
 import axios from 'axios';
 
 import './index.less';
@@ -12,14 +12,22 @@ const UploadFile: React.FC = (props) => {
     data: props.data,
     headers: {},
     withCredentials: true,
+    showUploadList: false,
     onStart(file) {
       console.log('onStart', file, file.name);
     },
     onSuccess(res, file) {
       if (props.callbackOk) {
-        props.callbackOk();
+        props.callbackOk(file);
       }
       console.log('onSuccess', res, file.name);
+    },
+    beforeUpload(file) {
+      const imgType = 'image/png,image/gif,image/jpg,image/jpeg';
+      if (imgType.indexOf(file.type) < 0) {
+        message.error(`${file.name} 不是jpg/jpeg/gif/png格式`);
+        return false;
+      }
     },
     onError(err) {
       console.log('onError', err);
@@ -41,8 +49,6 @@ const UploadFile: React.FC = (props) => {
       onSuccess,
       withCredentials,
     }) {
-      console.log('withCredentials:', withCredentials);
-      console.log('headers:', headers);
       // EXAMPLE: post form-data with 'axios'
       // eslint-disable-next-line no-undef
       const formData = new FormData();

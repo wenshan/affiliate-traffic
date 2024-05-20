@@ -67,4 +67,9 @@ export default {
   'pages.searchTable.tenThousand': '万',
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
+  'pages.community.TableList.searchTable.areas': '选择区域',
+  'pages.community.TableList.searchTable.region': '选择片区',
+  'pages.community.TableList.searchTable.build': '选择楼号',
+  'pages.community.TableList.searchTable.unit': '选择单元',
+  'pages.community.TableList.searchTable.default': '翠苑三区',
 };

@@ -1,6 +1,6 @@
 import { RedoOutlined, SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Input, Modal, Select, Space, Table } from 'antd';
+import { Button, Col, Input, Modal, Row, Select, Table } from 'antd';
 import { Component, JSX, Key } from 'react';
 import { connect, history } from 'umi';
 
@@ -348,11 +348,14 @@ class ProductList extends Component {
         searchParams: newSearchParams,
       },
     });
+    this.props.dispatch({
+      type: 'product/queryTypeSearch',
+    });
   };
-  searchTitleInputHandle = (event) => {
+  searchKeywordInputHandle = (event) => {
     const { value } = event.target;
     const { searchParams } = this.props.product;
-    const newSearchParams = Object.assign({}, searchParams, { title: value });
+    const newSearchParams = Object.assign({}, searchParams, { keyword: value });
     this.props.dispatch({
       type: 'product/update',
       payload: {
@@ -420,6 +423,12 @@ class ProductList extends Component {
       type: 'login/googleGetToken',
     });
   };
+  // 检索
+  handelSearchParamsButton = () => {
+    this.props.dispatch({
+      type: 'product/queryProductAll',
+    });
+  };
   componentDidMount() {
     this.props.dispatch({
       type: 'product/initQueryParams',
@@ -427,58 +436,88 @@ class ProductList extends Component {
     this.props.dispatch({
       type: 'product/queryProductAll',
     });
+    this.props.dispatch({
+      type: 'product/queryTypeSearch',
+    });
     // queryProductMainAllCompos
+    /*
     this.props.dispatch({
       type: 'product/queryProductMainAllCompos',
     });
+    */
   }
 
   render() {
-    const { productList, languageOption, pagination, searchParams, productTypeOption } =
-      this.props.product;
+    const { productList, languageOption, pagination, searchParams } = this.props.product;
+    console.log('searchParams:', searchParams);
     return (
       <PageContainer>
         <div className="page">
           <div className="product-list">
             <div className="header">
-              <Space size="large" direction="vertical">
-                <Button type="primary" icon={<RedoOutlined />} onClick={this.handelRefreshToken}>
-                  refresh google token
-                </Button>
-                <div className="form-item">
-                  <span className="label">选择语言:</span>
-                  <Select
-                    defaultValue={searchParams.language}
-                    value={searchParams.language}
-                    style={{ width: 120 }}
-                    onChange={this.searchLanguageSelectHandle}
-                    options={languageOption}
-                  />
-                </div>
-                <div className="form-item">
-                  <span className="label">自定商品分类:</span>
-                  <Select
-                    value={searchParams.product_type_id}
-                    style={{ width: 150 }}
-                    onChange={this.searchProductTypeSelectHandle}
-                    options={productTypeOption}
-                  />
-                </div>
-                <div className="form-item">
-                  <span className="label">商品名称:</span>
-                  <Input
-                    placeholder="商品名称"
-                    style={{ width: 200 }}
-                    value={searchParams.title}
-                    onChange={this.searchTitleInputHandle}
-                  />
-                </div>
-                <div className="form-item">
-                  <Button type="primary" icon={<SearchOutlined />}>
-                    Search
-                  </Button>
-                </div>
-              </Space>
+              <Row>
+                <Col span={6}>
+                  <div className="form-item">
+                    <span className="label">选择语言:</span>
+                    <Select
+                      defaultValue={searchParams.language}
+                      value={searchParams.language}
+                      style={{ width: 120 }}
+                      onChange={this.searchLanguageSelectHandle}
+                      options={languageOption}
+                    />
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div className="form-item">
+                    <span className="label">自定商品分类:</span>
+                    <Select
+                      defaultValue={searchParams.product_type_id}
+                      value={searchParams.product_type_id}
+                      style={{ width: 150 }}
+                      onChange={this.searchProductTypeSelectHandle}
+                      options={searchParams.productTypeOption}
+                    />
+                  </div>
+                </Col>
+                <Col span={10}>
+                  <div className="form-item">
+                    <span className="label">商品名称:</span>
+                    <Input
+                      placeholder="商品名称"
+                      style={{ width: 200 }}
+                      value={searchParams.keyword}
+                      onChange={this.searchKeywordInputHandle}
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col span={8}></Col>
+                <Col span={8}>
+                  <div className="form-item">
+                    <Button
+                      type="primary"
+                      icon={<RedoOutlined />}
+                      onClick={this.handelRefreshToken}
+                    >
+                      refresh google token
+                    </Button>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div className="form-item">
+                    <Button
+                      type="primary"
+                      icon={<SearchOutlined />}
+                      onClick={this.handelSearchParamsButton}
+                      style={{ width: 200 }}
+                    >
+                      Search
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
             </div>
             <div className="content">
               <Table
