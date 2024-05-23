@@ -1,396 +1,346 @@
-import { addRule, getUserTableList, removeRule, updateRule } from '@/services/api/login';
-import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import {
-  FooterToolbar,
-  ModalForm,
-  PageContainer,
-  ProDescriptions,
-  ProFormText,
-  ProFormTextArea,
-  ProTable,
-} from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
-import React, { useRef, useState } from 'react';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
+import { lastDayIntention, reportFormsBuildTable } from '@/services/api/community';
+import { PageContainer } from '@ant-design/pro-components';
+import type { RadioChangeEvent } from 'antd';
+import { Card, Col, Popover, Radio, Row, Table, Tag, message } from 'antd';
+import React, { useEffect, useState } from 'react';
 
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
+import './index.less';
 
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-    message.success('Configuration is successful');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Configuration failed, please try again!');
-    return false;
-  }
-};
+const Dashboard: React.FC = () => {
+  const [areas, setAreas] = useState('翠苑三区');
+  const [region, setRegion] = useState('all');
+  const [tableData, setTableData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 20 });
+  const [total, setTotal] = useState(0);
+  const [cardAllData, setCardAllData] = useState({
+    value: [],
+    days: [],
+    agreeUserNum: 0,
+    unwillingUserNum: 0,
+    communityUserNum: 0,
+  });
+  const [cardBData, setCardBData] = useState({
+    value: [],
+    days: [],
+    agreeUserNum: 0,
+    unwillingUserNum: 0,
+    communityUserNum: 0,
+  });
+  const [cardCData, setCardCData] = useState({
+    value: [],
+    days: [],
+    agreeUserNum: 0,
+    unwillingUserNum: 0,
+    communityUserNum: 0,
+  });
 
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
-
-const TableList: React.FC = () => {
-  /**
-   * @en-US Pop-up window of new window
-   * @zh-CN 新建窗口的弹窗
-   *  */
-  const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
-  const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-
-  const [showDetail, setShowDetail] = useState<boolean>(false);
-
-  const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
-
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
-
-  const columns: ProColumns<API.RuleListItem>[] = [
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
-        />
-      ),
-      dataIndex: 'name',
-      tip: 'The rule name is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
-      dataIndex: 'desc',
-      valueType: 'textarea',
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleCallNo"
-          defaultMessage="Number of service calls"
-        />
-      ),
-      dataIndex: 'callNo',
-      sorter: true,
-      hideInForm: true,
-      renderText: (val: string) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
-      dataIndex: 'status',
-      hideInForm: true,
-      valueEnum: {
-        0: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
-          ),
-          status: 'Default',
-        },
-        1: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
-          status: 'Processing',
-        },
-        2: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-          ),
-          status: 'Success',
-        },
-        3: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
-          ),
-          status: 'Error',
-        },
-      },
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
-        />
-      ),
-      sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
-        return defaultRender(item);
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
-      dataIndex: 'option',
-      valueType: 'option',
-      render: (_, record) => [
-        <a
-          key="config"
-          onClick={() => {
-            handleUpdateModalOpen(true);
-            setCurrentRow(record);
-          }}
-        >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
-        </a>,
-      ],
-    },
+  const optionsRadio = [
+    { label: '翠苑三区All', value: 'all' },
+    { label: 'B区', value: 'B' },
+    { label: 'C区', value: 'C' },
   ];
+
+  const columnsTable = () => {
+    return [
+      {
+        title: '区域',
+        key: 'name',
+        ellipsis: true,
+        render: (_: any, record: { areas: any; build: any; region: any }) => {
+          let text = '';
+          if (record && record.areas && record.build && record.region) {
+            text = `${record.areas}-${record.region}区-${record.build}幢`;
+          }
+          return text;
+        },
+      },
+      {
+        title: '实际套数',
+        dataIndex: 'total',
+        key: 'total',
+        ellipsis: true,
+      },
+      {
+        title: '登记同意用户数',
+        dataIndex: 'agreeNum',
+        key: 'agreeNum',
+        ellipsis: true,
+      },
+      {
+        title: '征集通过率',
+        key: 'rate',
+        ellipsis: true,
+        render: (_: any, record: { agreeNum: number; total: number }) => {
+          return `${((record.agreeNum / record.total) * 100).toFixed(2)} %`;
+        },
+      },
+      {
+        title: '详细的房号信息',
+        key: 'unitRoom',
+        ellipsis: true,
+        render: (_: any, record: { agreeNum: number; total: number; unitRoom: any }) => {
+          let html = [];
+          if (record && record.unitRoom) {
+            const items = record.unitRoom;
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            items.length &&
+              items.map((item: { unit: string | number; room: any }, idx: any) => {
+                html.push(
+                  <>
+                    {/**
+                     * {"id":158,"userid":124,
+                     * "roomid":"c_12102","name":"陈庆生","areas":"翠苑三区","region":"C","build":1,
+                     * "unit":2,"room":102,"is_certification":false,"contractId":"124_70414642",
+                     * "contractPath":"https://img.dreamstep.top/community/124/70414642_1716031935541.pdf",
+                     * "signatureFile":"",
+                     * "is_checkSignature":0,
+                     * "reviewer":null,
+                     * "submitConfirmation":0,
+                     * "mobile":null,
+                     * "is_checkMobile":true,
+                     * "owner":2,
+                     * "propertyType":1,
+                     * "feedback":null,
+                     * "createdAt":"2024-05-18 18:58:13",
+                     * "updatedAt":null}]}
+                     */}
+                    <dl key={`${item.unit}_${idx}`} className="room-list">
+                      <dt>{item.unit} #</dt>
+                      {item.room &&
+                        item.room.length > 0 &&
+                        item.room.map((list, index) => (
+                          <dd key={`${list.unit}_${index}_${list.room}`}>
+                            <Popover
+                              content={
+                                <>
+                                  <p>
+                                    户号：
+                                    {`${list.areas}-${list.region}区-${list.build}幢-${list.unit}单元-${list.room}室`}
+                                  </p>
+                                  <p>姓名：{list.name}</p>
+                                  <p>Mobile：{list.mobile}</p>
+                                  <p>
+                                    产权类型：
+                                    {list.propertyType > 0 ? (
+                                      <>{list.propertyType === 1 ? '个人' : '公司'}</>
+                                    ) : (
+                                      '未知'
+                                    )}
+                                  </p>
+                                  <p>
+                                    是否拥有产权：
+                                    {list.owner > 0 ? (
+                                      <>{list.owner === 2 ? '有' : '没有'}</>
+                                    ) : (
+                                      '未知'
+                                    )}
+                                  </p>
+                                  <p>
+                                    意愿申报：
+                                    {list.submitConfirmation > 0 ? (
+                                      <>{list.submitConfirmation === 2 ? '同意' : '不同意'}</>
+                                    ) : (
+                                      '未知'
+                                    )}
+                                  </p>
+                                  <p>
+                                    <img src={list.signatureFile} width={100} />
+                                  </p>
+                                  <p>
+                                    申报协议：
+                                    <a href={list.contractPath} target="_blank" rel="noreferrer">
+                                      点击查看
+                                    </a>
+                                  </p>
+                                  <p>
+                                    审核状态：{list.is_checkSignature === 1 ? '已审核' : '未审核'}
+                                  </p>
+                                  <p>审核人：{list.reviewer ? list.reviewer : '未审核'}</p>
+                                  <p>反馈信息：{list.feedback ? list.feedback : '无'}</p>
+                                  <p>申报时间：{list.createdAt}</p>
+                                </>
+                              }
+                              title="详情"
+                            >
+                              {list.submitConfirmation > 0 ? (
+                                <Tag color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}>
+                                  {list.room}
+                                </Tag>
+                              ) : (
+                                <Tag>{list.room}</Tag>
+                              )}
+                            </Popover>
+                          </dd>
+                        ))}
+                    </dl>
+                  </>,
+                );
+              });
+          }
+          return html;
+        },
+      },
+    ];
+  };
+  // 全区数据 lastDayIntention
+  const fetchDataCardAll = async ({ areas, region }) => {
+    const result = await lastDayIntention({ areas, region });
+    if (result && result.status === 200 && result.data) {
+      setCardAllData(result.data);
+    } else {
+      message.info('请求失败，请重试');
+    }
+  };
+  // B区数据
+  const fetchDataCardB = async ({ areas, region }) => {
+    const result = await lastDayIntention({ areas, region });
+    if (result && result.status === 200 && result.data) {
+      setCardBData(result.data);
+    } else {
+      message.info('请求失败，请重试');
+    }
+  };
+  // C区数据
+  const fetchDataCardC = async ({ areas, region }) => {
+    const result = await lastDayIntention({ areas, region });
+    if (result && result.status === 200 && result.data) {
+      setCardCData(result.data);
+    } else {
+      message.info('请求失败，请重试');
+    }
+  };
+
+  const fetchDataTable = async ({ areas, region, pagination }) => {
+    setLoading(true);
+    const result = await reportFormsBuildTable({ areas, region, ...pagination });
+    if (
+      result &&
+      result.status === 200 &&
+      result.data &&
+      result.data.rows &&
+      result.data.rows.length > 0
+    ) {
+      setTableData(result.data.rows);
+      setTotal(result.data.total);
+      setLoading(false);
+    } else {
+      setTableData([]);
+      setLoading(false);
+    }
+  };
+
+  const onChangeRadio = async ({ target: { value } }: RadioChangeEvent) => {
+    setRegion(value);
+    setPagination({ current: 1, pageSize: 20 });
+    fetchDataTable({ areas, region: value, pagination });
+  };
+
+  const handleTableChange = (pagination) => {
+    setPagination({
+      pagination,
+    });
+    fetchDataTable({ areas, region, pagination });
+  };
+
+  useEffect(() => {
+    setAreas('翠苑三区');
+    fetchDataTable({ areas, region, pagination });
+    fetchDataCardAll({ areas, region: 'all' });
+    fetchDataCardB({ areas, region: 'B' });
+    fetchDataCardC({ areas, region: 'C' });
+  }, [pagination?.current, pagination?.pageSize]);
 
   return (
     <PageContainer>
-      <ProTable<API.RuleListItem, API.PageParams>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
-        actionRef={actionRef}
-        rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
-        ]}
-        request={getUserTableList}
-        columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
-      />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-              &nbsp;&nbsp;
-              <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-              </span>
+      <div className="dashboard-page">
+        <div className="card-top">
+          <Row gutter={16}>
+            <Col span={8}>
+              <Card>
+                <div className="title">全区住房户号完成率</div>
+                <div className="rate">
+                  {((cardAllData.communityUserNum / 3850) * 100).toFixed(2)} %
+                </div>
+                <div className="des">
+                  <p>
+                    总户数: <span>1821</span>
+                  </p>
+                  <p>
+                    已申请住房户数: <span>{cardAllData.communityUserNum}</span>{' '}
+                  </p>
+                  <p>
+                    已申报成功用户: <span>{cardAllData.agreeUserNum}</span>
+                  </p>
+                </div>
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <div className="title">B区住房户号完成率</div>
+                <div className="rate">
+                  {((cardBData.communityUserNum / 870) * 100).toFixed(2)} %
+                </div>
+                <div className="des">
+                  <p>
+                    总户数: <span>870</span>
+                  </p>
+                  <p>
+                    已申请住房户数: <span>{cardBData.communityUserNum}</span>
+                  </p>
+                  <p>
+                    已申报成功用户: <span>{cardBData.agreeUserNum}</span>
+                  </p>
+                </div>
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <div className="title">C区住房户号完成率</div>
+                <div className="rate">
+                  {((cardCData.communityUserNum / 951) * 100).toFixed(2)} %
+                </div>
+                <div className="des">
+                  <p>
+                    总户数: <span>951</span>
+                  </p>
+                  <p>
+                    已申请住房户数: <span>{cardCData.communityUserNum}</span>
+                  </p>
+                  <p>
+                    已申报成功用户: <span>{cardCData.agreeUserNum}</span>
+                  </p>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+        <div className="tab-table">
+          <div className="header"></div>
+          <div className="content">
+            <div className="radio-wrap">
+              <Radio.Group
+                options={optionsRadio}
+                onChange={onChangeRadio}
+                value={region}
+                optionType="button"
+              />
             </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
-          <Button type="primary">
-            <FormattedMessage
-              id="pages.searchTable.batchApproval"
-              defaultMessage="Batch approval"
-            />
-          </Button>
-        </FooterToolbar>
-      )}
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
-        width="400px"
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
-      <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-          if (success) {
-            handleUpdateModalOpen(false);
-            setCurrentRow(undefined);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalOpen(false);
-          if (!showDetail) {
-            setCurrentRow(undefined);
-          }
-        }}
-        updateModalOpen={updateModalOpen}
-        values={currentRow || {}}
-      />
 
-      <Drawer
-        width={600}
-        open={showDetail}
-        onClose={() => {
-          setCurrentRow(undefined);
-          setShowDetail(false);
-        }}
-        closable={false}
-      >
-        {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
-            column={2}
-            title={currentRow?.name}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.name,
-            }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
-          />
-        )}
-      </Drawer>
+            <Table
+              columns={columnsTable()}
+              dataSource={tableData}
+              loading={isLoading}
+              pagination={{ ...pagination, total }}
+              showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+              onChange={handleTableChange}
+            ></Table>
+          </div>
+          <div className="footer"></div>
+        </div>
+      </div>
     </PageContainer>
   );
 };
 
-export default TableList;
+export default Dashboard;

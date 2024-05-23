@@ -1,9 +1,9 @@
-import { downloadXlsx, getUserTableList, verifySignature } from '@/services/api/login';
+import { downloadXlsx, getUserTableList, verifySignature } from '@/services/api/community';
 import { FileWordOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Modal, Popover, Radio, Space, message } from 'antd';
+import { Button, Modal, Popover, Radio, Space, Tag, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const TableList: React.FC = () => {
@@ -17,8 +17,7 @@ const TableList: React.FC = () => {
 
   // 下载 ex
   const handelDownloadXlsx = async () => {
-    const result = await downloadXlsx();
-    console.log('result:', result);
+    await downloadXlsx();
     setLoading(false);
   };
 
@@ -48,9 +47,14 @@ const TableList: React.FC = () => {
   const handleCancel = async () => {
     setModalShow(false);
   };
-  const onChangeRadio = (e) => {
-    console.log('radio checked', e.target.value);
+  const onChangeRadio = (e: any) => {
     setCheckSignature(e.target.value);
+  };
+
+  const handelOpenPDF = async (url) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
   };
 
   const columns: ProColumns<API.RuleListItem>[] = [
@@ -106,6 +110,8 @@ const TableList: React.FC = () => {
       valueType: 'select',
       initialValue: 'All',
       width: 150,
+      hideInForm: true,
+      hideInSearch: true,
       valueEnum: {
         all: {
           text: '所有',
@@ -138,7 +144,7 @@ const TableList: React.FC = () => {
                 <div className="check-signature">
                   {
                     <>
-                      审核未通过{' '}
+                      <Tag color="red">审核未通过</Tag>
                       <Button
                         type="link"
                         onClick={() =>
@@ -159,7 +165,7 @@ const TableList: React.FC = () => {
                 <div className="check-signature">
                   {
                     <>
-                      审核已通过{' '}
+                      <Tag color="green">审核已通过</Tag>
                       <Button
                         type="link"
                         onClick={() =>
@@ -181,7 +187,7 @@ const TableList: React.FC = () => {
               <div className="check-signature">
                 {
                   <>
-                    未审核{' '}
+                    <Tag color="orange">未审核</Tag>
                     <Button
                       type="link"
                       onClick={() =>
@@ -203,6 +209,13 @@ const TableList: React.FC = () => {
         }
         return html;
       },
+    },
+    {
+      title: '审核人',
+      dataIndex: 'reviewer',
+      hideInForm: true,
+      hideInSearch: true,
+      hideInTable: false,
     },
     {
       title: '选择区域',
@@ -478,19 +491,45 @@ const TableList: React.FC = () => {
       dataIndex: 'submitConfirmation',
       valueType: 'select',
       initialValue: 'All',
+      width: 120,
       valueEnum: {
         0: {
           text: '未申报',
           status: 'All',
         },
         1: {
-          text: '同意意愿',
+          text: '同意',
           status: '0',
         },
         2: {
-          text: '不同意意愿',
+          text: '不同意',
           status: '1',
         },
+      },
+      render: (_, record) => {
+        let html = '';
+        if (
+          record &&
+          record.signatureFile &&
+          record.submitConfirmation &&
+          record.submitConfirmation > 0
+        ) {
+          if (record.submitConfirmation === 2) {
+            html = (
+              <>
+                <Tag color="green">同意</Tag>{' '}
+                <Button type="link" onClick={() => handelOpenPDF(record.contractPath)}>
+                  查看协议
+                </Button>
+              </>
+            );
+          } else {
+            html = <Tag color="red">不同意</Tag>;
+          }
+        } else {
+          html = <Tag color="orange">未申报</Tag>;
+        }
+        return html;
       },
     },
     {

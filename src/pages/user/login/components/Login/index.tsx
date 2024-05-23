@@ -4,7 +4,6 @@ import {
   LockOutlined,
   MailOutlined,
   TaobaoCircleOutlined,
-  UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
@@ -184,28 +183,6 @@ const Login: React.FC = () => {
                       <FormattedMessage
                         id="pages.login.email.required"
                         defaultMessage="请输入邮箱!"
-                      />
-                    ),
-                  },
-                ]}
-              />
-              <ProFormText
-                name="name"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined />,
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.name.placeholder',
-                  defaultMessage: '用户名:',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.name.required"
-                        defaultMessage="请输入用户名!"
                       />
                     ),
                   },

@@ -7,7 +7,7 @@ import {
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
-import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
+import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { FormattedMessage, history, useIntl, useModel } from '@umijs/max';
 import { Alert, message } from 'antd';
 import { createStyles } from 'antd-style';
@@ -193,7 +193,7 @@ const Register: React.FC = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.name.placeholder',
-                  defaultMessage: '用户名:',
+                  defaultMessage: 'NickName:',
                 })}
                 rules={[
                   {
@@ -201,7 +201,7 @@ const Register: React.FC = () => {
                     message: (
                       <FormattedMessage
                         id="pages.login.name.required"
-                        defaultMessage="请输入用户名!"
+                        defaultMessage="请输入NickName!"
                       />
                     ),
                   },
@@ -236,9 +236,6 @@ const Register: React.FC = () => {
               marginBottom: 24,
             }}
           >
-            <ProFormCheckbox noStyle name="auto_Login">
-              <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
-            </ProFormCheckbox>
             <a
               style={{
                 float: 'right',

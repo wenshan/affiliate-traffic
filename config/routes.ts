@@ -62,7 +62,7 @@ export default [
     name: 'community',
     path: '/community',
     icon: 'profile',
-    // access: 'canAdmin',
+    access: 'canAdmin',
     layout: true,
     routes: [
       {
@@ -90,7 +90,7 @@ export default [
       {
         path: '/admin/sub-page',
         name: 'sub-page',
-        component: './Admin',
+        component: './admin',
       },
     ],
   },
