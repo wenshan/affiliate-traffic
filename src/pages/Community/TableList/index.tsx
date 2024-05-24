@@ -3,8 +3,10 @@ import { FileWordOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Modal, Popover, Radio, Space, Tag, message } from 'antd';
+import { Button, Input, Modal, Popover, Radio, Space, Tag, message } from 'antd';
 import React, { useRef, useState } from 'react';
+
+const { TextArea } = Input;
 
 const TableList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,6 +14,7 @@ const TableList: React.FC = () => {
   const [id, setTableId] = useState<number>(0);
   const [is_checkSignature, setCheckSignature] = useState(0);
   const [params, setParams] = useState<number>(0);
+  const [remark, setRemark] = useState<string>('');
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
 
@@ -21,6 +24,11 @@ const TableList: React.FC = () => {
     setLoading(false);
   };
 
+  //  remark
+  const textAreaOnChange = async (e) => {
+    const { value } = e.target;
+    setRemark(value);
+  };
   // 审核
   const handelVerifySignatureStatus = async ({ id, is_checkSignature }) => {
     setModalShow(true);
@@ -31,7 +39,7 @@ const TableList: React.FC = () => {
   const handleOk = async () => {
     const logTime = new Date().getTime();
     setModalShow(false);
-    const result = await verifySignature({ id, is_checkSignature });
+    const result = await verifySignature({ id, is_checkSignature, remark });
     if (result && result.status === 200) {
       setParams(logTime);
       message.success({
@@ -213,6 +221,13 @@ const TableList: React.FC = () => {
     {
       title: '审核人',
       dataIndex: 'reviewer',
+      hideInForm: true,
+      hideInSearch: true,
+      hideInTable: false,
+    },
+    {
+      title: '审核备注',
+      dataIndex: 'remark',
       hideInForm: true,
       hideInSearch: true,
       hideInTable: false,
@@ -581,13 +596,34 @@ const TableList: React.FC = () => {
         request={getUserTableList}
         columns={columns}
       />
-      <Modal title="电子签名审核" open={isModalShow} onOk={handleOk} onCancel={handleCancel}>
-        <Radio.Group onChange={onChangeRadio} value={is_checkSignature}>
-          <Space direction="vertical">
-            <Radio value={1}>审核未通过</Radio>
-            <Radio value={2}>审核通过</Radio>
-          </Space>
-        </Radio.Group>
+      <Modal
+        title="电子签名审核"
+        open={isModalShow}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        className="modal-check"
+      >
+        <div className="check clearfix">
+          <div className="tx">
+            <p>状态</p>
+            <Radio.Group onChange={onChangeRadio} value={is_checkSignature}>
+              <Space direction="vertical">
+                <Radio value={1}>审核未通过</Radio>
+                <Radio value={2}>审核通过</Radio>
+              </Space>
+            </Radio.Group>
+          </div>
+          <div className="tx">
+            <p>备注</p>
+            <TextArea
+              rows={4}
+              allowClear
+              showCount
+              value={remark}
+              onChange={textAreaOnChange}
+            ></TextArea>
+          </div>
+        </div>
       </Modal>
     </PageContainer>
   );
