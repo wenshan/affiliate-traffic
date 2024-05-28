@@ -1,6 +1,7 @@
 declare namespace API {
   type CurrentUser = {
     name?: string;
+    nickname: ?string;
     avatar?: string;
     userid?: string;
     email?: string;
@@ -44,6 +45,7 @@ declare namespace API {
     password?: string;
     autoLogin?: boolean;
     email?: string;
+    nickname: ?string;
   };
 
   type RegisterParams = {
@@ -51,6 +53,7 @@ declare namespace API {
     password?: string;
     autoLogin?: boolean;
     email?: string;
+    nickname: ?string;
   };
 
   type LoginResult = {

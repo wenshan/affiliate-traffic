@@ -1,11 +1,13 @@
 const client = require('scp2');
 // 服务器信息
 const host = '139.224.110.211';
+// const host = '1.94.25.172';
 const username = 'root';
 const password = 'Hws2416$';
 const port = 22;
 const localFilePath = `${__dirname}/dist`;
-const remoteFilePath = '/www/html'; // /www/traffic
+const remoteFilePath = '/www/gtraffic';
+// const remoteFilePath = '/www/traffic';
 
 const remoteAddress = `${username}:${password}@${host}`;
 console.log('localFilePath:', `${localFilePath}/index.html`);

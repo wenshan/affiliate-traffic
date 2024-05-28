@@ -11,7 +11,7 @@ export const googleGetToken = async (params?: { [key: string]: any }) => {
   });
 };
 
-export const googleGetJwtToken = async (params) => {
+export const googleGetJwtToken = async (params: { url: any }) => {
   return requestToken({
     url: params.url,
     method: 'POST',

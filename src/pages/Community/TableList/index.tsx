@@ -452,11 +452,11 @@ const TableList: React.FC = () => {
           status: '0',
         },
         1: {
-          text: '个人产权',
+          text: '个人',
           status: '1',
         },
         2: {
-          text: '公司产权',
+          text: '公司',
           status: '2',
         },
       },

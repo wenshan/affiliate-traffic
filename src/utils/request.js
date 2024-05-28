@@ -4,20 +4,20 @@ import { message } from 'antd';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const limeet = 'https://www.limeetpet.com';
+const dreamstep = 'https://www.dreamstep.top';
+const devUrl = 'http://127.0.0.1:7001/';
+
 const isDev = process.env.NODE_ENV === 'development';
-// const API_DEV = 'https://www.limeetpet.com/';
-const API_DEV = 'http://127.0.0.1:7001/';
-// const API_PRO = 'https://dreamstep.top/';
-const API_PRO = 'https://www.limeetpet.com/';
+const API_DEV = `${devUrl}/`;
+const API_PRO = `${limeet}/`;
 
 const instance = axios.create({
   baseURL: isDev ? API_DEV : API_PRO,
   timeout: 1000 * 60,
   headers: {
     'Access-Control-Allow-Credentials': true,
-    'Access-Control-Allow-Origin': `${
-      isDev ? 'http://127.0.0.1:7001' : 'https://www.limeetpet.com'
-    }`,
+    'Access-Control-Allow-Origin': `${isDev ? API_DEV : limeet}`,
     'Access-Control-Allow-Methods': 'DELETE, HEAD, GET, OPTIONS, POST, PUT',
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Headers':

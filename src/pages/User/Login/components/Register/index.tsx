@@ -121,7 +121,7 @@ const Register: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { status } = userLoginState;
+  const { status, msg } = userLoginState;
   return (
     <div className={styles.container}>
       <div
@@ -135,8 +135,13 @@ const Register: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
-          title="Affiliate Traffic"
+          logo={
+            <img
+              alt="logo"
+              src="https://affiliate-traffic.oss-cn-hongkong.aliyuncs.com/gtraffic/gtraffic_500_260.png"
+            />
+          }
+          title="Gtraffic"
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
             auto_Login: true,
@@ -153,14 +158,7 @@ const Register: React.FC = () => {
             await handleSubmit(values as API.LoginParams);
           }}
         >
-          {status !== 200 && (
-            <LoginMessage
-              content={intl.formatMessage({
-                id: 'pages.login.accountRegister.errorMessage',
-                defaultMessage: '邮箱已经被注册',
-              })}
-            />
-          )}
+          {status !== 200 && msg && <LoginMessage content={JSON.stringify(msg)} />}
           {
             <>
               <ProFormText
@@ -186,22 +184,22 @@ const Register: React.FC = () => {
                 ]}
               />
               <ProFormText
-                name="name"
+                name="nickname"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.name.placeholder',
-                  defaultMessage: 'NickName:',
+                  id: 'pages.login.nickname.placeholder',
+                  defaultMessage: 'nickname:',
                 })}
                 rules={[
                   {
                     required: true,
                     message: (
                       <FormattedMessage
-                        id="pages.login.name.required"
-                        defaultMessage="请输入NickName!"
+                        id="pages.login.nickname.required"
+                        defaultMessage="请输入nickname!"
                       />
                     ),
                   },

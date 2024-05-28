@@ -124,7 +124,7 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { status } = userLoginState;
+  const { status, msg } = userLoginState;
   return (
     <div className={styles.container}>
       <div
@@ -138,11 +138,16 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
-          title="Affiliate Traffic"
+          logo={
+            <img
+              alt="logo"
+              src="https://affiliate-traffic.oss-cn-hongkong.aliyuncs.com/gtraffic/gtraffic_500_260.png"
+            />
+          }
+          title="Gtraffic"
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
-            auto_Login: true,
+            auto_Login: false,
           }}
           actions={[
             <FormattedMessage
@@ -156,14 +161,7 @@ const Login: React.FC = () => {
             await handleSubmit(values as API.LoginParams);
           }}
         >
-          {status !== 200 && (
-            <LoginMessage
-              content={intl.formatMessage({
-                id: 'pages.login.accountLogin.errorMessage',
-                defaultMessage: '邮箱已被注册',
-              })}
-            />
-          )}
+          {status !== 200 && msg && <LoginMessage content={JSON.stringify(msg)} />}
           {
             <>
               <ProFormText

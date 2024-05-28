@@ -15,9 +15,9 @@ const Settings: ProLayoutProps & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: 'Gtraffic',
+  title: '流量联盟',
   pwa: true,
-  logo: 'https://affiliate-traffic.oss-cn-hongkong.aliyuncs.com/gtraffic/gtraffic_100_36.png',
+  logo: 'https://affiliate-traffic.oss-cn-hongkong.aliyuncs.com/gtraffic/gtraffic_500_260.png',
   iconfontUrl: '',
   token: {
     // 参见ts声明，demo 见文档，通过token 修改样式
