@@ -2,6 +2,7 @@ import { lastDayIntention, reportFormsBuildTable } from '@/services/api/communit
 import { PageContainer } from '@ant-design/pro-components';
 import type { RadioChangeEvent } from 'antd';
 import { Card, Col, Popover, Radio, Row, Table, Tag, message } from 'antd';
+import { MessageOutline } from 'antd-mobile-icons';
 import React, { useEffect, useState } from 'react';
 
 import './index.less';
@@ -124,6 +125,7 @@ const Dashboard: React.FC = () => {
                           item.room.map(
                             (
                               list: {
+                                [x: string]: ReactNode;
                                 unit: any;
                                 room:
                                   | string
@@ -217,6 +219,7 @@ const Dashboard: React.FC = () => {
                                       {`${list.areas}-${list.region}区-${list.build}幢-${list.unit}单元-${list.room}室`}
                                     </p>
                                     <p>姓名：{list.name}</p>
+                                    <p>userid：{list.userid}</p>
                                     <p>Mobile：{list.mobile}</p>
                                     <p>
                                       产权类型：
@@ -242,15 +245,23 @@ const Dashboard: React.FC = () => {
                                         '未知'
                                       )}
                                     </p>
-                                    <p>
-                                      <img src={list.signatureFile} width={100} />
-                                    </p>
-                                    <p>
-                                      申报协议：
-                                      <a href={list.contractPath} target="_blank" rel="noreferrer">
-                                        点击查看
-                                      </a>
-                                    </p>
+                                    {list.signatureFile && (
+                                      <p>
+                                        <img src={list.signatureFile} width={120} />
+                                      </p>
+                                    )}
+                                    {list.contractPath && (
+                                      <p>
+                                        申报协议：
+                                        <a
+                                          href={list.contractPath}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                        >
+                                          点击查看
+                                        </a>
+                                      </p>
+                                    )}
                                     <p>
                                       审核状态：{list.is_checkSignature === 1 ? '已审核' : '未审核'}
                                     </p>
@@ -263,7 +274,7 @@ const Dashboard: React.FC = () => {
                               >
                                 {list.submitConfirmation > 0 ? (
                                   <Tag color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}>
-                                    {list.room}
+                                    {list.room} {list.feedback && <MessageOutline />}
                                   </Tag>
                                 ) : (
                                   <Tag>{list.room}</Tag>
