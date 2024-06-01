@@ -6,6 +6,8 @@ import { useIntl } from '@umijs/max';
 import { Button, Input, Modal, Popover, Radio, Space, Tag, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
+import './index.less';
+
 const { TextArea } = Input;
 
 const TableList: React.FC = () => {
@@ -38,17 +40,24 @@ const TableList: React.FC = () => {
   // 发送审核结果
   const handleOk = async () => {
     const logTime = new Date().getTime();
-    setModalShow(false);
-    const result = await verifySignature({ id, is_checkSignature, remark });
-    if (result && result.status === 200) {
-      setParams(logTime);
+    if (is_checkSignature === 1 && !remark) {
       message.success({
-        content: '审核成功',
+        content: '未通过的状态的审核，请填写备注.',
       });
+      return;
     } else {
-      message.error({
-        content: '审核失败',
-      });
+      const result = await verifySignature({ id, is_checkSignature, remark });
+      if (result && result.status === 200) {
+        setModalShow(false);
+        setParams(logTime);
+        message.success({
+          content: '审核变更成功',
+        });
+      } else {
+        message.error({
+          content: '审核变更失败',
+        });
+      }
     }
   };
 
@@ -72,7 +81,8 @@ const TableList: React.FC = () => {
       hideInForm: true,
       hideInSearch: true,
       hideInTable: false,
-      valueType: 'indexBorder',
+      valueType: 'index',
+      width: 60,
     },
     {
       title: '用户ID',
@@ -605,7 +615,7 @@ const TableList: React.FC = () => {
       >
         <div className="check clearfix">
           <div className="tx">
-            <p>状态</p>
+            <div className="title">状态</div>
             <Radio.Group onChange={onChangeRadio} value={is_checkSignature}>
               <Space direction="vertical">
                 <Radio value={1}>审核未通过</Radio>
@@ -614,7 +624,7 @@ const TableList: React.FC = () => {
             </Radio.Group>
           </div>
           <div className="tx">
-            <p>备注</p>
+            <div className="title">备注</div>
             <TextArea
               rows={4}
               allowClear

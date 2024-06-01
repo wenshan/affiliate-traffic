@@ -1,8 +1,7 @@
 import { Footer } from '@/components';
-import { Helmet, useIntl } from '@umijs/max';
+import { useIntl } from '@umijs/max';
 import { Tabs } from 'antd';
 import React, { useState } from 'react';
-import Settings from '../../../../config/defaultSettings';
 import Login from './components/Login';
 import Register from './components/Register';
 
@@ -13,15 +12,6 @@ const LoginInit: React.FC = () => {
   const [type, setType] = useState<string>('login');
   return (
     <div className="container">
-      <Helmet>
-        <title>
-          {intl.formatMessage({
-            id: 'menu.login',
-            defaultMessage: '登录注册页',
-          })}
-          - {Settings.title}
-        </title>
-      </Helmet>
       <div
         style={{
           flex: '1',

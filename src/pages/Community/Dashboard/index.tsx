@@ -44,6 +44,15 @@ const Dashboard: React.FC = () => {
   const columnsTable = () => {
     return [
       {
+        title: 'ID',
+        dataIndex: 'index',
+        valueType: 'index',
+        width: 60,
+        render: (text, record, index) => {
+          return index + 1;
+        },
+      },
+      {
         title: '区域',
         key: 'name',
         ellipsis: true,
@@ -78,9 +87,9 @@ const Dashboard: React.FC = () => {
       {
         title: '详细的房号信息',
         key: 'unitRoom',
-        ellipsis: true,
+        ellipsis: false,
         render: (_: any, record: { agreeNum: number; total: number; unitRoom: any }) => {
-          let html = [];
+          let html: React.JSX.Element[] = [];
           if (record && record.unitRoom) {
             const items = record.unitRoom;
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -105,75 +114,165 @@ const Dashboard: React.FC = () => {
                      * "createdAt":"2024-05-18 18:58:13",
                      * "updatedAt":null}]}
                      */}
-                    <dl key={`${item.unit}_${idx}`} className="room-list">
-                      <dt>{item.unit} #</dt>
-                      {item.room &&
-                        item.room.length > 0 &&
-                        item.room.map((list, index) => (
-                          <dd key={`${list.unit}_${index}_${list.room}`}>
-                            <Popover
-                              content={
-                                <>
-                                  <p>
-                                    户号：
-                                    {`${list.areas}-${list.region}区-${list.build}幢-${list.unit}单元-${list.room}室`}
-                                  </p>
-                                  <p>姓名：{list.name}</p>
-                                  <p>Mobile：{list.mobile}</p>
-                                  <p>
-                                    产权类型：
-                                    {list.propertyType > 0 ? (
-                                      <>{list.propertyType === 1 ? '个人' : '公司'}</>
-                                    ) : (
-                                      '未知'
-                                    )}
-                                  </p>
-                                  <p>
-                                    是否拥有产权：
-                                    {list.owner > 0 ? (
-                                      <>{list.owner === 2 ? '有' : '没有'}</>
-                                    ) : (
-                                      '未知'
-                                    )}
-                                  </p>
-                                  <p>
-                                    意愿申报：
-                                    {list.submitConfirmation > 0 ? (
-                                      <>{list.submitConfirmation === 2 ? '同意' : '不同意'}</>
-                                    ) : (
-                                      '未知'
-                                    )}
-                                  </p>
-                                  <p>
-                                    <img src={list.signatureFile} width={100} />
-                                  </p>
-                                  <p>
-                                    申报协议：
-                                    <a href={list.contractPath} target="_blank" rel="noreferrer">
-                                      点击查看
-                                    </a>
-                                  </p>
-                                  <p>
-                                    审核状态：{list.is_checkSignature === 1 ? '已审核' : '未审核'}
-                                  </p>
-                                  <p>审核人：{list.reviewer ? list.reviewer : '未审核'}</p>
-                                  <p>反馈信息：{list.feedback ? list.feedback : '无'}</p>
-                                  <p>申报时间：{list.createdAt}</p>
-                                </>
-                              }
-                              title="详情"
-                            >
-                              {list.submitConfirmation > 0 ? (
-                                <Tag color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}>
-                                  {list.room}
-                                </Tag>
-                              ) : (
-                                <Tag>{list.room}</Tag>
-                              )}
-                            </Popover>
-                          </dd>
-                        ))}
-                    </dl>
+                    <div key={`${item.unit}_${idx}`} className="room-list clearfix">
+                      <div className="unit" key={`${item.unit}_${idx}_unit`}>
+                        {item.unit} #
+                      </div>
+                      <div className="list clearfix" key={`${item.unit}_${idx}list`}>
+                        {item.room &&
+                          item.room.length > 0 &&
+                          item.room.map(
+                            (
+                              list: {
+                                unit: any;
+                                room:
+                                  | string
+                                  | number
+                                  | boolean
+                                  | React.ReactElement<
+                                      any,
+                                      string | React.JSXElementConstructor<any>
+                                    >
+                                  | Iterable<React.ReactNode>
+                                  | null
+                                  | undefined;
+                                areas: any;
+                                region: any;
+                                build: any;
+                                name:
+                                  | string
+                                  | number
+                                  | boolean
+                                  | React.ReactElement<
+                                      any,
+                                      string | React.JSXElementConstructor<any>
+                                    >
+                                  | Iterable<React.ReactNode>
+                                  | React.ReactPortal
+                                  | null
+                                  | undefined;
+                                mobile:
+                                  | string
+                                  | number
+                                  | boolean
+                                  | React.ReactElement<
+                                      any,
+                                      string | React.JSXElementConstructor<any>
+                                    >
+                                  | Iterable<React.ReactNode>
+                                  | React.ReactPortal
+                                  | null
+                                  | undefined;
+                                propertyType: number;
+                                owner: number;
+                                submitConfirmation: number;
+                                signatureFile: string | undefined;
+                                contractPath: string | undefined;
+                                is_checkSignature: number;
+                                reviewer:
+                                  | string
+                                  | number
+                                  | boolean
+                                  | React.ReactElement<
+                                      any,
+                                      string | React.JSXElementConstructor<any>
+                                    >
+                                  | Iterable<React.ReactNode>
+                                  | React.ReactPortal
+                                  | null
+                                  | undefined;
+                                feedback:
+                                  | string
+                                  | number
+                                  | boolean
+                                  | React.ReactElement<
+                                      any,
+                                      string | React.JSXElementConstructor<any>
+                                    >
+                                  | Iterable<React.ReactNode>
+                                  | React.ReactPortal
+                                  | null
+                                  | undefined;
+                                createdAt:
+                                  | string
+                                  | number
+                                  | boolean
+                                  | React.ReactElement<
+                                      any,
+                                      string | React.JSXElementConstructor<any>
+                                    >
+                                  | Iterable<React.ReactNode>
+                                  | React.ReactPortal
+                                  | null
+                                  | undefined;
+                              },
+                              index: any,
+                            ) => (
+                              <Popover
+                                key={`${list.unit}_${index}_${list.room}_popover`}
+                                content={
+                                  <>
+                                    <p>
+                                      户号：
+                                      {`${list.areas}-${list.region}区-${list.build}幢-${list.unit}单元-${list.room}室`}
+                                    </p>
+                                    <p>姓名：{list.name}</p>
+                                    <p>Mobile：{list.mobile}</p>
+                                    <p>
+                                      产权类型：
+                                      {list.propertyType > 0 ? (
+                                        <>{list.propertyType === 1 ? '个人' : '公司'}</>
+                                      ) : (
+                                        '未知'
+                                      )}
+                                    </p>
+                                    <p>
+                                      是否拥有产权：
+                                      {list.owner > 0 ? (
+                                        <>{list.owner === 2 ? '有' : '没有'}</>
+                                      ) : (
+                                        '未知'
+                                      )}
+                                    </p>
+                                    <p>
+                                      意愿申报：
+                                      {list.submitConfirmation > 0 ? (
+                                        <>{list.submitConfirmation === 2 ? '同意' : '不同意'}</>
+                                      ) : (
+                                        '未知'
+                                      )}
+                                    </p>
+                                    <p>
+                                      <img src={list.signatureFile} width={100} />
+                                    </p>
+                                    <p>
+                                      申报协议：
+                                      <a href={list.contractPath} target="_blank" rel="noreferrer">
+                                        点击查看
+                                      </a>
+                                    </p>
+                                    <p>
+                                      审核状态：{list.is_checkSignature === 1 ? '已审核' : '未审核'}
+                                    </p>
+                                    <p>审核人：{list.reviewer ? list.reviewer : '未审核'}</p>
+                                    <p>反馈信息：{list.feedback ? list.feedback : '无'}</p>
+                                    <p>申报时间：{list.createdAt}</p>
+                                  </>
+                                }
+                                title="详情"
+                              >
+                                {list.submitConfirmation > 0 ? (
+                                  <Tag color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}>
+                                    {list.room}
+                                  </Tag>
+                                ) : (
+                                  <Tag>{list.room}</Tag>
+                                )}
+                              </Popover>
+                            ),
+                          )}
+                      </div>
+                    </div>
                   </>,
                 );
               });
@@ -232,7 +331,7 @@ const Dashboard: React.FC = () => {
 
   const onChangeRadio = async ({ target: { value } }: RadioChangeEvent) => {
     setRegion(value);
-    setPagination({ current: 1, pageSize: 20 });
+    setPagination({ current: 1, pageSize: 100 });
     fetchDataTable({ areas, region: value, pagination });
   };
 
