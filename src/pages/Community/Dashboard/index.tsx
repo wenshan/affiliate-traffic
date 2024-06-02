@@ -389,11 +389,11 @@ const Dashboard: React.FC = () => {
               <Card>
                 <div className="title">B区住房户号完成率</div>
                 <div className="rate">
-                  {((cardBData.communityUserNum / 870) * 100).toFixed(2)} %
+                  {((cardBData.communityUserNum / 966) * 100).toFixed(2)} %
                 </div>
                 <div className="des">
                   <p>
-                    总户数: <span>870</span>
+                    总户数: <span>966</span>
                   </p>
                   <p>
                     已申请住房户数: <span>{cardBData.communityUserNum}</span>
