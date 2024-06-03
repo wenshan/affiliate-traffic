@@ -1,7 +1,7 @@
 import { lastDayIntention, reportFormsBuildTable } from '@/services/api/community';
 import { PageContainer } from '@ant-design/pro-components';
 import type { RadioChangeEvent } from 'antd';
-import { Card, Col, Popover, Radio, Row, Table, Tag, message } from 'antd';
+import { Card, Col, Popover, Radio, Row, Space, Table, Tag, message } from 'antd';
 import { MessageOutline } from 'antd-mobile-icons';
 import React, { useEffect, useState } from 'react';
 
@@ -273,11 +273,17 @@ const Dashboard: React.FC = () => {
                                 title="详情"
                               >
                                 {list.submitConfirmation > 0 ? (
-                                  <Tag color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}>
-                                    {list.room} {list.feedback && <MessageOutline />}
-                                  </Tag>
+                                  <Space>
+                                    <Tag
+                                      color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}
+                                    >
+                                      {list.room} {list.feedback && <MessageOutline />}
+                                    </Tag>
+                                  </Space>
                                 ) : (
-                                  <Tag>{list.room}</Tag>
+                                  <Space>
+                                    <Tag>{list.room}</Tag>
+                                  </Space>
                                 )}
                               </Popover>
                             ),
