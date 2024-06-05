@@ -25,6 +25,9 @@ export async function downloadXlsx() {
   return request('/api/community/downloadXlsx', {
     method: 'POST',
     data: {},
+    config: {
+      isAccess: false,
+    },
   });
 }
 
@@ -41,6 +44,9 @@ export async function reportFormsBuildTable(options: { [key: string]: any }) {
   return request('/api/community/reportFormsBuildTable', {
     method: 'POST',
     data: options,
+    config: {
+      isAccess: false,
+    },
   });
 }
 
@@ -49,5 +55,8 @@ export async function lastDayIntention(options: { [key: string]: any }) {
   return request('/api/community/lastDayIntention', {
     method: 'POST',
     data: options,
+    config: {
+      isAccess: false,
+    },
   });
 }

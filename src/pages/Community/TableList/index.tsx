@@ -1,4 +1,5 @@
 import { downloadXlsx, getUserTableList, verifySignature } from '@/services/api/community';
+import roomBuild from '@/utils/roomBuild';
 import { FileWordOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
@@ -248,7 +249,7 @@ const TableList: React.FC = () => {
       initialValue: '翠苑三区',
       filters: true,
       onFilter: true,
-      ellipsis: true,
+      ellipsis: false,
       valueType: 'select',
       valueEnum: {
         翠苑三区: { text: '翠苑三区', status: '翠苑三区' },
@@ -260,7 +261,7 @@ const TableList: React.FC = () => {
       initialValue: 'C',
       filters: true,
       onFilter: true,
-      ellipsis: true,
+      ellipsis: false,
       valueType: 'select',
       valueEnum: {
         all: {
@@ -287,125 +288,14 @@ const TableList: React.FC = () => {
       initialValue: 'All',
       filters: true,
       onFilter: true,
-      ellipsis: true,
+      ellipsis: false,
       valueType: 'select',
       valueEnum: {
         all: {
           text: 'All',
           status: '',
         },
-        1: {
-          text: '1号',
-          status: '1',
-        },
-        2: {
-          text: '2号',
-          status: '2',
-        },
-        3: {
-          text: '3号',
-          status: '3',
-        },
-        4: {
-          text: '4号',
-          status: '4',
-        },
-        5: {
-          text: '5号',
-          status: '5',
-        },
-        6: {
-          text: '6号',
-          status: '6',
-        },
-        7: {
-          text: '7号',
-          status: '7',
-        },
-        8: {
-          text: '8号',
-          status: '8',
-        },
-        9: {
-          text: '9号',
-          status: '9',
-        },
-        10: {
-          text: '10号',
-          status: '10',
-        },
-        11: {
-          text: '11号',
-          status: '11',
-        },
-        12: {
-          text: '12号',
-          status: '12',
-        },
-        13: {
-          text: '13号',
-          status: '13',
-        },
-        14: {
-          text: '14号',
-          status: '14',
-        },
-        15: {
-          text: '15号',
-          status: '15',
-        },
-        16: {
-          text: '16号',
-          status: '16',
-        },
-        17: {
-          text: '17号',
-          status: '17',
-        },
-        18: {
-          text: '18号',
-          status: '18',
-        },
-        19: {
-          text: '19号',
-          status: '19',
-        },
-        20: {
-          text: '20号',
-          status: '20',
-        },
-        21: {
-          text: '21号',
-          status: '21',
-        },
-        22: {
-          text: '22号',
-          status: '22',
-        },
-        23: {
-          text: '23号',
-          status: '23',
-        },
-        24: {
-          text: '24号',
-          status: '24',
-        },
-        25: {
-          text: '25号',
-          status: '25',
-        },
-        26: {
-          text: '26号',
-          status: '26',
-        },
-        27: {
-          text: '27号',
-          status: '27',
-        },
-        28: {
-          text: '28号',
-          status: '28',
-        },
+        ...roomBuild,
       },
     },
     {
@@ -414,7 +304,7 @@ const TableList: React.FC = () => {
       initialValue: 'All',
       filters: true,
       onFilter: true,
-      ellipsis: true,
+      ellipsis: false,
       valueType: 'select',
       valueEnum: {
         All: {
@@ -442,8 +332,8 @@ const TableList: React.FC = () => {
           status: '5',
         },
         6: {
-          text: '5单元',
-          status: '5',
+          text: '6单元',
+          status: '6',
         },
       },
     },

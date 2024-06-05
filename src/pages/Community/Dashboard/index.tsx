@@ -56,11 +56,11 @@ const Dashboard: React.FC = () => {
       {
         title: '区域',
         key: 'name',
-        ellipsis: true,
+        ellipsis: false,
         render: (_: any, record: { areas: any; build: any; region: any }) => {
           let text = '';
           if (record && record.areas && record.build && record.region) {
-            text = `${record.areas}-${record.region}区-${record.build}幢`;
+            text = `${record.areas}${record.region}区-${record.build}幢`;
           }
           return text;
         },
@@ -69,24 +69,24 @@ const Dashboard: React.FC = () => {
         title: '实际套数',
         dataIndex: 'total',
         key: 'total',
-        ellipsis: true,
+        ellipsis: false,
       },
       {
-        title: '登记同意用户数',
+        title: '同意用户数',
         dataIndex: 'agreeNum',
         key: 'agreeNum',
-        ellipsis: true,
+        ellipsis: false,
       },
       {
-        title: '征集通过率',
+        title: '通过率',
         key: 'rate',
-        ellipsis: true,
+        ellipsis: false,
         render: (_: any, record: { agreeNum: number; total: number }) => {
           return `${((record.agreeNum / record.total) * 100).toFixed(2)} %`;
         },
       },
       {
-        title: '详细的房号信息',
+        title: '意愿房号信息',
         key: 'unitRoom',
         ellipsis: false,
         render: (_: any, record: { agreeNum: number; total: number; unitRoom: any }) => {
@@ -297,6 +297,42 @@ const Dashboard: React.FC = () => {
           return html;
         },
       },
+      {
+        title: '未提交意愿户号',
+        dataIndex: 'buildRoom',
+        key: 'buildRoom',
+        ellipsis: false,
+        render: (_, record) => {
+          let html: React.JSX.Element[] = [];
+          if (record && record.buildRoom) {
+            const items = record.buildRoom;
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            items &&
+              items.length &&
+              items.map((item, idx) => {
+                html.push(
+                  <>
+                    <div key={`${item.unit}_${idx}`} className="room-list clearfix">
+                      <div className="unit" key={`${item.unit}_${idx}_notunit`}>
+                        {item.unit} #
+                      </div>
+                      <div className="list clearfix" key={`${item.unit}_${idx}notlist`}>
+                        {item.room &&
+                          item.room.length > 0 &&
+                          item.room.map((list, index) => (
+                            <Space key={`${item.unit}_${idx}_${index}_s`}>
+                              <Tag key={`${item.unit}_${idx}_${index}_t`}>{list}</Tag>
+                            </Space>
+                          ))}
+                      </div>
+                    </div>
+                  </>,
+                );
+              });
+            return html;
+          }
+        },
+      },
     ];
   };
   // 全区数据 lastDayIntention
@@ -376,11 +412,11 @@ const Dashboard: React.FC = () => {
               <Card>
                 <div className="title">全区住房户号完成率</div>
                 <div className="rate">
-                  {((cardAllData.communityUserNum / 3850) * 100).toFixed(2)} %
+                  {((cardAllData.communityUserNum / 1929) * 100).toFixed(2)} %
                 </div>
                 <div className="des">
                   <p>
-                    总户数: <span>1821</span>
+                    总户数: <span>1929</span>
                   </p>
                   <p>
                     已申请住房户数: <span>{cardAllData.communityUserNum}</span>{' '}
@@ -395,11 +431,11 @@ const Dashboard: React.FC = () => {
               <Card>
                 <div className="title">B区住房户号完成率</div>
                 <div className="rate">
-                  {((cardBData.communityUserNum / 966) * 100).toFixed(2)} %
+                  {((cardBData.communityUserNum / 978) * 100).toFixed(2)} %
                 </div>
                 <div className="des">
                   <p>
-                    总户数: <span>966</span>
+                    总户数: <span>978</span>
                   </p>
                   <p>
                     已申请住房户数: <span>{cardBData.communityUserNum}</span>
