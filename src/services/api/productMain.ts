@@ -5,6 +5,7 @@ import request from '@/utils/request';
 
 /** 创建主商品 */
 export const createProductMain = async (params?: { [key: string]: any }) => {
+  debugger;
   return request<{ data: any }>('/api/product/createProductMain', {
     method: 'POST',
     data: params,

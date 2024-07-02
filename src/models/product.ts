@@ -31,18 +31,23 @@ export default {
       total: 0,
     },
     searchParams: {
-      language: 'en-US',
+      language: 'zh-CN',
       keyword: '',
       product_type_id: 0,
       productTypeOption: [],
     },
+    productStatusAll: {
+      isCreateMainModalShow: false,
+    }, // 统一的用户操作状态
     product_sku_option_status: 0,
     languageOption: [
+      { value: 'zh-CN', label: '中文' },
       { value: 'en-US', label: '英语' },
       { value: 'ja-JP', label: '日语' },
       { value: 'ko_KR', label: '韩语' },
     ],
     monetaryUnitOption: [
+      { value: 'CNY', label: '人民币' },
       { value: 'USD', label: '美元' },
       { value: 'JPY', label: '日元' },
       { value: 'EUR', label: '欧元' },
@@ -63,7 +68,7 @@ export default {
       },
       google_product_category_id: 632,
       gtin: '',
-      brand: '',
+      brand: 'Limeet',
     },
     productMainList: [],
     productAttributeOption: [
@@ -119,7 +124,7 @@ export default {
       brand: '',
       offer_id: '',
       product_main_id: 0,
-      language: 'en-US',
+      language: 'zh-CN',
       product_type: { key: '', title: '' },
       product_type_id: '',
       monetary_unit: 'USD',
@@ -205,31 +210,25 @@ export default {
         google_product_category,
         google_product_category_id,
         gtin,
-        product_type,
-        product_type_id,
         brand,
       } = data;
-      if (
-        title &&
-        google_product_category &&
-        google_product_category_id &&
-        id &&
-        product_type &&
-        product_type_id &&
-        offer_id
-      ) {
+      const { productStatusAll } = yield select((state) => state.product);
+      const newProductStatusAll = Object.assign({}, productStatusAll, {
+        isCreateMainModalShow: false,
+      });
+      if (title && google_product_category && google_product_category_id && id && offer_id) {
         const result = yield call(editProductMain, {
           title,
           offer_id,
           google_product_category,
           gtin,
           id,
-          product_type,
           brand,
         });
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
           const current = 1;
+          yield put({ type: 'update', payload: { productStatusAll: newProductStatusAll } });
           yield put({ type: 'queryProductMainAll', payload: { current, pageSize } });
         }
       }
@@ -252,28 +251,15 @@ export default {
       }
     },
     *createProductMain({ payload: data }, { call, put, select }) {
-      const {
-        title,
-        product_type,
-        product_type_id,
-        offer_id,
-        google_product_category,
-        google_product_category_id,
-        gtin,
-        brand,
-      } = data;
-      if (
-        title &&
-        google_product_category &&
-        product_type &&
-        product_type_id &&
-        google_product_category_id &&
-        offer_id
-      ) {
+      const { title, offer_id, google_product_category, google_product_category_id, gtin, brand } =
+        data;
+      const { productStatusAll } = yield select((state) => state.product);
+      const newProductStatusAll = Object.assign({}, productStatusAll, {
+        isCreateMainModalShow: false,
+      });
+      if (title && google_product_category && google_product_category_id && offer_id) {
         const result = yield call(createProductMain, {
           title,
-          product_type,
-          product_type_id,
           offer_id,
           google_product_category,
           google_product_category_id,
@@ -283,6 +269,7 @@ export default {
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
           const current = 1;
+          yield put({ type: 'update', payload: { productStatusAll: newProductStatusAll } });
           yield put({ type: 'queryProductMainAll', payload: { current, pageSize } });
           message.success({ content: '创建主商品成功' });
         } else {

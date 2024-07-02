@@ -280,6 +280,14 @@ const TableList: React.FC = () => {
           text: 'C',
           status: 'C',
         },
+        D: {
+          text: 'D',
+          status: 'D',
+        },
+        E: {
+          text: 'E',
+          status: 'E',
+        },
       },
     },
     {

@@ -15,7 +15,6 @@ class ProductCreate extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isCreateMainModalShow: false,
       pageSize: 20,
       current: 1,
       currentOptionActionStatus: 0, // 0 添加 1 编辑
@@ -23,22 +22,35 @@ class ProductCreate extends Component {
   }
   createMainModalStatusHandle = () => {
     this.setState({
-      isCreateMainModalShow: true,
       currentOptionActionStatus: 0,
+    });
+    const { productStatusAll } = this.props.product;
+    const newProductStatusAll = Object.assign({}, productStatusAll, {
+      isCreateMainModalShow: true,
+    });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        productStatusAll: newProductStatusAll,
+      },
     });
   };
   createMainModalCallbackCancel = () => {
-    this.setState({
+    const { productStatusAll } = this.props.product;
+    const newProductStatusAll = Object.assign({}, productStatusAll, {
       isCreateMainModalShow: false,
+    });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        productStatusAll: newProductStatusAll,
+      },
     });
   };
   createMainModalCallbackOk = (currentProductMain) => {
     const { currentOptionActionStatus } = this.state;
     console.log('currentProductMain:', currentProductMain);
     console.log('currentOptionActionStatus:', currentOptionActionStatus);
-    this.setState({
-      isCreateMainModalShow: false,
-    });
     this.props.dispatch({
       type: 'product/update',
       payload: currentProductMain,
@@ -87,9 +99,12 @@ class ProductCreate extends Component {
 
   handelTableEdit = (record) => {
     console.log(' handelTableEdit record:', record);
+    const { productStatusAll } = this.props.product;
+    const newProductStatusAll = Object.assign({}, productStatusAll, {
+      isCreateMainModalShow: true,
+    });
     this.setState(
       {
-        isCreateMainModalShow: true,
         currentOptionActionStatus: 1,
       },
       () => {
@@ -97,6 +112,7 @@ class ProductCreate extends Component {
           type: 'product/update',
           payload: {
             currentProductMain: record,
+            productStatusAll: newProductStatusAll,
           },
         });
       },
@@ -221,8 +237,9 @@ class ProductCreate extends Component {
   };
 
   render() {
-    const { productTypeOption, currentProductMain, productMainList, pagination } =
+    const { productTypeOption, currentProductMain, productMainList, pagination, productStatusAll } =
       this.props.product;
+    const { isCreateMainModalShow } = productStatusAll;
     const { currentOptionActionStatus } = this.state;
     return (
       <PageContainer>
@@ -251,7 +268,7 @@ class ProductCreate extends Component {
             <div className="footer">
               <CreateMainModal
                 dataSource={{ currentProductMain, productTypeOption }}
-                open={this.state.isCreateMainModalShow}
+                open={isCreateMainModalShow}
                 callbackCancel={this.createMainModalCallbackCancel}
                 callbackOk={this.createMainModalCallbackOk}
                 optionAction={currentOptionActionStatus}

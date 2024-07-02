@@ -1,8 +1,13 @@
-import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
-import { Button, Col, Modal, Row, message } from 'antd';
+import listToTreeSelf from '@/utils/listToTreeSelf';
+import {
+  FolderAddOutlined,
+  FolderOpenOutlined,
+  MinusSquareOutlined,
+  PlusSquareOutlined,
+} from '@ant-design/icons';
+import { Button, Checkbox, Col, Input, Modal, Row, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'umi';
-import FolderDirectory from './components/FolderDirectory';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
 
@@ -19,7 +24,7 @@ class Material extends Component {
     this.state = {
       optionAction: 0,
       folderOpenStatus: false,
-      currentFolderDirectory: {
+      operateFolderDirectory: {
         label: '',
         key: '',
       },
@@ -30,32 +35,58 @@ class Material extends Component {
       folderOpenStatus: false,
     });
   };
-  handelFolderOk = (currentItem) => {
-    const { optionAction } = this.state;
+  handelFolderOk = () => {
+    const { optionAction, operateFolderDirectory } = this.state;
+    const { currentFolderDirectory } = this.props.material;
+    let addFolderDirectory = Object.assign({}, operateFolderDirectory);
     this.setState(
       {
         folderOpenStatus: false,
-        currentFolderDirectory: currentItem,
       },
       () => {
-        this.props.dispatch({
-          type: 'material/update',
-          payload: {
-            currentFolderDirectory: currentItem,
-          },
-        });
         if (optionAction === 1) {
           this.props.dispatch({
             type: 'material/editFolder',
             payload: {
-              ...currentItem,
+              ...addFolderDirectory,
             },
           });
         } else {
+          // 默认分组直接建立目录
+          if (currentFolderDirectory.key === '00000000') {
+            addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+              father_key: '',
+              key_path: '',
+              key: '',
+              is_leaf: 1,
+              active: false,
+              is_default: false,
+            });
+          } else {
+            if (currentFolderDirectory.father_key) {
+              addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+                father_key: currentFolderDirectory.key,
+                key_path: `${currentFolderDirectory.father_key}/${currentFolderDirectory.key}`,
+                key: '',
+                is_leaf: 1,
+                active: false,
+                is_default: false,
+              });
+            } else {
+              addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+                father_key: currentFolderDirectory.key,
+                key_path: `${currentFolderDirectory.key}`,
+                key: '',
+                is_leaf: 1,
+                active: false,
+                is_default: false,
+              });
+            }
+          }
           this.props.dispatch({
             type: 'material/createFolder',
             payload: {
-              ...currentItem,
+              ...addFolderDirectory,
             },
           });
         }
@@ -66,26 +97,39 @@ class Material extends Component {
     this.setState({
       optionAction: 0,
       folderOpenStatus: true,
+      operateFolderDirectory: {
+        label: '',
+        key: '',
+      },
     });
   };
-  handleClickDropdownEdit = (currentItem: any) => {
-    this.setState(
-      {
-        optionAction: 1,
-        folderOpenStatus: true,
-        currentFolderDirectory: currentItem,
-      },
-      () => {
-        this.props.dispatch({
-          type: 'material/update',
-          payload: {
-            currentFolderDirectory: currentItem,
-          },
-        });
-      },
-    );
+  handleClickDropdownEdit = () => {
+    const { currentFolderDirectory } = this.props.material;
+    this.setState({
+      optionAction: 1,
+      folderOpenStatus: true,
+      operateFolderDirectory: currentFolderDirectory,
+    });
   };
-  handleClickDropdownDel = (currentItem) => {
+  folderInputHandle = (event) => {
+    const { value } = event.target;
+    const { optionAction } = this.state;
+    const { currentFolderDirectory } = this.props.material;
+    if (optionAction === 1) {
+      this.setState({
+        operateFolderDirectory: Object.assign({}, currentFolderDirectory, {
+          title: value,
+          label: value,
+        }),
+      });
+    } else {
+      this.setState({
+        operateFolderDirectory: Object.assign({}, { title: value, label: value }),
+      });
+    }
+  };
+  handleClickDropdownDel = () => {
+    const { currentFolderDirectory } = this.props.material;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     Modal.confirm({
@@ -95,7 +139,7 @@ class Material extends Component {
         self.props.dispatch({
           type: 'material/delFolder',
           payload: {
-            ...currentItem,
+            ...currentFolderDirectory,
           },
         });
       },
@@ -104,73 +148,214 @@ class Material extends Component {
       },
     });
   };
-  handleClickFolderMenu = (currentItem) => {
-    const { folderDirectory } = this.props.material;
-    const newFolderDirectory: any[] = [];
-    // eslint-disable-next-line array-callback-return
-    folderDirectory.map((item) => {
-      if (item.key === currentItem.key) {
-        newFolderDirectory.push(Object.assign({}, item, { active: true }));
-      } else {
-        newFolderDirectory.push(Object.assign({}, item, { active: false }));
-      }
-    });
-    this.props.dispatch({
-      type: 'material/update',
-      payload: {
-        folderDirectory: newFolderDirectory,
-        currentFolderDirectory: currentItem,
-      },
-    });
-    this.props.dispatch({
-      type: 'material/queryFolderMaterial',
-      payload: {
-        ...currentItem,
-      },
-    });
+
+  handleOnCheckSelectFolderMenu = (event) => {
+    console.log('OnCheck event:', event);
+    const { folderDirectoryRows } = this.props.material;
+    const key = event.target.value;
+    const newRows: any[] = [];
+    let currentItem;
+    if (key) {
+      folderDirectoryRows.map((item: { key: any; checked: any }) => {
+        if (item.key === key) {
+          let tempItem;
+          if (item && item.checked) {
+            tempItem = Object.assign({}, item, { active: 1, checked: false });
+          } else {
+            tempItem = Object.assign({}, item, { active: 1, checked: true });
+          }
+          newRows.push(tempItem);
+          currentItem = tempItem;
+        } else {
+          newRows.push(Object.assign({}, item, { active: 0, checked: false }));
+        }
+      });
+      const folderDirectory = listToTreeSelf(newRows);
+      this.props.dispatch({
+        type: 'material/update',
+        payload: {
+          folderDirectory,
+          currentFolderDirectory: currentItem,
+          folderDirectoryRows: newRows,
+        },
+      });
+    }
+  };
+
+  handleClickFolderMenu = (currentItem: any) => {
+    console.log('currentItem:', currentItem);
+    const { folderDirectoryRows } = this.props.material;
+    const newRows: any = [];
+    if (currentItem && currentItem.key) {
+      folderDirectoryRows.map((item) => {
+        if (item.key === currentItem.key) {
+          newRows.push(Object.assign({}, item, { active: 1 }));
+        } else {
+          newRows.push(Object.assign({}, item, { active: 0 }));
+        }
+      });
+      const folderDirectory = listToTreeSelf(newRows);
+      this.props.dispatch({
+        type: 'material/update',
+        payload: {
+          folderDirectory,
+          currentFolderDirectory: currentItem,
+          folderDirectoryRows: newRows,
+        },
+      });
+      this.props.dispatch({
+        type: 'material/queryFolderMaterial',
+        payload: {
+          ...currentItem,
+        },
+      });
+    }
   };
   folderMenuHtml = () => {
     const html: React.JSX.Element[] = [];
     const { folderDirectory } = this.props.material;
     if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
       // eslint-disable-next-line array-callback-return
-      folderDirectory.map((item: any) => {
-        if (item && item.is_default) {
+      folderDirectory.map((item: any, index: number) => {
+        if (item.children) {
           html.push(
-            <dd
-              className={item && item.active ? 'active' : ''}
-              key={item.key}
-              onClick={() => {
-                this.handleClickFolderMenu(item);
-              }}
-            >
-              {item && item.label}
-            </dd>,
+            <li key={`${item.key}_${index}`} className="pad00">
+              <div
+                className={`item ${item.active ? 'active' : ''}`}
+                onClick={() => this.handleClickFolderMenu(item)}
+                key={item.key}
+              >
+                <span className="space"></span>
+                {item.is_leaf === 1 ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
+                <Checkbox
+                  value={item.key}
+                  disabled={!!item.is_default}
+                  checked={item.checked}
+                  onChange={this.handleOnCheckSelectFolderMenu}
+                ></Checkbox>{' '}
+                {item && item.label}
+              </div>
+              {item.children && item.children.length && (
+                <ul>
+                  {item.children.map((childrenItem: any, idx: number) => {
+                    return (
+                      <li key={`${childrenItem.key}_${idx}`} className="pad01">
+                        <div
+                          className={`item ${childrenItem.active ? 'active' : ''}`}
+                          onClick={() => this.handleClickFolderMenu(childrenItem)}
+                        >
+                          <span className="space"></span>
+                          {childrenItem.is_default === 0 ? (
+                            childrenItem.is_leaf === 1 ? (
+                              <MinusSquareOutlined />
+                            ) : (
+                              <PlusSquareOutlined />
+                            )
+                          ) : null}
+                          <Checkbox
+                            value={childrenItem.key}
+                            disabled={!!childrenItem.is_default}
+                            checked={childrenItem.checked}
+                            onChange={this.handleOnCheckSelectFolderMenu}
+                          ></Checkbox>{' '}
+                          {childrenItem.label}
+                        </div>
+                        {childrenItem.children && childrenItem.children.length && (
+                          <ul key={`${childrenItem.key}_${idx}_ul`}>
+                            {childrenItem.children.map((children2Item: any, idx2: number) => {
+                              return (
+                                <li key={`${children2Item.key}_${idx2}`} className="pad02">
+                                  <div
+                                    className={`item ${children2Item.active ? 'active' : ''}`}
+                                    onClick={() => this.handleClickFolderMenu(children2Item)}
+                                  >
+                                    <span className="space"></span>
+                                    {children2Item.is_default === 0 ? (
+                                      children2Item.is_leaf === 1 ? (
+                                        <MinusSquareOutlined />
+                                      ) : (
+                                        <PlusSquareOutlined />
+                                      )
+                                    ) : null}
+                                    <Checkbox
+                                      value={children2Item.key}
+                                      disabled={!!children2Item.is_default}
+                                      checked={children2Item.checked}
+                                      onChange={this.handleOnCheckSelectFolderMenu}
+                                    ></Checkbox>
+                                    {children2Item.label}
+                                  </div>
+                                  {children2Item.children && children2Item.children.length && (
+                                    <ul key={`${children2Item.key}_${idx2}_ul`}>
+                                      {children2Item.children.map(
+                                        (children3Item: any, idx3: number) => {
+                                          <li
+                                            key={`${children3Item.key}_${idx3}`}
+                                            className="pad03"
+                                          >
+                                            <div
+                                              className={`${children3Item.active ? 'active' : ''}`}
+                                              onClick={() =>
+                                                this.handleClickFolderMenu(children3Item)
+                                              }
+                                            >
+                                              <span className="space"></span>
+                                              {children3Item.is_default === 0 ? (
+                                                children3Item.is_leaf === 1 ? (
+                                                  <MinusSquareOutlined />
+                                                ) : (
+                                                  <PlusSquareOutlined />
+                                                )
+                                              ) : null}
+                                              <Checkbox
+                                                value={children3Item.key}
+                                                disabled={!!children3Item.is_default}
+                                                checked={children3Item.checked}
+                                                onChange={this.handleOnCheckSelectFolderMenu}
+                                              ></Checkbox>
+                                              {children3Item.label}
+                                            </div>
+                                          </li>;
+                                        },
+                                      )}
+                                    </ul>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>,
           );
         } else {
           html.push(
-            <dd
-              className={item && item.active ? 'active' : ''}
-              key={item.key}
-              onClick={() => {
-                this.handleClickFolderMenu(item);
-              }}
-            >
-              {item && item.label}{' '}
-              <div className="span">
-                <div className="dropdown">
-                  <ul>
-                    <li onClick={() => this.handleClickDropdownEdit(item)}>编辑</li>
-                    <li onClick={() => this.handleClickDropdownDel(item)}>删除</li>
-                  </ul>
-                  <i className="icon arrow_right"></i>
-                </div>
+            <li key={`${item.key}_${item.is_defaul}`} className="pad00">
+              <div
+                className={`item ${item.active ? 'active' : ''}`}
+                onClick={() => this.handleClickFolderMenu(item)}
+                key={item.key}
+              >
+                <span className="space"></span>
+                {item.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
+                <Checkbox
+                  value={item.key}
+                  disabled={!!item.is_default}
+                  checked={item.checked}
+                  onChange={this.handleOnCheckSelectFolderMenu}
+                ></Checkbox>
+                {item.label}
               </div>
-            </dd>,
+            </li>,
           );
         }
       });
     }
+
     return html;
   };
 
@@ -212,7 +397,7 @@ class Material extends Component {
     }
   };
   handelUploadOk = (file) => {
-    message.error(`${file.name} 上传成功！`);
+    message.success(`${file.name} 上传成功！`);
     this.props.dispatch({
       type: 'material/queryFolder',
     });
@@ -229,8 +414,10 @@ class Material extends Component {
       type: 'material/queryFolder',
     });
   }
+
   render() {
-    const { currentFolderDirectory, imageList } = this.props.material;
+    const { currentFolderDirectory, imageList, folderDirectory } = this.props.material;
+    // console.log('currentFolderDirectory:', currentFolderDirectory);
     return (
       <div className="page">
         <div className="material">
@@ -238,17 +425,25 @@ class Material extends Component {
             <Row>
               <Col span={4}>
                 <div className="folder-menu">
-                  <dl>
-                    <dt>
-                      <FolderOpenOutlined /> 文件目录
-                    </dt>
-                    {this.folderMenuHtml()}
-                  </dl>
+                  <div className="header">
+                    {' '}
+                    <FolderOpenOutlined /> 文件目录
+                  </div>
+                  <div className="menu-wrap">
+                    <ul>
+                      {folderDirectory &&
+                        currentFolderDirectory &&
+                        currentFolderDirectory.key &&
+                        this.folderMenuHtml()}
+                    </ul>
+                  </div>
                 </div>
               </Col>
               <Col span={20}>
                 <div className="container">
                   <div className="header">
+                    <Button onClick={this.handleClickDropdownDel}>删除</Button>
+                    <Button onClick={this.handleClickDropdownEdit}>编辑</Button>
                     <Button icon={<FolderAddOutlined />} onClick={this.handelCreateFolder}>
                       新建文件目录
                     </Button>
@@ -267,13 +462,25 @@ class Material extends Component {
                   {currentFolderDirectory &&
                     currentFolderDirectory.label &&
                     currentFolderDirectory.key && (
-                      <FolderDirectory
+                      <Modal
+                        title={this.state.optionAction > 0 ? '编辑文件目录' : '添加文件目录'}
                         open={this.state.folderOpenStatus}
-                        optionAction={this.state.optionAction}
-                        callbackOk={this.handelFolderOk}
-                        callbackCancel={this.handelFolderCancel}
-                        currentFolderDirectory={currentFolderDirectory}
-                      ></FolderDirectory>
+                        width={500}
+                        onOk={this.handelFolderOk}
+                        onCancel={this.handelFolderCancel}
+                      >
+                        <div className="content">
+                          <div className="form-item">
+                            <span className="label">文件夹名称: </span>
+                            <Input
+                              placeholder="文件夹名称"
+                              style={{ width: 250 }}
+                              value={this.state.operateFolderDirectory.label}
+                              onChange={this.folderInputHandle}
+                            />
+                          </div>
+                        </div>
+                      </Modal>
                     )}
                 </div>
               </Col>

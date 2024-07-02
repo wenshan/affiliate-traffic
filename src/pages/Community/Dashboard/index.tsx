@@ -21,6 +21,13 @@ const Dashboard: React.FC = () => {
     unwillingUserNum: 0,
     communityUserNum: 0,
   });
+  const [cardAData, setCardAData] = useState({
+    value: [],
+    days: [],
+    agreeUserNum: 0,
+    unwillingUserNum: 0,
+    communityUserNum: 0,
+  });
   const [cardBData, setCardBData] = useState({
     value: [],
     days: [],
@@ -35,11 +42,28 @@ const Dashboard: React.FC = () => {
     unwillingUserNum: 0,
     communityUserNum: 0,
   });
+  const [cardDData, setCardDData] = useState({
+    value: [],
+    days: [],
+    agreeUserNum: 0,
+    unwillingUserNum: 0,
+    communityUserNum: 0,
+  });
+  const [cardEData, setCardEData] = useState({
+    value: [],
+    days: [],
+    agreeUserNum: 0,
+    unwillingUserNum: 0,
+    communityUserNum: 0,
+  });
 
   const optionsRadio = [
     { label: '翠苑三区All', value: 'all' },
+    { label: 'A区', value: 'A' },
     { label: 'B区', value: 'B' },
     { label: 'C区', value: 'C' },
+    { label: 'D区', value: 'D' },
+    { label: 'E区', value: 'E' },
   ];
 
   const columnsTable = () => {
@@ -344,6 +368,15 @@ const Dashboard: React.FC = () => {
       message.info('请求失败，请重试');
     }
   };
+  // A区数据
+  const fetchDataCardA = async ({ areas, region }) => {
+    const result = await lastDayIntention({ areas, region });
+    if (result && result.status === 200 && result.data) {
+      setCardAData(result.data);
+    } else {
+      message.info('请求失败，请重试');
+    }
+  };
   // B区数据
   const fetchDataCardB = async ({ areas, region }) => {
     const result = await lastDayIntention({ areas, region });
@@ -358,6 +391,20 @@ const Dashboard: React.FC = () => {
     const result = await lastDayIntention({ areas, region });
     if (result && result.status === 200 && result.data) {
       setCardCData(result.data);
+    } else {
+      message.info('请求失败，请重试');
+    }
+  };
+  // D区数据
+  const fetchDataCardD = async ({ areas, region }) => {
+    console.log(areas, region);
+    setCardDData([]);
+  };
+  // E区数据
+  const fetchDataCardE = async ({ areas, region }) => {
+    const result = await lastDayIntention({ areas, region });
+    if (result && result.status === 200 && result.data) {
+      setCardEData(result.data);
     } else {
       message.info('请求失败，请重试');
     }
@@ -399,37 +446,59 @@ const Dashboard: React.FC = () => {
     setAreas('翠苑三区');
     fetchDataTable({ areas, region, pagination });
     fetchDataCardAll({ areas, region: 'all' });
+    fetchDataCardA({ areas, region: 'A' });
     fetchDataCardB({ areas, region: 'B' });
     fetchDataCardC({ areas, region: 'C' });
+    fetchDataCardD({ areas, region: 'D' });
+    fetchDataCardE({ areas, region: 'E' });
   }, [pagination?.current, pagination?.pageSize]);
 
   return (
     <PageContainer>
       <div className="dashboard-page">
         <div className="card-top">
-          <Row gutter={16}>
-            <Col span={8}>
-              <Card>
-                <div className="title">全区住房户号完成率</div>
+          <Row gutter={10}>
+            <Col span={4}>
+              <Card size="small">
+                <div className="title">全区完成率</div>
                 <div className="rate">
-                  {((cardAllData.communityUserNum / 1929) * 100).toFixed(2)} %
+                  {((cardAllData.communityUserNum / 2798) * 100).toFixed(2)} %
                 </div>
                 <div className="des">
                   <p>
-                    总户数: <span>1929</span>
+                    总户数: <span>2798</span>
                   </p>
                   <p>
-                    已申请住房户数: <span>{cardAllData.communityUserNum}</span>{' '}
+                    已申请户数: <span>{cardAllData.communityUserNum}</span>{' '}
                   </p>
                   <p>
-                    已申报成功用户: <span>{cardAllData.agreeUserNum}</span>
+                    成功用户数: <span>{cardAllData.agreeUserNum}</span>
                   </p>
                 </div>
               </Card>
             </Col>
-            <Col span={8}>
-              <Card>
-                <div className="title">B区住房户号完成率</div>
+            <Col span={4}>
+              <Card size="small">
+                <div className="title">A区完成率</div>
+                <div className="rate">
+                  {((cardAData.communityUserNum / 869) * 100).toFixed(2)} %
+                </div>
+                <div className="des">
+                  <p>
+                    总户数: <span>869</span>
+                  </p>
+                  <p>
+                    已申请户数: <span>{cardAData.communityUserNum}</span>
+                  </p>
+                  <p>
+                    成功用户数: <span>{cardAData.agreeUserNum}</span>
+                  </p>
+                </div>
+              </Card>
+            </Col>
+            <Col span={4}>
+              <Card size="small">
+                <div className="title">B区完成率</div>
                 <div className="rate">
                   {((cardBData.communityUserNum / 978) * 100).toFixed(2)} %
                 </div>
@@ -438,17 +507,17 @@ const Dashboard: React.FC = () => {
                     总户数: <span>978</span>
                   </p>
                   <p>
-                    已申请住房户数: <span>{cardBData.communityUserNum}</span>
+                    已申请户数: <span>{cardBData.communityUserNum}</span>
                   </p>
                   <p>
-                    已申报成功用户: <span>{cardBData.agreeUserNum}</span>
+                    成功用户数: <span>{cardBData.agreeUserNum}</span>
                   </p>
                 </div>
               </Card>
             </Col>
-            <Col span={8}>
-              <Card>
-                <div className="title">C区住房户号完成率</div>
+            <Col span={4}>
+              <Card size="small">
+                <div className="title">C区完成率</div>
                 <div className="rate">
                   {((cardCData.communityUserNum / 951) * 100).toFixed(2)} %
                 </div>
@@ -457,10 +526,48 @@ const Dashboard: React.FC = () => {
                     总户数: <span>951</span>
                   </p>
                   <p>
-                    已申请住房户数: <span>{cardCData.communityUserNum}</span>
+                    已申请户数: <span>{cardCData.communityUserNum}</span>
                   </p>
                   <p>
-                    已申报成功用户: <span>{cardCData.agreeUserNum}</span>
+                    成功用户数: <span>{cardCData.agreeUserNum}</span>
+                  </p>
+                </div>
+              </Card>
+            </Col>
+            <Col span={4}>
+              <Card size="small">
+                <div className="title">D区完成率</div>
+                <div className="rate">
+                  {((cardDData.communityUserNum / 224) * 100).toFixed(2)} %
+                </div>
+                <div className="des">
+                  <p>
+                    总户数: <span>0</span>
+                  </p>
+                  <p>
+                    已申请住房户数: <span>{cardDData.communityUserNum}</span>
+                  </p>
+                  <p>
+                    成功用户数: <span>{cardDData.agreeUserNum}</span>
+                  </p>
+                </div>
+              </Card>
+            </Col>
+            <Col span={4}>
+              <Card size="small">
+                <div className="title">E区完成率</div>
+                <div className="rate">
+                  {((cardEData.communityUserNum / 224) * 100).toFixed(2)} %
+                </div>
+                <div className="des">
+                  <p>
+                    总户数: <span>224</span>
+                  </p>
+                  <p>
+                    已申请户数: <span>{cardEData.communityUserNum}</span>
+                  </p>
+                  <p>
+                    成功用户数: <span>{cardEData.agreeUserNum}</span>
                   </p>
                 </div>
               </Card>

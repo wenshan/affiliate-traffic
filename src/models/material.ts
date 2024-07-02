@@ -10,6 +10,8 @@ import {
   queryFolder,
   queryFolderMaterial,
 } from '@/services/api/material';
+import listToTreeSelf from '@/utils/listToTreeSelf';
+import { message } from 'antd';
 
 export default {
   namespace: 'material',
@@ -37,7 +39,18 @@ export default {
       key: '00000000',
       is_default: true,
       active: true,
+      is_leaf: 1,
+      key_path: '',
+      father_key: '',
     },
+    addFolderDirectory: {
+      label: '',
+      is_default: false,
+      active: true,
+      is_leaf: 1,
+      father_key: '',
+    },
+    folderDirectoryRows: [],
     folderDirectory: [
       {
         label: '默认分组',
@@ -50,6 +63,7 @@ export default {
         },
       },
     ],
+    folderDirectoryMap: {},
   },
 
   subscriptions: {},
@@ -57,23 +71,35 @@ export default {
   effects: {
     *queryFolder({ payload }, { call, put, select }) {
       const result = yield call(queryFolder);
+      const map = new Map();
       if (result.status === 200 && result.data && result.data.rows) {
         // 已删除文件放在最后排序
         const rows = result.data.rows;
-        const newRows: { key: string }[] = [];
+        const newRows: { key: string; father_key: string; is_leaf: any }[] = [];
         rows &&
           rows.length &&
           rows.map((item: { key: string }) => {
             if (item.key !== '11111111') {
-              newRows.push(item);
+              newRows.push(Object.assign({}, item, { title: item.label, checked: false }));
             }
+            map.set(item.key, Object.assign({}, item, { checked: false }));
           });
-        newRows.push(rows[1]);
-        console.log('newRows:', newRows);
-        yield put({ type: 'update', payload: { folderDirectory: newRows } });
-        yield put({ type: 'update', payload: { currentFolderDirectory: result.data.rows[0] } });
+        newRows.push(
+          Object.assign({}, rows[1], { title: rows[1] && rows[1].label, checked: false }),
+        );
+
+        const tree = listToTreeSelf(newRows);
+        // console.log('tree:', tree);
+        yield put({
+          type: 'update',
+          payload: { folderDirectory: tree, folderDirectoryRows: newRows },
+        });
+        yield put({
+          type: 'update',
+          payload: { currentFolderDirectory: tree[0], folderDirectoryMap: map },
+        });
         // 初始化默认文件夹素材
-        yield put({ type: 'queryFolderMaterial', payload: { ...result.data.rows[0] } });
+        yield put({ type: 'queryFolderMaterial', payload: { ...tree[0] } });
       }
     },
     // subscriptions 更新当前的用户信息
@@ -83,11 +109,24 @@ export default {
         yield put({ type: 'queryFolder' });
       }
     },
-    // 获取用户信息
+    // 删除文件夹
     *delFolder({ payload: data }, { call, put, select }) {
-      const result = yield call(delFolder, data);
-      if (result.status === 200 && result.data) {
-        yield put({ type: 'queryFolder' });
+      if (data && data.key) {
+        if (data.is_leaf === 1) {
+          const result = yield call(delFolder, data);
+          if (result.status === 200 && result.data) {
+            yield put({ type: 'queryFolder' });
+          }
+        } else {
+          if (data.is_leaf === 0 && (!data.children || data.children.length === 0)) {
+            const result = yield call(delFolder, data);
+            if (result.status === 200 && result.data) {
+              yield put({ type: 'queryFolder' });
+            }
+          } else {
+            message.error('节点逐级删除');
+          }
+        }
       }
     },
     *createFolder({ payload: data }, { call, put, select }) {
@@ -98,24 +137,42 @@ export default {
     },
     *queryFolderMaterial({ payload: data }, { call, put, select }) {
       const { folderDirectory, currentFolderDirectory } = yield select((state) => state.material);
-      const result = yield call(queryFolderMaterial, data);
-      if (result.status === 200 && result.data && data && data.key) {
-        console.log('folderDirectory:', folderDirectory);
-        // eslint-disable-next-line array-callback-return
-        folderDirectory.map((item: { key: any }, idx: string | number) => {
-          console.log('item:', item);
-          if (folderDirectory[idx] && item && Number(item.key) === Number(data.key)) {
-            folderDirectory[idx] = Object.assign({}, item, { data: result.data });
-          }
-        });
-        console.log('folderDirectory:', folderDirectory);
-        yield put({
-          type: 'update',
-          payload: {
-            folderDirectory,
-            imageList: result.data.rows,
-          },
-        });
+      if (data) {
+        const paramsKeys = [];
+        paramsKeys.push(data.key);
+        if (data.children && data.children.length > 0) {
+          data.children.map((itemChildren) => {
+            paramsKeys.push(itemChildren.key);
+            if (itemChildren.children && itemChildren.children.length) {
+              itemChildren.children.map((itemChildren2) => {
+                paramsKeys.push(itemChildren2.key);
+                if (itemChildren2.children && itemChildren2.children.length) {
+                  itemChildren2.children.map((itemChildren3) => {
+                    paramsKeys.push(itemChildren3.key);
+                  });
+                }
+              });
+            }
+          });
+        }
+        const result = yield call(queryFolderMaterial, { key: paramsKeys.join(',') });
+        if (result.status === 200 && result.data && data && data.key) {
+          // console.log('folderDirectory:', folderDirectory);
+          // eslint-disable-next-line array-callback-return
+          folderDirectory.map((item: { key: any }, idx: string | number) => {
+            if (folderDirectory[idx] && item && Number(item.key) === Number(data.key)) {
+              folderDirectory[idx] = Object.assign({}, item, { data: result.data });
+            }
+          });
+          // console.log('folderDirectory:', folderDirectory);
+          yield put({
+            type: 'update',
+            payload: {
+              folderDirectory,
+              imageList: result.data.rows,
+            },
+          });
+        }
       }
     },
     *delMaterial({ payload: data }, { call, put, select }) {

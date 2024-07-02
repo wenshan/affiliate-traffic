@@ -6,6 +6,7 @@ import axios from 'axios';
 import './index.less';
 // https://github.com/react-component/upload#customrequest
 const UploadFile: React.FC = (props) => {
+  // console.log('UploadFile props:', props);
   const uploadProps = {
     action: uploadFileURL(),
     multiple: false,
@@ -23,10 +24,14 @@ const UploadFile: React.FC = (props) => {
       console.log('onSuccess', res, file.name);
     },
     beforeUpload(file) {
-      const imgType = 'image/png,image/gif,image/jpg,image/jpeg';
-      if (imgType.indexOf(file.type) < 0) {
-        message.error(`${file.name} 不是jpg/jpeg/gif/png格式`);
-        return false;
+      if (props && props.data && props.data.is_leaf === 1) {
+        const imgType = 'image/png,image/gif,image/jpg,image/jpeg';
+        if (imgType.indexOf(file.type) < 0) {
+          message.error(`${file.name} 不是jpg/jpeg/gif/png格式`);
+          return false;
+        }
+      } else {
+        message.error(`当前文件夹不是叶子目录`);
       }
     },
     onError(err) {

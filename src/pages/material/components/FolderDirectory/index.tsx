@@ -1,13 +1,20 @@
 import { Input, Modal } from 'antd';
 import { Component } from 'react';
+import { connect } from 'umi';
 
 import './index.less';
 
+@connect(({ product, common, material }) => ({
+  product,
+  common,
+  material,
+}))
 class FolderDirectory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentFolderDirectory: {
+      optionAction: 0,
+      operateFolderDirectory: {
         label: '',
         key: '',
       },
@@ -19,14 +26,12 @@ class FolderDirectory extends Component {
   handelTableDel = () => {};
 
   // Modal
-  handleOk = () => {
-    const { currentFolderDirectory } = this.state;
-    if (this.props.callbackOk) {
-      this.props.callbackOk(currentFolderDirectory);
-    }
-  };
+  handleOk = () => {};
 
   handleCancel = () => {
+    this.setState({
+      operateFolderDirectory: { label: '', key: '' },
+    });
     if (this.props.callbackCancel) {
       this.props.callbackCancel();
     }
@@ -34,26 +39,35 @@ class FolderDirectory extends Component {
 
   folderInputHandle = (event) => {
     const { value } = event.target;
-    const { currentFolderDirectory } = this.state;
+    const { optionAction } = this.state;
+    const { currentFolderDirectory } = this.props.material;
+    let addFolderDirectory;
+    if (optionAction > 0) {
+      // 编辑
+      addFolderDirectory = Object.assign({}, currentFolderDirectory, {
+        label: value,
+        is_default: false,
+        active: false,
+      });
+    } else {
+      // 新增
+      addFolderDirectory = Object.assign({}, { label: value, is_default: false, active: false });
+    }
     this.setState({
-      currentFolderDirectory: Object.assign({}, currentFolderDirectory, { label: value }),
+      operateFolderDirectory: addFolderDirectory,
+    });
+    this.props.dispatch({
+      type: 'material/update',
+      payload: {
+        addFolderDirectory,
+      },
     });
   };
-
+  /*
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.currentFolderDirectory !== this.props.currentFolderDirectory) {
-      const newCurrentFolderDirectory = Object.assign(
-        {},
-        {
-          label: nextProps.currentFolderDirectory.label,
-          key: nextProps.currentFolderDirectory.key,
-        },
-      );
-      this.setState({
-        currentFolderDirectory: newCurrentFolderDirectory,
-      });
-    }
+
   }
+  */
 
   render() {
     return (
@@ -71,7 +85,7 @@ class FolderDirectory extends Component {
               <Input
                 placeholder="文件夹名称"
                 style={{ width: 250 }}
-                value={this.state.currentFolderDirectory.label}
+                value={this.state.operateFolderDirectory.label}
                 onChange={this.folderInputHandle}
               />
             </div>

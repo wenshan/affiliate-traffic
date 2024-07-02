@@ -7,6 +7,9 @@ export const createFolder = async (params?: { [key: string]: any }) => {
   return request<{ data: any }>('/api/folder/createFolder', {
     method: 'POST',
     data: params,
+    config: {
+      isToast: true,
+    },
   });
 };
 

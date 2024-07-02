@@ -128,7 +128,7 @@ class ImgList extends Component {
   };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    console.log('nextProps:', nextProps);
+    // console.log('nextProps:', nextProps);
     if (nextProps.dataSource !== this.props.dataSource) {
       this.setState({
         imageList: nextProps.dataSource,

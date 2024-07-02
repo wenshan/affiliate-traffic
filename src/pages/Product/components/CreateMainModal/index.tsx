@@ -19,7 +19,7 @@ class CreateMainModal extends Component {
         },
         google_product_category_id: 632,
         gtin: '',
-        brand: '',
+        brand: 'Limeet',
       },
     };
   }
@@ -88,22 +88,9 @@ class CreateMainModal extends Component {
   handleOk = () => {
     const { currentProductMain } = this.state;
     console.log('currentProductMain:', currentProductMain);
-    const {
-      google_product_category,
-      google_product_category_id,
-      product_type,
-      product_type_id,
-      title,
-      offer_id,
-    } = currentProductMain;
-    if (
-      google_product_category &&
-      google_product_category_id &&
-      product_type &&
-      product_type_id &&
-      title &&
-      offer_id
-    ) {
+    const { google_product_category, google_product_category_id, title, offer_id, brand } =
+      currentProductMain;
+    if (google_product_category && google_product_category_id && title && offer_id && brand) {
       if (this.props.callbackOk) {
         this.props.callbackOk(currentProductMain);
       }
@@ -114,6 +101,7 @@ class CreateMainModal extends Component {
       return;
     }
   };
+
   handleCancel = () => {
     if (this.props.callbackCancel) {
       this.props.callbackCancel();
