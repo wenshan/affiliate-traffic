@@ -1,4 +1,5 @@
 import listToTreeSelf from '@/utils/listToTreeSelf';
+import Tool from '@/utils/tool';
 import {
   FolderAddOutlined,
   FolderOpenOutlined,
@@ -221,6 +222,7 @@ class Material extends Component {
           html.push(
             <li key={`${item.key}_${index}`} className="pad00">
               <div
+                title={item.label}
                 className={`item ${item.active ? 'active' : ''}`}
                 onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
@@ -233,7 +235,7 @@ class Material extends Component {
                   checked={item.checked}
                   onChange={this.handleOnCheckSelectFolderMenu}
                 ></Checkbox>{' '}
-                {item && item.label}
+                {Tool.replaceExceedEnd(item.label, 25)}
               </div>
               {item.children && item.children.length && (
                 <ul>
@@ -241,6 +243,7 @@ class Material extends Component {
                     return (
                       <li key={`${childrenItem.key}_${idx}`} className="pad01">
                         <div
+                          title={childrenItem.label}
                           className={`item ${childrenItem.active ? 'active' : ''}`}
                           onClick={() => this.handleClickFolderMenu(childrenItem)}
                         >
@@ -258,7 +261,7 @@ class Material extends Component {
                             checked={childrenItem.checked}
                             onChange={this.handleOnCheckSelectFolderMenu}
                           ></Checkbox>{' '}
-                          {childrenItem.label}
+                          {Tool.replaceExceedEnd(childrenItem.label, 25)}
                         </div>
                         {childrenItem.children && childrenItem.children.length && (
                           <ul key={`${childrenItem.key}_${idx}_ul`}>
@@ -266,6 +269,7 @@ class Material extends Component {
                               return (
                                 <li key={`${children2Item.key}_${idx2}`} className="pad02">
                                   <div
+                                    title={children2Item.label}
                                     className={`item ${children2Item.active ? 'active' : ''}`}
                                     onClick={() => this.handleClickFolderMenu(children2Item)}
                                   >
@@ -283,7 +287,7 @@ class Material extends Component {
                                       checked={children2Item.checked}
                                       onChange={this.handleOnCheckSelectFolderMenu}
                                     ></Checkbox>
-                                    {children2Item.label}
+                                    {Tool.replaceExceedEnd(children2Item.label, 25)}
                                   </div>
                                   {children2Item.children && children2Item.children.length && (
                                     <ul key={`${children2Item.key}_${idx2}_ul`}>
@@ -294,6 +298,7 @@ class Material extends Component {
                                             className="pad03"
                                           >
                                             <div
+                                              title={children3Item.label}
                                               className={`${children3Item.active ? 'active' : ''}`}
                                               onClick={() =>
                                                 this.handleClickFolderMenu(children3Item)
@@ -313,7 +318,7 @@ class Material extends Component {
                                                 checked={children3Item.checked}
                                                 onChange={this.handleOnCheckSelectFolderMenu}
                                               ></Checkbox>
-                                              {children3Item.label}
+                                              {Tool.replaceExceedEnd(children3Item.label, 25)}
                                             </div>
                                           </li>;
                                         },
@@ -336,6 +341,7 @@ class Material extends Component {
           html.push(
             <li key={`${item.key}_${item.is_defaul}`} className="pad00">
               <div
+                title={item.label}
                 className={`item ${item.active ? 'active' : ''}`}
                 onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
@@ -348,7 +354,7 @@ class Material extends Component {
                   checked={item.checked}
                   onChange={this.handleOnCheckSelectFolderMenu}
                 ></Checkbox>
-                {item.label}
+                {Tool.replaceExceedEnd(item.label, 25)}
               </div>
             </li>,
           );
@@ -397,9 +403,13 @@ class Material extends Component {
     }
   };
   handelUploadOk = (file) => {
+    const { currentFolderDirectory } = this.props.material;
     message.success(`${file.name} 上传成功！`);
     this.props.dispatch({
-      type: 'material/queryFolder',
+      type: 'material/queryFolderMaterial',
+      payload: {
+        ...currentFolderDirectory,
+      },
     });
   };
   handelUploadFailed = () => {
@@ -423,7 +433,7 @@ class Material extends Component {
         <div className="material">
           <div className="content">
             <Row>
-              <Col span={4}>
+              <Col span={5}>
                 <div className="folder-menu">
                   <div className="header">
                     {' '}
@@ -439,7 +449,7 @@ class Material extends Component {
                   </div>
                 </div>
               </Col>
-              <Col span={20}>
+              <Col span={19}>
                 <div className="container">
                   <div className="header">
                     <Button onClick={this.handleClickDropdownDel}>删除</Button>

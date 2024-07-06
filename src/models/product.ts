@@ -16,6 +16,7 @@ import {
   editProductMain,
   queryProductMainAll,
   queryProductMainAllCompos,
+  queryProductMainDetail,
 } from '@/services/api/productMain';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
 import { history } from '@umijs/max';
@@ -31,10 +32,18 @@ export default {
       total: 0,
     },
     searchParams: {
-      language: 'zh-CN',
       keyword: '',
-      product_type_id: 0,
+      offer_id: 'all',
+      product_type_id: 'all',
       productTypeOption: [],
+      language: 'all',
+      languageOption: [
+        { value: 'all', label: 'ALL' },
+        { value: 'zh-CN', label: '中文' },
+        { value: 'en-US', label: '英语' },
+        { value: 'ja-JP', label: '日语' },
+        { value: 'ko_KR', label: '韩语' },
+      ],
     },
     productStatusAll: {
       isCreateMainModalShow: false,
@@ -63,10 +72,10 @@ export default {
       title: '',
       offer_id: '',
       google_product_category: {
-        key: 632,
-        title: '五金/硬件',
+        key: 4,
+        title: '动物/宠物用品>宠物用品>猫用品',
       },
-      google_product_category_id: 632,
+      google_product_category_id: 4,
       gtin: '',
       brand: 'Limeet',
     },
@@ -87,7 +96,7 @@ export default {
     genderOption: [
       { value: 'male', label: '男性' },
       { value: 'female', label: '女性' },
-      { value: 'unisex', label: '女性' },
+      { value: 'unisex', label: '男女通用' },
     ],
     sizeSystemOption: [
       { value: 'US', label: 'US' },
@@ -125,8 +134,6 @@ export default {
       offer_id: '',
       product_main_id: 0,
       language: 'zh-CN',
-      product_type: { key: '', title: '' },
-      product_type_id: '',
       monetary_unit: 'USD',
       title: '',
       title_main: '',
@@ -138,6 +145,8 @@ export default {
       lifestyle_image_link: [],
       google_product_category: '',
       google_product_category_id: '',
+      product_type: { key: '', title: '' },
+      product_type_id: '',
       color: '',
       material: '',
       price: '',
@@ -277,6 +286,29 @@ export default {
         }
       }
     },
+    // 获取主商品详情
+    *queryProductMainDetail({ payload: data }, { call, put, select }) {
+      const { productDetail } = yield select((state) => state.product);
+      const { id } = data;
+      if (id) {
+        const result = yield call(queryProductMainDetail, { id });
+        if (result && result.status && result.status === 200) {
+          const newProductDetail = Object.assign({}, productDetail, {
+            title_main: result.data.title,
+            google_product_category: result.data.google_product_category,
+            google_product_category_id: result.data.google_product_category_id,
+            offer_id: result.data.offer_id,
+          });
+          yield put({
+            type: 'update',
+            payload: {
+              currentProductMain: result.data,
+              productDetail: newProductDetail,
+            },
+          });
+        }
+      }
+    },
     // 商品分类
     *cerateType({ payload: data }, { call, put, select }) {
       const { title } = data;
@@ -345,9 +377,9 @@ export default {
           const productTypeOption: { label: any; value: any }[] = [];
           productTypeOption.push({
             label: 'All',
-            value: 0,
+            value: 'all',
           });
-          let product_type_id = 0;
+          let product_type_id = 'all';
           result.data.rows.map((item: { title: any; key: any }) => {
             productTypeOption.push(Object.assign({}, item, { label: item.title, value: item.key }));
           });
@@ -448,8 +480,6 @@ export default {
       console.log('currentProductMain:', currentProductMain);
       const {
         id,
-        product_type,
-        product_type_id,
         title: title_main,
         offer_id,
         google_product_category,
@@ -478,6 +508,8 @@ export default {
         product_weight,
         availability,
         description,
+        product_type,
+        product_type_id,
       } = productDetail;
       if (
         title &&

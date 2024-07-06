@@ -49,7 +49,7 @@ class LabelHelpTip extends Component {
       return;
     }
     const currentHelpObj = labelHelpTip[this.props.keyLabel];
-    console.log('currentHelpObj:', currentHelpObj);
+    // console.log('currentHelpObj:', currentHelpObj);
     if (currentHelpObj && !currentHelpObj.title) {
       return;
     }

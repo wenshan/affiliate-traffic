@@ -175,8 +175,8 @@ class ProductCreate extends Component {
       },
       {
         title: '商品货号',
-        dataIndex: 'title',
-        key: 'title',
+        dataIndex: 'offer_id',
+        key: 'offer_id',
       },
       {
         title: 'Google商品类目',

@@ -14,10 +14,10 @@ class CreateMainModal extends Component {
         title: '',
         offer_id: '',
         google_product_category: {
-          key: 632,
-          title: '五金/硬件',
+          key: 4,
+          title: '动物/宠物用品>宠物用品>猫用品',
         },
-        google_product_category_id: 632,
+        google_product_category_id: 4,
         gtin: '',
         brand: 'Limeet',
       },

@@ -1,4 +1,5 @@
 export default (list) => {
+  // https://juejin.cn/post/7043324432537878536
   // https://www.xiabingbao.com/post/comments/comments-list-to-tree-r7zsnb.html
   const newList = JSON.parse(JSON.stringify(list)); // 避免影响外层的数组
   const map = new Map();

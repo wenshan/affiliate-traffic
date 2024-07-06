@@ -178,21 +178,16 @@ class ProductList extends Component {
         dataIndex: 'lifestyle_image_link',
         key: 'lifestyle_image_link',
         width: 90,
-        render: (text, record) => {
-          if (record.lifestyle_image_link) {
-            return (
-              <a
-                href={record.lifestyle_image_link}
-                title={record.lifestyle_image_link}
-                target="_blank"
-                rel="noreferrer"
-              >
-                链接
-              </a>
-            );
-          } else {
-            return '-';
-          }
+        render: (text: any, record: { lifestyle_image_link: string[] }) => {
+          const html: JSX.Element[] = [];
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          record &&
+            record.lifestyle_image_link &&
+            record.lifestyle_image_link.length &&
+            record.lifestyle_image_link.map((item: string, idx: Key) => {
+              html.push(<img key={idx} src={item} width={50}></img>);
+            });
+          return html;
         },
       },
       {
@@ -448,8 +443,8 @@ class ProductList extends Component {
   }
 
   render() {
-    const { productList, languageOption, pagination, searchParams } = this.props.product;
-    console.log('searchParams:', searchParams);
+    const { productList, pagination, searchParams } = this.props.product;
+    // console.log('searchParams:', searchParams);
     return (
       <PageContainer>
         <div className="page">
@@ -464,7 +459,7 @@ class ProductList extends Component {
                       value={searchParams.language}
                       style={{ width: 120 }}
                       onChange={this.searchLanguageSelectHandle}
-                      options={languageOption}
+                      options={searchParams.languageOption}
                     />
                   </div>
                 </Col>
@@ -472,7 +467,6 @@ class ProductList extends Component {
                   <div className="form-item">
                     <span className="label">自定商品分类:</span>
                     <Select
-                      defaultValue={searchParams.product_type_id}
                       value={searchParams.product_type_id}
                       style={{ width: 150 }}
                       onChange={this.searchProductTypeSelectHandle}

@@ -1,5 +1,6 @@
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Image, Input, Radio, Select, Table, message } from 'antd';
+import QueryString from 'query-string';
 import { Component, JSX } from 'react';
 import { connect } from 'umi';
 import Tool from '../../../utils/tool.js';
@@ -279,6 +280,14 @@ class ProductCreateSku extends Component {
         },
       });
     }
+    if (currentImageProductType === 'lifestyle_image_link') {
+      this.props.dispatch({
+        type: 'product/updateProduct',
+        payload: {
+          lifestyle_image_link: imageSrc,
+        },
+      });
+    }
     this.setState({
       isProductImageModal: false,
     });
@@ -526,6 +535,18 @@ class ProductCreateSku extends Component {
     this.props.dispatch({
       type: 'product/queryAttr',
     });
+    // 获取主商品详细
+    const search = window.document.location.search;
+    const query = QueryString.parse(search);
+    console.log('query===:', query);
+    if (query && query.product_main_id) {
+      this.props.dispatch({
+        type: 'product/queryProductMainDetail',
+        payload: {
+          id: query.product_main_id,
+        },
+      });
+    }
     /*
     this.props.dispatch({
       type: 'product/queryType',
@@ -843,7 +864,8 @@ class ProductCreateSku extends Component {
               </div>
               <div className="form-item">
                 <LabelHelpTip keyLabel="product_highlight"></LabelHelpTip>
-                <Input
+                <TextArea
+                  rows={4}
                   placeholder="商品亮点"
                   style={{ width: 350 }}
                   value={product_highlight}
@@ -858,12 +880,18 @@ class ProductCreateSku extends Component {
               <div className="form-item">
                 <div className="line-box">
                   <LabelHelpTip keyLabel="lifestyle_image_link"></LabelHelpTip>
-                  <Input
-                    placeholder="生活风格图片链接"
-                    style={{ width: 350 }}
-                    value={lifestyle_image_link}
-                    onChange={this.productLifestyleImageLinkInputHandle}
-                  />
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      this.imageSelectModel('lifestyle_image_link', 10);
+                    }}
+                  >
+                    添加附属图片
+                  </Button>
+                </div>
+                <div className="line-box">
+                  <div className="add-img-list">{this.imageRenderView(lifestyle_image_link)}</div>
                 </div>
               </div>
             </div>
