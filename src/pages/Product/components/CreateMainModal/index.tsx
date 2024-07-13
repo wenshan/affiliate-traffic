@@ -1,6 +1,6 @@
 import { Button, Input, Modal, message } from 'antd';
 import { Component } from 'react';
-import GoogleProductCategory from '../GoogleProductCategory';
+// import GoogleProductCategory from '../GoogleProductCategory';
 import LabelHelpTip from '../LabelHelpTip';
 
 import './index.less';
@@ -189,11 +189,14 @@ class CreateMainModal extends Component {
               />
             </div>
           </div>
+          {/*
+
           <GoogleProductCategory
             open={this.state.isProductCategoryShow}
             callbackCancel={this.productCategoryCallBackCancel}
             callbackOk={this.productCategoryCallBackOk}
           ></GoogleProductCategory>
+                      */}
         </Modal>
       </div>
     );

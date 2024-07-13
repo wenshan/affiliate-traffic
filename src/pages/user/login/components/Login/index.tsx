@@ -7,7 +7,7 @@ import {
   WeiboCircleOutlined,
 } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
-import { FormattedMessage, history, useIntl, useModel } from '@umijs/max';
+import { history, useModel } from '@umijs/max';
 import { Alert, message } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
@@ -84,7 +84,6 @@ const Login: React.FC = () => {
   });
   const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
-  const intl = useIntl();
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
@@ -103,10 +102,7 @@ const Login: React.FC = () => {
       // 登录
       const result = await login(values);
       if (result.status === 200) {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: '登录成功！',
-        });
+        const defaultLoginSuccessMessage = '登录成功！';
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
@@ -116,10 +112,7 @@ const Login: React.FC = () => {
         setUserLoginState(result);
       }
     } catch (error) {
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: '登录失败，请重试！',
-      });
+      const defaultLoginFailureMessage = '登录失败，请重试！';
       message.error(defaultLoginFailureMessage);
     }
   };
@@ -143,18 +136,11 @@ const Login: React.FC = () => {
               src="https://affiliate-traffic.oss-cn-hongkong.aliyuncs.com/gtraffic/gtraffic_500_260.png"
             />
           }
-          subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          subTitle="Gtraffic 联盟流量管理平台"
           initialValues={{
             auto_Login: false,
           }}
-          actions={[
-            <FormattedMessage
-              key="loginWith"
-              id="pages.login.loginWith"
-              defaultMessage="其他登录方式"
-            />,
-            <ActionIcons key="icons" />,
-          ]}
+          actions={['其他登录方式', <ActionIcons key="icons" />]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
           }}
@@ -168,19 +154,11 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <MailOutlined />,
                 }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.email.placeholder',
-                  defaultMessage: 'Email:',
-                })}
+                placeholder="Email"
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.email.required"
-                        defaultMessage="请输入邮箱!"
-                      />
-                    ),
+                    message: '请输入邮箱!',
                   },
                 ]}
               />
@@ -190,19 +168,11 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码:',
-                })}
+                placeholder="密码"
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.password.required"
-                        defaultMessage="请输入密码！"
-                      />
-                    ),
+                    message: '请输入密码！',
                   },
                 ]}
               />
@@ -214,14 +184,14 @@ const Login: React.FC = () => {
             }}
           >
             <ProFormCheckbox noStyle name="auto_Login">
-              <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
+              自动登录
             </ProFormCheckbox>
             <a
               style={{
                 float: 'right',
               }}
             >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
+              忘记密码
             </a>
           </div>
         </LoginForm>

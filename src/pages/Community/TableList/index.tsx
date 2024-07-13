@@ -3,11 +3,8 @@ import roomBuild from '@/utils/roomBuild';
 import { FileWordOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
 import { Button, Input, Modal, Popover, Radio, Space, Tag, message } from 'antd';
 import React, { useRef, useState } from 'react';
-
-import './index.less';
 
 const { TextArea } = Input;
 
@@ -19,7 +16,6 @@ const TableList: React.FC = () => {
   const [params, setParams] = useState<number>(0);
   const [remark, setRemark] = useState<string>('');
   const actionRef = useRef<ActionType>();
-  const intl = useIntl();
 
   // 下载 ex
   const handelDownloadXlsx = async () => {
@@ -479,10 +475,7 @@ const TableList: React.FC = () => {
       <ProTable<API.RuleListItem, API.PageParams>
         tableClassName="page-table"
         params={params}
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
+        headerTitle="数据表"
         actionRef={actionRef}
         rowKey="key"
         search={{

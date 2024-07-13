@@ -140,7 +140,7 @@ export default {
       description: '',
       link: '',
       mobile_link: '',
-      image_link: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+      image_link: [],
       additional_image_link: [],
       lifestyle_image_link: [],
       google_product_category: '',

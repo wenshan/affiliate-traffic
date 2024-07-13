@@ -50,6 +50,7 @@ export default {
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
   'menu.material': '素材管理',
+  'menu.banner': '广告管理',
   'menu.product': '商品管理',
   'menu.product.productCreate': '创建主商品',
   'menu.product.productEdit': '编辑商品',

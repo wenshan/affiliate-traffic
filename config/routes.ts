@@ -23,63 +23,69 @@ export default [
     ],
   },
   {
+    name: '欢迎👏🏻',
     path: '/welcome',
-    name: 'welcome',
     icon: 'smile',
     component: './Welcome',
   },
   {
+    name: '广告管理',
+    path: '/banner',
+    icon: 'table',
+    component: './Banner',
+  },
+  {
+    name: '素材管理',
     path: '/material',
-    name: 'material',
     icon: 'profile',
     component: './Material',
   },
   {
-    name: 'product',
+    name: '商品管理',
     path: '/product',
     layout: true,
     icon: 'profile',
     routes: [
       {
-        name: 'productCreate',
+        name: '创建主商品',
         path: '/product/ProductCreate',
         component: './Product/ProductCreate',
       },
       {
-        name: 'productCreateSku',
+        name: '创建SKU商品',
         path: '/product/ProductCreateSku',
         hideInMenu: true,
         component: './Product/ProductCreateSku',
       },
       {
-        name: 'productList',
+        name: '商品列表',
         path: '/product/ProductList',
         component: './Product/ProductList',
       },
     ],
   },
   {
-    name: 'community',
+    name: '西子翠苑',
     path: '/community',
     icon: 'profile',
     access: 'canAdmin',
     layout: true,
     routes: [
       {
-        name: 'dashboard',
+        name: '数据面板',
         path: '/community/Dashboard',
         component: './Community/Dashboard',
       },
       {
-        name: 'tableList',
+        name: '数据检索',
         path: '/community/TableList',
         component: './Community/TableList',
       },
     ],
   },
   {
+    name: '管理页',
     path: '/admin',
-    name: 'admin',
     icon: 'crown',
     access: 'canAdmin',
     routes: [
@@ -88,20 +94,18 @@ export default [
         redirect: '/admin/sub-page',
       },
       {
+        name: '二级管理页',
         path: '/admin/sub-page',
-        name: 'sub-page',
         component: './admin',
       },
     ],
   },
-  /*
   {
-    name: 'list.table-list',
+    name: '查询表格',
     icon: 'table',
     path: '/list',
     component: './TableList',
   },
-  */
   {
     path: '/',
     redirect: '/Welcome',
