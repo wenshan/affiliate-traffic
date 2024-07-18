@@ -17,11 +17,12 @@ import {
   queryProductMainAll,
   queryProductMainAllCompos,
   queryProductMainDetail,
+  queryProductMainOfferId,
 } from '@/services/api/productMain';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
-import { history } from '@umijs/max';
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
+import { history } from 'umi';
 
 export default {
   namespace: 'product',
@@ -38,7 +39,7 @@ export default {
       productTypeOption: [],
       language: 'all',
       languageOption: [
-        { value: 'all', label: 'ALL' },
+        { value: 'all', label: 'All' },
         { value: 'zh-CN', label: '中文' },
         { value: 'en-US', label: '英语' },
         { value: 'ja-JP', label: '日语' },
@@ -159,6 +160,7 @@ export default {
       product_weight: '',
       availability: 'in_stock',
     },
+    productMainOfferIds: [],
   },
 
   subscriptions: {
@@ -476,8 +478,6 @@ export default {
     // 商品SKU
     *createProduct({ payload: data }, { call, put, select }) {
       const { productDetail, currentProductMain } = yield select((state) => state.product);
-      console.log('productDetail:', productDetail);
-      console.log('currentProductMain:', currentProductMain);
       const {
         id,
         title: title_main,
@@ -580,15 +580,15 @@ export default {
     },
     *queryProductAll({ payload: data }, { call, put, select }) {
       const { pagination, searchParams } = yield select((state) => state.product);
-      const { language, keyword, product_type_id } = searchParams;
+      const { language, product_type_id, offer_id } = searchParams;
       const { current, pageSize } = pagination;
       if (current && pageSize && language) {
         const result = yield call(queryProductAll, {
           current,
           pageSize,
           language,
-          keyword,
           product_type_id,
+          offer_id,
         });
         if (result && result.status && result.status === 200 && result.data.rows) {
           const updatePagination = Object.assign({}, pagination, { total: result.data.count });
@@ -634,8 +634,6 @@ export default {
               }
             });
           const productMainList = Object.values(resultSkuObj);
-          console.log('resultSkuObj:', resultSkuObj);
-          console.log('productMainList:', productMainList);
           yield put({
             type: 'update',
             payload: {
@@ -652,8 +650,6 @@ export default {
     },
     *editProduct({ payload: data }, { call, put, select }) {
       const { productDetail, currentProductMain } = yield select((state) => state.product);
-      console.log('productDetail:', productDetail);
-      console.log('currentProductMain:', currentProductMain);
       const {
         title,
         language,
@@ -706,9 +702,9 @@ export default {
       }
     },
     *delProduct({ payload: data }, { call, put, select }) {
-      const { id } = data;
+      const { id, language } = data;
       if (id) {
-        const result = yield call(delProduct, { id });
+        const result = yield call(delProduct, { id, language });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
           console.log('删除商品SKU分类成功');
@@ -716,9 +712,9 @@ export default {
       }
     },
     *queryProductDetail({ payload: data }, { call, put, select }) {
-      const { id } = data;
+      const { id, language } = data;
       if (id) {
-        const result = yield call(queryProductDetail, { id });
+        const result = yield call(queryProductDetail, { id, language });
         if (result && result.status && result.status === 200) {
           yield put({
             type: 'update',
@@ -728,6 +724,25 @@ export default {
           });
           console.log('删除商品SKU分类成功');
         }
+      }
+    },
+    *queryProductMainOfferId({ payload }, { call, put, select }) {
+      const result = yield call(queryProductMainOfferId);
+      if (result && result.status && result.status === 200) {
+        const temp = [
+          {
+            value: 'all',
+            label: 'All',
+          },
+        ];
+        const newProductMainOfferIds = temp.concat(result.data);
+        yield put({
+          type: 'update',
+          payload: {
+            productMainOfferIds: newProductMainOfferIds,
+          },
+        });
+        console.log('删除商品SKU分类成功');
       }
     },
   },

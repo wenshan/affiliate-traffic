@@ -1,6 +1,6 @@
 import bannerChannel from '@/constant/bannerChannel';
 import bannerType from '@/constant/bannerType';
-import { createBanner, queryBanner } from '@/services/api/banner';
+import { createBanner, delBanner, editBanner, queryBanner } from '@/services/api/banner';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
@@ -12,7 +12,7 @@ import {
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Form, message } from 'antd';
+import { Button, Form, Modal, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import ImageSelectModal from './components/ImageSelectModal';
 
@@ -24,7 +24,7 @@ const initDetail = {
   src: '',
   url: '',
   type: '',
-  is_show: false,
+  is_show: 1,
   remark: '',
   channel: '',
 };
@@ -48,12 +48,22 @@ const Banner: React.FC = () => {
   };
 
   const createBannerPost = async (item) => {
+    let result;
     if (item && item.name && item.url && item.type && item.channel && item.src) {
-      const result = await createBanner(item);
-      if (result.status === 200 && result.data) {
+      if (optionType < 2) {
+        if (optionType === 0) {
+          result = await createBanner(item);
+        }
+        if (optionType === 1) {
+          result = await editBanner(item);
+        }
+        if (result && result.status === 200 && result.data) {
+          setModalFormStatus(false);
+          setParams(new Date().getTime());
+          message.success('提交成功');
+        }
+      } else {
         setModalFormStatus(false);
-        setParams(1);
-        message.success('提交成功');
       }
     } else {
       message.success('缺少必要参数');
@@ -61,16 +71,32 @@ const Banner: React.FC = () => {
   };
 
   const tableHandelEdit = (item) => {
-    console.log(item);
     setOptionType(1);
     setCurrentDetail(item);
     setModalFormStatus(true);
   };
   const tableHandelView = (item) => {
-    console.log(item);
     setOptionType(2);
     setCurrentDetail(item);
     setModalFormStatus(true);
+  };
+  const tableHandelDel = async (item) => {
+    if (item && item.id) {
+      Modal.confirm({
+        title: '确认删除',
+        content: '删除当前的广告Banner',
+        onOk: async () => {
+          const result = await delBanner({ id: item.id });
+          if (result && result.status === 200) {
+            setParams(new Date().getTime());
+            message.success('删除成功');
+          }
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    }
   };
 
   const columns: ProColumns<API.RuleListItem>[] = [
@@ -181,6 +207,14 @@ const Banner: React.FC = () => {
         >
           查看
         </a>,
+        <a
+          key="del"
+          onClick={() => {
+            tableHandelDel(record);
+          }}
+        >
+          删除
+        </a>,
       ],
     },
   ];
@@ -221,6 +255,7 @@ const Banner: React.FC = () => {
             key="button"
             icon={<PlusOutlined />}
             onClick={() => {
+              setOptionType(0);
               setCurrentDetail(initDetail);
               setModalFormStatus(true);
             }}
@@ -234,6 +269,7 @@ const Banner: React.FC = () => {
         open={isModalFormStatus}
         title={subTitle()}
         form={form}
+        readonly={optionType === 2}
         autoFocusFirstInput
         modalProps={{
           destroyOnClose: true,
@@ -260,11 +296,11 @@ const Banner: React.FC = () => {
             width="md"
             rules={[{ required: true }]}
             label="是否展示"
-            name="invoiceType"
+            name="is_show"
             initialValue={currentDetail.is_show}
             options={[
-              { label: '是', value: true },
-              { label: '否', value: false },
+              { label: '是', value: 1 },
+              { label: '否', value: 0 },
             ]}
           />
         </ProForm.Group>

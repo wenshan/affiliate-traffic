@@ -1,6 +1,6 @@
-import { RedoOutlined, SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Col, Input, Modal, Row, Select, Table } from 'antd';
+import { Button, Col, Modal, Row, Select, Table } from 'antd';
 import { Component, JSX, Key } from 'react';
 import { connect, history } from 'umi';
 
@@ -174,7 +174,7 @@ class ProductList extends Component {
         },
       },
       {
-        title: '生活风格图',
+        title: '详情图',
         dataIndex: 'lifestyle_image_link',
         key: 'lifestyle_image_link',
         width: 90,
@@ -185,7 +185,7 @@ class ProductList extends Component {
             record.lifestyle_image_link &&
             record.lifestyle_image_link.length &&
             record.lifestyle_image_link.map((item: string, idx: Key) => {
-              html.push(<img key={idx} src={item} width={50}></img>);
+              html.push(<img key={idx} src={item} width={30}></img>);
             });
           return html;
         },
@@ -368,6 +368,16 @@ class ProductList extends Component {
       },
     });
   };
+  searchProductOfferIdHandle = (value) => {
+    const { searchParams } = this.props.product;
+    const newSearchParams = Object.assign({}, searchParams, { offer_id: value });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        searchParams: newSearchParams,
+      },
+    });
+  };
   handelTableView = (record) => {
     console.log(record);
   };
@@ -434,17 +444,13 @@ class ProductList extends Component {
     this.props.dispatch({
       type: 'product/queryTypeSearch',
     });
-    // queryProductMainAllCompos
-    /*
     this.props.dispatch({
-      type: 'product/queryProductMainAllCompos',
+      type: 'product/queryProductMainOfferId',
     });
-    */
   }
 
   render() {
-    const { productList, pagination, searchParams } = this.props.product;
-    // console.log('searchParams:', searchParams);
+    const { productList, pagination, searchParams, productMainOfferIds } = this.props.product;
     return (
       <PageContainer>
         <div className="page">
@@ -463,9 +469,9 @@ class ProductList extends Component {
                     />
                   </div>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <div className="form-item">
-                    <span className="label">自定商品分类:</span>
+                    <span className="label">自定分类:</span>
                     <Select
                       value={searchParams.product_type_id}
                       style={{ width: 150 }}
@@ -474,32 +480,18 @@ class ProductList extends Component {
                     />
                   </div>
                 </Col>
-                <Col span={10}>
+                <Col span={6}>
                   <div className="form-item">
-                    <span className="label">商品名称:</span>
-                    <Input
-                      placeholder="商品名称"
-                      style={{ width: 200 }}
-                      value={searchParams.keyword}
-                      onChange={this.searchKeywordInputHandle}
+                    <span className="label">商品货号:</span>
+                    <Select
+                      value={searchParams.offer_id}
+                      style={{ width: 150 }}
+                      onChange={this.searchProductOfferIdHandle}
+                      options={productMainOfferIds}
                     />
                   </div>
                 </Col>
-              </Row>
-              <Row>
-                <Col span={8}></Col>
-                <Col span={8}>
-                  <div className="form-item">
-                    <Button
-                      type="primary"
-                      icon={<RedoOutlined />}
-                      onClick={this.handelRefreshToken}
-                    >
-                      refresh google token
-                    </Button>
-                  </div>
-                </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <div className="form-item">
                     <Button
                       type="primary"
@@ -507,7 +499,7 @@ class ProductList extends Component {
                       onClick={this.handelSearchParamsButton}
                       style={{ width: 200 }}
                     >
-                      Search
+                      搜索
                     </Button>
                   </div>
                 </Col>

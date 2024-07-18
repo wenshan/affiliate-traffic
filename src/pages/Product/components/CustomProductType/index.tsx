@@ -106,6 +106,8 @@ class CustomProductType extends Component {
     });
   };
   onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
+    console.log('selectedRowKeys:', selectedRowKeys);
+    console.log('selectedRows:', selectedRows);
     this.setState({
       currentProductType: selectedRows,
     });

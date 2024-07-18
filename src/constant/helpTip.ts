@@ -24,15 +24,15 @@ export default {
     link: '',
   },
   image_link: {
-    title: '图片链接',
+    title: '商品主图',
     des: '商品的主图片网址',
-    rule: '链接到商品的主图片。以 http 或 https 开头。使用经过编码且符合 RFC 2396 或 RFC 1738 规范的网址。确保 Google 可以抓取网址（使用允许 Googlebot 和 Googlebot-image 抓取网址的 robots.txt 配置）。',
+    rule: '链接到商品的白底主图片。以 http 或 https 开头。使用经过编码且符合 RFC 2396 或 RFC 1738 规范的网址。确保 Google 可以抓取网址（使用允许 Googlebot 和 Googlebot-image 抓取网址的 robots.txt 配置）。',
     exam: 'http:// www.example.com/image1.jpg',
     required: true,
     link: '',
   },
   additional_image_link: {
-    title: '附加图链接',
+    title: '附加图附件图片',
     des: '商品附加图的网址',
     rule: '图片可展示商品陈列环境或商品使用场景。可以包含图片或插图。通过多次添加此属性，最多可以提交 10 张商品附加图。',
     exam: 'http://www.example.com/image1.jpg',
@@ -234,7 +234,7 @@ export default {
     link: '',
   },
   lifestyle_image_link: {
-    title: '生活风格图片链接',
+    title: '商品详情图',
     des: '此属性用于为商品添加生活风格图片的网址,仅适用于浏览型展示平台',
     rule: '使用的网址应指向采用受支持文件格式的图片。应以 http 或 https 开头，且符合 RFC 3986 标准。其中若包含符号或空格，则需替换为网址编码实体。确保 Google 能够抓取您的网址。    ',
     exam: 'https://www.example.com/rule.html',

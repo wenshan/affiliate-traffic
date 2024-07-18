@@ -38,6 +38,13 @@ export const queryProductMainDetail = async (params?: { [key: string]: any }) =>
     data: params,
   });
 };
+/** 主商品offer id */
+export const queryProductMainOfferId = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/product/queryProductMainOfferId', {
+    method: 'POST',
+    data: params,
+  });
+};
 
 /** 创建语言商品 */
 export const createProduct = async (params?: { [key: string]: any }) => {

@@ -18,7 +18,6 @@ import './index.less';
 
 // const ImageSelectModal: React.FC = () => {
 const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCancel }) => {
-  console.log('open:', open);
   const limitParams = imageListTip[selectedType];
   const [folderDirectory, setFolderDirectory] = useState([]);
   const [imageList, setImageList] = useState([]);
@@ -117,7 +116,6 @@ const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCa
   }, [currentFolderDirectory]);
 
   const handleClickFolderMenu = (currentItem) => {
-    console.log(currentItem);
     const newFolderDirectory = [];
     // eslint-disable-next-line array-callback-return
     folderDirectory.map((item) => {
@@ -297,7 +295,6 @@ const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCa
       message.success(`当前场景下素材一次操作限制${limit}张素材`);
       return false;
     }
-    console.log(checkedData);
     setImageList(imageList);
     setSelectedMaterial(checkedData);
   };
