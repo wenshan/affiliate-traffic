@@ -2,5 +2,5 @@
   "editor.formatOnSave": true,
   "prettier.requireConfig": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "cSpell.words": ["checkcallback", "gtin", "Gtraffic", "iconfont"]
+  "cSpell.words": ["Braft", "checkcallback", "gtin", "Gtraffic", "iconfont"]
 }

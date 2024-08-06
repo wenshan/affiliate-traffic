@@ -70,12 +70,14 @@ export default {
 
   effects: {
     *queryFolder({ payload }, { call, put, select }) {
+      const { currentFolderDirectory } = yield select((state) => state.material);
       const result = yield call(queryFolder);
       const map = new Map();
       if (result.status === 200 && result.data && result.data.rows) {
         // 已删除文件放在最后排序
         const rows = result.data.rows;
         const newRows: { key: string; father_key: string; is_leaf: any }[] = [];
+        const newRows2: { key: string; father_key: string; is_leaf: any }[] = [];
         rows &&
           rows.length &&
           rows.map((item: { key: string }) => {
@@ -88,11 +90,26 @@ export default {
           Object.assign({}, rows[1], { title: rows[1] && rows[1].label, checked: false }),
         );
 
-        const tree = listToTreeSelf(newRows);
-        // console.log('tree:', tree);
+        if (currentFolderDirectory && currentFolderDirectory.key) {
+          newRows.map((item) => {
+            if (item.key === currentFolderDirectory.key) {
+              newRows2.push(Object.assign({}, item, { active: 1 }));
+            } else {
+              newRows2.push(Object.assign({}, item, { active: 0 }));
+            }
+          });
+        } else {
+          newRows.map((item) => {
+            newRows2.push(Object.assign({}, item));
+          });
+        }
+
+        const tree = listToTreeSelf(newRows2);
+        // console.log('tree:', tree); folderDirectoryRows currentFolderDirectory
+        // 当前的 初始化 currentFolderDirectory
         yield put({
           type: 'update',
-          payload: { folderDirectory: tree, folderDirectoryRows: newRows },
+          payload: { folderDirectory: tree, folderDirectoryRows: newRows2 },
         });
         yield put({
           type: 'update',

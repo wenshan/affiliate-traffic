@@ -84,6 +84,18 @@ class ProductList extends Component {
         dataIndex: 'description',
         key: 'description',
         width: 220,
+        render: (text, record) => {
+          if (record && record.description) {
+            return (
+              <div
+                className="clearfix"
+                dangerouslySetInnerHTML={{ __html: record.description ? record.description : '' }}
+              />
+            );
+          } else {
+            return '-';
+          }
+        },
       },
       {
         title: 'GTIN',

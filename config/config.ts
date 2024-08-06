@@ -154,6 +154,7 @@ export default defineConfig({
   requestRecord: {},
   scripts: [{ src: 'https://accounts.google.com/gsi/client', defer: true, async: true }],
   metas: [
+    { charset: 'utf-8' },
     { name: 'keywords', content: 'umi, umijs' },
     { name: 'description', content: 'React framework.' },
     { name: 'google-site-verification', content: 'KxHWtVZGvgcLVkcM4l40FNpLvHf3tA_z7D_jE83_wXM' },

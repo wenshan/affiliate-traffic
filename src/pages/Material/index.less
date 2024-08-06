@@ -43,67 +43,88 @@
       ul {
         margin: 0;
         padding: 0;
-      }
-      li {
-        min-height: 24px;
-        margin: 0 0 2px 0;
-        padding: 0 0 0 0;
-        line-height: 24px;
-        list-style: none;
-        border-radius: 10px;
-        cursor: pointer;
-        div {
-          display: block;
+        li {
+          min-height: 24px;
+          margin: 0 0 2px 0;
+          padding: 0 0 0 0;
+          line-height: 24px;
+          list-style: none;
+          border-radius: 4px;
+          cursor: pointer;
+          div {
+            display: block;
+            margin: 0;
+            padding-left: 0;
+            color: #999;
+            span.anticon {
+              padding-right: 4px;
+            }
+            label.ant-checkbox-wrapper {
+              padding-right: 4px;
+            }
+          }
+        }
+        li.pad00 {
           margin: 0;
-          padding-left: 0;
-          color: #999;
-          span.anticon {
-            padding-right: 4px;
-          }
-          label.ant-checkbox-wrapper {
-            padding-right: 4px;
+          padding: 0;
+          span.space {
+            display: inline-block;
+            width: 0px;
           }
         }
-      }
-      li.pad00 {
-        margin: 0;
-        padding: 0;
-        span.space {
-          display: inline-block;
-          width: 0px;
+        li.pad01 {
+          margin: 0;
+          padding: 0;
+          span.space {
+            display: inline-block;
+            width: 10px;
+          }
         }
-      }
-      li.pad01 {
-        margin: 0;
-        padding: 0;
-        span.space {
-          display: inline-block;
-          width: 10px;
+        li.pad02 {
+          margin: 0;
+          padding: 0;
+          span.space {
+            display: inline-block;
+            width: 20px;
+          }
         }
-      }
-      li.pad02 {
-        margin: 0;
-        padding: 0;
-        span.space {
-          display: inline-block;
-          width: 20px;
+        li.pad03 {
+          margin: 0;
+          padding: 0;
+          span.space {
+            display: inline-block;
+            width: 30px;
+          }
         }
-      }
-      li.pad03 {
-        margin: 0;
-        padding: 0;
-        span.space {
-          display: inline-block;
-          width: 30px;
+        div:hover {
+          background-color: rgba(0, 0, 0, 0.06);
         }
-      }
-      div:hover {
-        background-color: rgba(0, 0, 0, 0.06);
-      }
-      div.active {
-        background-color: #e6f4ff;
-        .dropdown {
+        li.active {
+          background-color: #e6f4ff;
+          .dropdown {
+            display: block;
+          }
+        }
+        li ul {
+          display: none;
+        }
+        li.active ul {
           display: block;
+        }
+        li.pad00 ul li.pad01 ul {
+          display: none;
+        }
+        li.pad00 ul li.active-second ul {
+          display: block !important;
+        }
+        li.active ul li.active-second div.item-second {
+          background-color: rgba(0, 0, 0, 0.04);
+        }
+        li.active ul li.active-second ul li.active-third div.item-third {
+          background-color: #cddbef;
+        }
+        li.active ul li.active-second ul li.active-third ul li.active-fourth div.item-fourth {
+          background-color: #bdcadd;
         }
       }
       .dropdown {

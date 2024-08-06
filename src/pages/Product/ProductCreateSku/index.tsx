@@ -8,10 +8,10 @@ import CustomProductType from '../components/CustomProductType';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
+import RichTextEditor from '../components/RichTextEditor';
 
 import './index.less';
 
-const { TextArea } = Input;
 @connect(({ product, common, material }) => ({
   product,
   common,
@@ -26,6 +26,9 @@ class ProductCreateSku extends Component {
       currentImageProductType: 'image_link',
       imageLimitNum: 20,
       isProductTypeShow: false,
+      typeTextEditor: 'product_highlight',
+      isTextEditorState: false,
+      initValuerTextEditor: '',
     };
   }
   // 语言
@@ -94,16 +97,6 @@ class ProductCreateSku extends Component {
       type: 'product/updateProduct',
       payload: {
         sale_price: value,
-      },
-    });
-  };
-  // 商品亮点
-  productHighlightInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        product_highlight: value,
       },
     });
   };
@@ -528,6 +521,27 @@ class ProductCreateSku extends Component {
       });
     }
   };
+
+  // 富文本编辑器回调
+  callbackTextEditorDescription = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        description: value,
+      },
+    });
+  };
+  // 富文本编辑器回调
+  callbackTextEditorProductHighlight = (value) => {
+    console.log('====', value);
+    console.log(value);
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        product_highlight: value,
+      },
+    });
+  };
   componentDidMount() {
     this.props.dispatch({
       type: 'product/initQueryParams',
@@ -641,13 +655,26 @@ class ProductCreateSku extends Component {
                 />
               </div>
               <div className="form-item">
-                <LabelHelpTip keyLabel="description"></LabelHelpTip>
-                <TextArea
-                  rows={4}
-                  style={{ width: 350 }}
-                  value={description}
-                  onChange={this.descriptionTextAreaHandle}
-                />
+                <div className="line-box-header">
+                  <LabelHelpTip keyLabel="description"></LabelHelpTip>
+                </div>
+                <div className="line-box-container">
+                  <RichTextEditor
+                    callbackValue={this.callbackTextEditorDescription}
+                    initValuerTextEditor={description}
+                  ></RichTextEditor>
+                </div>
+              </div>
+              <div className="form-item">
+                <div className="line-box-header">
+                  <LabelHelpTip keyLabel="product_highlight"></LabelHelpTip>
+                </div>
+                <div className="line-box-container">
+                  <RichTextEditor
+                    callbackValue={this.callbackTextEditorProductHighlight}
+                    initValuerTextEditor={product_highlight}
+                  ></RichTextEditor>
+                </div>
               </div>
               <div className="form-item">
                 <div className="line-box">
@@ -681,6 +708,25 @@ class ProductCreateSku extends Component {
                 </div>
                 <div className="line-box">
                   <div className="add-img-list">{this.imageRenderView(additional_image_link)}</div>
+                </div>
+              </div>
+              <div className="content form-box">
+                <div className="form-item">
+                  <div className="line-box">
+                    <LabelHelpTip keyLabel="lifestyle_image_link"></LabelHelpTip>
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={() => {
+                        this.imageSelectModel('lifestyle_image_link', 10);
+                      }}
+                    >
+                      添加附属图片
+                    </Button>
+                  </div>
+                  <div className="line-box">
+                    <div className="add-img-list">{this.imageRenderView(lifestyle_image_link)}</div>
+                  </div>
                 </div>
               </div>
               <div className="form-item">
@@ -862,41 +908,6 @@ class ProductCreateSku extends Component {
                   </div>
                 </div>
               </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="product_highlight"></LabelHelpTip>
-                <TextArea
-                  rows={4}
-                  placeholder="商品亮点"
-                  style={{ width: 350 }}
-                  value={product_highlight}
-                  onChange={this.productHighlightInputHandle}
-                />
-              </div>
-            </div>
-            <div className="header">
-              <div className="sub-header">购物广告系列和其他配置</div>
-            </div>
-            <div className="content form-box">
-              <div className="form-item">
-                <div className="line-box">
-                  <LabelHelpTip keyLabel="lifestyle_image_link"></LabelHelpTip>
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() => {
-                      this.imageSelectModel('lifestyle_image_link', 10);
-                    }}
-                  >
-                    添加附属图片
-                  </Button>
-                </div>
-                <div className="line-box">
-                  <div className="add-img-list">{this.imageRenderView(lifestyle_image_link)}</div>
-                </div>
-              </div>
-            </div>
-            <div className="header">
-              <div className="sub-header">目标平台</div>
             </div>
             <div className="content form-box"></div>
             <div className="content form-box">

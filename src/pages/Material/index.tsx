@@ -161,14 +161,14 @@ class Material extends Component {
         if (item.key === key) {
           let tempItem;
           if (item && item.checked) {
-            tempItem = Object.assign({}, item, { active: 1, checked: false });
+            tempItem = Object.assign({}, item, { checked: false });
           } else {
-            tempItem = Object.assign({}, item, { active: 1, checked: true });
+            tempItem = Object.assign({}, item, { checked: true });
           }
           newRows.push(tempItem);
           currentItem = tempItem;
         } else {
-          newRows.push(Object.assign({}, item, { active: 0, checked: false }));
+          newRows.push(Object.assign({}, item, { checked: false }));
         }
       });
       const folderDirectory = listToTreeSelf(newRows);
@@ -185,23 +185,166 @@ class Material extends Component {
 
   handleClickFolderMenu = (currentItem: any) => {
     console.log('currentItem:', currentItem);
-    const { folderDirectoryRows } = this.props.material;
-    const newRows: any = [];
+    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
+    const father_key = [];
+    // folderDirectory 父级id
     if (currentItem && currentItem.key) {
-      folderDirectoryRows.map((item) => {
-        if (item.key === currentItem.key) {
-          newRows.push(Object.assign({}, item, { active: 1 }));
-        } else {
-          newRows.push(Object.assign({}, item, { active: 0 }));
+      father_key.push(currentItem.key);
+      if (currentItem.father_key) {
+        const father01 = folderDirectoryMap.get(currentItem.father_key);
+        if (father01) {
+          father_key.push(father01.key);
+          if (father01.father_key) {
+            const father02 = folderDirectoryMap.get(father01.father_key);
+            father_key.push(father02.key);
+            if (father02.father_key) {
+              const father03 = folderDirectoryMap.get(father02.father_key);
+              father_key.push(father03.key);
+              if (father03.father_key) {
+                const father04 = folderDirectoryMap.get(father02.father_key);
+                father_key.push(father04.key);
+              }
+            }
+          }
         }
-      });
-      const folderDirectory = listToTreeSelf(newRows);
+      }
+    }
+    if (currentItem && currentItem.key) {
+      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
       this.props.dispatch({
         type: 'material/update',
         payload: {
           folderDirectory,
           currentFolderDirectory: currentItem,
-          folderDirectoryRows: newRows,
+        },
+      });
+      this.props.dispatch({
+        type: 'material/queryFolderMaterial',
+        payload: {
+          ...currentItem,
+        },
+      });
+    }
+  };
+  handleClickFolderMenuSecond = (currentItem: any) => {
+    console.log('currentItem:', currentItem);
+    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
+    const father_key = [];
+    // folderDirectory 父级id
+    if (currentItem && currentItem.key) {
+      father_key.push(currentItem.key);
+      if (currentItem.father_key) {
+        const father01 = folderDirectoryMap.get(currentItem.father_key);
+        if (father01) {
+          father_key.push(father01.key);
+          if (father01.father_key) {
+            const father02 = folderDirectoryMap.get(father01.father_key);
+            father_key.push(father02.key);
+            if (father02.father_key) {
+              const father03 = folderDirectoryMap.get(father02.father_key);
+              father_key.push(father03.key);
+              if (father03.father_key) {
+                const father04 = folderDirectoryMap.get(father02.father_key);
+                father_key.push(father04.key);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (currentItem && currentItem.key) {
+      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      this.props.dispatch({
+        type: 'material/update',
+        payload: {
+          folderDirectory,
+          currentFolderDirectory: currentItem,
+        },
+      });
+      this.props.dispatch({
+        type: 'material/queryFolderMaterial',
+        payload: {
+          ...currentItem,
+        },
+      });
+    }
+  };
+  handleClickFolderMenuThird = (currentItem: any) => {
+    console.log('currentItem:', currentItem);
+    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
+    const father_key = [];
+    // folderDirectory 父级id
+    if (currentItem && currentItem.key) {
+      father_key.push(currentItem.key);
+      if (currentItem.father_key) {
+        const father01 = folderDirectoryMap.get(currentItem.father_key);
+        if (father01) {
+          father_key.push(father01.key);
+          if (father01.father_key) {
+            const father02 = folderDirectoryMap.get(father01.father_key);
+            father_key.push(father02.key);
+            if (father02.father_key) {
+              const father03 = folderDirectoryMap.get(father02.father_key);
+              father_key.push(father03.key);
+              if (father03.father_key) {
+                const father04 = folderDirectoryMap.get(father02.father_key);
+                father_key.push(father04.key);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (currentItem && currentItem.key) {
+      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      this.props.dispatch({
+        type: 'material/update',
+        payload: {
+          folderDirectory,
+          currentFolderDirectory: currentItem,
+        },
+      });
+      this.props.dispatch({
+        type: 'material/queryFolderMaterial',
+        payload: {
+          ...currentItem,
+        },
+      });
+    }
+  };
+  handleClickFolderMenuFourth = (currentItem: any) => {
+    console.log('currentItem:', currentItem);
+    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
+    const father_key = [];
+    // folderDirectory 父级id
+    if (currentItem && currentItem.key) {
+      father_key.push(currentItem.key);
+      if (currentItem.father_key) {
+        const father01 = folderDirectoryMap.get(currentItem.father_key);
+        if (father01) {
+          father_key.push(father01.key);
+          if (father01.father_key) {
+            const father02 = folderDirectoryMap.get(father01.father_key);
+            father_key.push(father02.key);
+            if (father02.father_key) {
+              const father03 = folderDirectoryMap.get(father02.father_key);
+              father_key.push(father03.key);
+              if (father03.father_key) {
+                const father04 = folderDirectoryMap.get(father02.father_key);
+                father_key.push(father04.key);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (currentItem && currentItem.key) {
+      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      this.props.dispatch({
+        type: 'material/update',
+        payload: {
+          folderDirectory,
+          currentFolderDirectory: currentItem,
         },
       });
       this.props.dispatch({
@@ -220,10 +363,10 @@ class Material extends Component {
       folderDirectory.map((item: any, index: number) => {
         if (item.children) {
           html.push(
-            <li key={`${item.key}_${index}`} className="pad00">
+            <li key={`${item.key}_${index}`} className={`pad00 ${item.active ? 'active' : ''}`}>
               <div
                 title={item.label}
-                className={`item ${item.active ? 'active' : ''}`}
+                className="item"
                 onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
               >
@@ -241,11 +384,14 @@ class Material extends Component {
                 <ul>
                   {item.children.map((childrenItem: any, idx: number) => {
                     return (
-                      <li key={`${childrenItem.key}_${idx}`} className="pad01">
+                      <li
+                        key={`${childrenItem.key}_${idx}`}
+                        className={`pad01 ${childrenItem.active ? 'active-second' : ''}`}
+                      >
                         <div
                           title={childrenItem.label}
-                          className={`item ${childrenItem.active ? 'active' : ''}`}
-                          onClick={() => this.handleClickFolderMenu(childrenItem)}
+                          className="item item-second"
+                          onClick={() => this.handleClickFolderMenuSecond(childrenItem)}
                         >
                           <span className="space"></span>
                           {childrenItem.is_default === 0 ? (
@@ -267,11 +413,14 @@ class Material extends Component {
                           <ul key={`${childrenItem.key}_${idx}_ul`}>
                             {childrenItem.children.map((children2Item: any, idx2: number) => {
                               return (
-                                <li key={`${children2Item.key}_${idx2}`} className="pad02">
+                                <li
+                                  key={`${children2Item.key}_${idx2}`}
+                                  className={`pad02 ${children2Item.active ? 'active-third' : ''}`}
+                                >
                                   <div
                                     title={children2Item.label}
-                                    className={`item ${children2Item.active ? 'active' : ''}`}
-                                    onClick={() => this.handleClickFolderMenu(children2Item)}
+                                    className="item item-third"
+                                    onClick={() => this.handleClickFolderMenuThird(children2Item)}
                                   >
                                     <span className="space"></span>
                                     {children2Item.is_default === 0 ? (
@@ -295,13 +444,15 @@ class Material extends Component {
                                         (children3Item: any, idx3: number) => {
                                           <li
                                             key={`${children3Item.key}_${idx3}`}
-                                            className="pad03"
+                                            className={`pad03 ${
+                                              children3Item.active ? 'active-fourth' : ''
+                                            }`}
                                           >
                                             <div
                                               title={children3Item.label}
-                                              className={`${children3Item.active ? 'active' : ''}`}
+                                              className="item item-fourth"
                                               onClick={() =>
-                                                this.handleClickFolderMenu(children3Item)
+                                                this.handleClickFolderMenuFourth(children3Item)
                                               }
                                             >
                                               <span className="space"></span>
@@ -339,10 +490,13 @@ class Material extends Component {
           );
         } else {
           html.push(
-            <li key={`${item.key}_${item.is_defaul}`} className="pad00">
+            <li
+              key={`${item.key}_${item.is_defaul}`}
+              className={`pad00 ${item.active ? 'active' : ''}`}
+            >
               <div
                 title={item.label}
-                className={`item ${item.active ? 'active' : ''}`}
+                className="item"
                 onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
               >
