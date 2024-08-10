@@ -77,7 +77,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Gtraffic',
+  title: 'Gtraffic 您跨境电商流程平台',
   layout: {
     locale: true,
     ...defaultSettings,

@@ -7,17 +7,12 @@ const Footer: React.FC = () => {
       style={{
         background: 'none',
       }}
+      copyright="Gtraffic"
       links={[
         {
-          key: 'Gtraffic',
-          title: 'Gtraffic',
-          href: 'https://shoptraffic.cn',
-          blankTarget: true,
-        },
-        {
-          key: 'Hangzhou Ouhao Trading Co., Ltd',
-          title: 'Hangzhou Ouhao Trading Co., Ltd',
-          href: 'https://shoptraffic.cn',
+          key: '浙ICP备2023008986号',
+          title: '浙ICP备2023008986号',
+          href: 'https://beian.miit.gov.cn/#/Integrated/index',
           blankTarget: true,
         },
       ]}

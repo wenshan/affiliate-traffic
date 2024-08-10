@@ -1,7 +1,6 @@
 const client = require('scp2');
 // 服务器信息
 const host = '139.224.110.211';
-// const host = '1.94.25.172';
 const username = 'root';
 const password = 'Hws2416$';
 const port = 22;

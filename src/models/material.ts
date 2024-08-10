@@ -77,7 +77,6 @@ export default {
         // 已删除文件放在最后排序
         const rows = result.data.rows;
         const newRows: { key: string; father_key: string; is_leaf: any }[] = [];
-        const newRows2: { key: string; father_key: string; is_leaf: any }[] = [];
         rows &&
           rows.length &&
           rows.map((item: { key: string }) => {
@@ -89,27 +88,34 @@ export default {
         newRows.push(
           Object.assign({}, rows[1], { title: rows[1] && rows[1].label, checked: false }),
         );
-
+        const father_key = [];
         if (currentFolderDirectory && currentFolderDirectory.key) {
-          newRows.map((item) => {
-            if (item.key === currentFolderDirectory.key) {
-              newRows2.push(Object.assign({}, item, { active: 1 }));
-            } else {
-              newRows2.push(Object.assign({}, item, { active: 0 }));
+          father_key.push(currentFolderDirectory.key);
+          if (currentFolderDirectory.father_key) {
+            const father01 = map.get(currentFolderDirectory.father_key);
+            if (father01) {
+              father_key.push(father01.key);
+              if (father01.father_key) {
+                const father02 = map.get(father01.father_key);
+                father_key.push(father02.key);
+                if (father02.father_key) {
+                  const father03 = map.get(father02.father_key);
+                  father_key.push(father03.key);
+                  if (father03.father_key) {
+                    const father04 = map.get(father02.father_key);
+                    father_key.push(father04.key);
+                  }
+                }
+              }
             }
-          });
-        } else {
-          newRows.map((item) => {
-            newRows2.push(Object.assign({}, item));
-          });
+          }
         }
-
-        const tree = listToTreeSelf(newRows2);
+        const tree = listToTreeSelf(newRows, father_key);
         // console.log('tree:', tree); folderDirectoryRows currentFolderDirectory
         // 当前的 初始化 currentFolderDirectory
         yield put({
           type: 'update',
-          payload: { folderDirectory: tree, folderDirectoryRows: newRows2 },
+          payload: { folderDirectory: tree, folderDirectoryRows: newRows },
         });
         yield put({
           type: 'update',
