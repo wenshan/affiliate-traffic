@@ -56,11 +56,14 @@
             margin: 0;
             padding-left: 0;
             color: #999;
-            span.anticon {
+            span.active {
               padding-right: 4px;
             }
             label.ant-checkbox-wrapper {
               padding-right: 4px;
+            }
+            span.label {
+              display: inline-block;
             }
           }
         }
@@ -125,50 +128,6 @@
         }
         li.active ul li.active-second ul li.active-third ul li.active-fourth div.item-fourth {
           background-color: #bdcadd;
-        }
-      }
-      .dropdown {
-        position: relative;
-        z-index: 99;
-        display: none;
-        .arrow_right {
-          z-index: 99;
-          margin-top: 5px;
-        }
-        ul {
-          position: absolute;
-          top: 15px;
-          right: -55px;
-          z-index: 999;
-          display: none;
-          width: 60px;
-          margin: 0;
-          padding: 0;
-          padding: 4px;
-          list-style-type: none;
-          background-color: #ffffff;
-          background-clip: padding-box;
-          border-radius: 8px;
-          outline: none;
-          box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
-            0 9px 28px 8px rgba(0, 0, 0, 0.05);
-          li {
-            display: block;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            color: #333;
-            font-size: 14px;
-            text-align: center;
-          }
-          li:hover {
-            background-color: rgba(0, 0, 0, 0.04);
-          }
-        }
-      }
-      .dropdown:hover {
-        ul {
-          display: block;
         }
       }
     }

@@ -38,61 +38,65 @@ class Material extends Component {
   };
   handelFolderOk = () => {
     const { optionAction, operateFolderDirectory } = this.state;
-    const { currentFolderDirectory } = this.props.material;
+    const { selectFolderDirectory } = this.props.material;
     let addFolderDirectory = Object.assign({}, operateFolderDirectory);
-    this.setState(
-      {
-        folderOpenStatus: false,
-      },
-      () => {
-        if (optionAction === 1) {
-          this.props.dispatch({
-            type: 'material/editFolder',
-            payload: {
-              ...addFolderDirectory,
-            },
-          });
-        } else {
-          // 默认分组直接建立目录
-          if (currentFolderDirectory.key === '00000000') {
-            addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-              father_key: '',
-              key_path: '',
-              key: '',
-              is_leaf: 1,
-              active: false,
-              is_default: false,
+    if (selectFolderDirectory && selectFolderDirectory.key) {
+      this.setState(
+        {
+          folderOpenStatus: false,
+        },
+        () => {
+          if (optionAction === 1) {
+            this.props.dispatch({
+              type: 'material/editFolder',
+              payload: {
+                ...addFolderDirectory,
+              },
             });
           } else {
-            if (currentFolderDirectory.father_key) {
+            // 默认分组直接建立目录
+            if (selectFolderDirectory.key === '00000000') {
               addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-                father_key: currentFolderDirectory.key,
-                key_path: `${currentFolderDirectory.father_key}/${currentFolderDirectory.key}`,
+                father_key: '',
+                key_path: '',
                 key: '',
                 is_leaf: 1,
                 active: false,
                 is_default: false,
               });
             } else {
-              addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-                father_key: currentFolderDirectory.key,
-                key_path: `${currentFolderDirectory.key}`,
-                key: '',
-                is_leaf: 1,
-                active: false,
-                is_default: false,
-              });
+              if (selectFolderDirectory.father_key) {
+                addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+                  father_key: selectFolderDirectory.key,
+                  key_path: `${selectFolderDirectory.father_key}/${selectFolderDirectory.key}`,
+                  key: '',
+                  is_leaf: 1,
+                  active: false,
+                  is_default: false,
+                });
+              } else {
+                addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+                  father_key: selectFolderDirectory.key,
+                  key_path: `${selectFolderDirectory.key}`,
+                  key: '',
+                  is_leaf: 1,
+                  active: false,
+                  is_default: false,
+                });
+              }
             }
+            this.props.dispatch({
+              type: 'material/createFolder',
+              payload: {
+                ...addFolderDirectory,
+              },
+            });
           }
-          this.props.dispatch({
-            type: 'material/createFolder',
-            payload: {
-              ...addFolderDirectory,
-            },
-          });
-        }
-      },
-    );
+        },
+      );
+    } else {
+      message.info('选择当前文件夹');
+    }
   };
   handelCreateFolder = () => {
     this.setState({
@@ -105,12 +109,16 @@ class Material extends Component {
     });
   };
   handleClickDropdownEdit = () => {
-    const { currentFolderDirectory } = this.props.material;
-    this.setState({
-      optionAction: 1,
-      folderOpenStatus: true,
-      operateFolderDirectory: currentFolderDirectory,
-    });
+    const { selectFolderDirectory } = this.props.material;
+    if (selectFolderDirectory && selectFolderDirectory.key) {
+      this.setState({
+        optionAction: 1,
+        folderOpenStatus: true,
+        operateFolderDirectory: selectFolderDirectory,
+      });
+    } else {
+      message.info('选择当前文件夹');
+    }
   };
   folderInputHandle = (event) => {
     const { value } = event.target;
@@ -130,33 +138,36 @@ class Material extends Component {
     }
   };
   handleClickDropdownDel = () => {
-    const { currentFolderDirectory } = this.props.material;
+    const { selectFolderDirectory } = this.props.material;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    Modal.confirm({
-      title: '确认删除',
-      content: '当前素材文件转移到默认文件夹下。',
-      onOk() {
-        self.props.dispatch({
-          type: 'material/delFolder',
-          payload: {
-            ...currentFolderDirectory,
-          },
-        });
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
+    if (selectFolderDirectory && selectFolderDirectory.key) {
+      Modal.confirm({
+        title: '确认删除',
+        content: '当前素材文件转移到默认文件夹下。',
+        onOk() {
+          self.props.dispatch({
+            type: 'material/delFolder',
+            payload: {
+              ...selectFolderDirectory,
+            },
+          });
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    } else {
+      message.info('选择当前文件夹');
+    }
   };
 
   handleOnCheckSelectFolderMenu = (event) => {
-    console.log('OnCheck event:', event);
     const { folderDirectoryRows } = this.props.material;
     const key = event.target.value;
     const newRows: any[] = [];
     let currentItem;
-    if (key) {
+    if (key && folderDirectoryRows) {
       folderDirectoryRows.map((item: { key: any; checked: any }) => {
         if (item.key === key) {
           let tempItem;
@@ -171,13 +182,13 @@ class Material extends Component {
           newRows.push(Object.assign({}, item, { checked: false }));
         }
       });
-      const folderDirectory = listToTreeSelf(newRows);
+      const { rowsTree, rowsList } = listToTreeSelf(newRows, currentItem);
       this.props.dispatch({
         type: 'material/update',
         payload: {
-          folderDirectory,
-          currentFolderDirectory: currentItem,
-          folderDirectoryRows: newRows,
+          folderDirectory: rowsTree,
+          folderDirectoryRows: rowsList,
+          selectFolderDirectory: currentItem,
         },
       });
     }
@@ -185,36 +196,14 @@ class Material extends Component {
 
   handleClickFolderMenu = (currentItem: any) => {
     console.log('currentItem:', currentItem);
-    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
-    const father_key = [];
-    // folderDirectory 父级id
+    const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
-      father_key.push(currentItem.key);
-      if (currentItem.father_key) {
-        const father01 = folderDirectoryMap.get(currentItem.father_key);
-        if (father01) {
-          father_key.push(father01.key);
-          if (father01.father_key) {
-            const father02 = folderDirectoryMap.get(father01.father_key);
-            father_key.push(father02.key);
-            if (father02.father_key) {
-              const father03 = folderDirectoryMap.get(father02.father_key);
-              father_key.push(father03.key);
-              if (father03.father_key) {
-                const father04 = folderDirectoryMap.get(father02.father_key);
-                father_key.push(father04.key);
-              }
-            }
-          }
-        }
-      }
-    }
-    if (currentItem && currentItem.key) {
-      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
       this.props.dispatch({
         type: 'material/update',
         payload: {
-          folderDirectory,
+          folderDirectory: rowsTree,
+          folderDirectoryRows: rowsList,
           currentFolderDirectory: currentItem,
         },
       });
@@ -228,36 +217,14 @@ class Material extends Component {
   };
   handleClickFolderMenuSecond = (currentItem: any) => {
     console.log('currentItem:', currentItem);
-    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
-    const father_key = [];
-    // folderDirectory 父级id
+    const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
-      father_key.push(currentItem.key);
-      if (currentItem.father_key) {
-        const father01 = folderDirectoryMap.get(currentItem.father_key);
-        if (father01) {
-          father_key.push(father01.key);
-          if (father01.father_key) {
-            const father02 = folderDirectoryMap.get(father01.father_key);
-            father_key.push(father02.key);
-            if (father02.father_key) {
-              const father03 = folderDirectoryMap.get(father02.father_key);
-              father_key.push(father03.key);
-              if (father03.father_key) {
-                const father04 = folderDirectoryMap.get(father02.father_key);
-                father_key.push(father04.key);
-              }
-            }
-          }
-        }
-      }
-    }
-    if (currentItem && currentItem.key) {
-      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
       this.props.dispatch({
         type: 'material/update',
         payload: {
-          folderDirectory,
+          folderDirectory: rowsTree,
+          folderDirectoryRows: rowsList,
           currentFolderDirectory: currentItem,
         },
       });
@@ -271,36 +238,14 @@ class Material extends Component {
   };
   handleClickFolderMenuThird = (currentItem: any) => {
     console.log('currentItem:', currentItem);
-    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
-    const father_key = [];
-    // folderDirectory 父级id
+    const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
-      father_key.push(currentItem.key);
-      if (currentItem.father_key) {
-        const father01 = folderDirectoryMap.get(currentItem.father_key);
-        if (father01) {
-          father_key.push(father01.key);
-          if (father01.father_key) {
-            const father02 = folderDirectoryMap.get(father01.father_key);
-            father_key.push(father02.key);
-            if (father02.father_key) {
-              const father03 = folderDirectoryMap.get(father02.father_key);
-              father_key.push(father03.key);
-              if (father03.father_key) {
-                const father04 = folderDirectoryMap.get(father02.father_key);
-                father_key.push(father04.key);
-              }
-            }
-          }
-        }
-      }
-    }
-    if (currentItem && currentItem.key) {
-      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
       this.props.dispatch({
         type: 'material/update',
         payload: {
-          folderDirectory,
+          folderDirectory: rowsTree,
+          folderDirectoryRows: rowsList,
           currentFolderDirectory: currentItem,
         },
       });
@@ -314,36 +259,14 @@ class Material extends Component {
   };
   handleClickFolderMenuFourth = (currentItem: any) => {
     console.log('currentItem:', currentItem);
-    const { folderDirectoryRows, folderDirectoryMap } = this.props.material;
-    const father_key = [];
-    // folderDirectory 父级id
+    const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
-      father_key.push(currentItem.key);
-      if (currentItem.father_key) {
-        const father01 = folderDirectoryMap.get(currentItem.father_key);
-        if (father01) {
-          father_key.push(father01.key);
-          if (father01.father_key) {
-            const father02 = folderDirectoryMap.get(father01.father_key);
-            father_key.push(father02.key);
-            if (father02.father_key) {
-              const father03 = folderDirectoryMap.get(father02.father_key);
-              father_key.push(father03.key);
-              if (father03.father_key) {
-                const father04 = folderDirectoryMap.get(father02.father_key);
-                father_key.push(father04.key);
-              }
-            }
-          }
-        }
-      }
-    }
-    if (currentItem && currentItem.key) {
-      const folderDirectory = listToTreeSelf(folderDirectoryRows, father_key);
+      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
       this.props.dispatch({
         type: 'material/update',
         payload: {
-          folderDirectory,
+          folderDirectory: rowsTree,
+          folderDirectoryRows: rowsList,
           currentFolderDirectory: currentItem,
         },
       });
@@ -364,12 +287,7 @@ class Material extends Component {
         if (item.children) {
           html.push(
             <li key={`${item.key}_${index}`} className={`pad00 ${item.active ? 'active' : ''}`}>
-              <div
-                title={item.label}
-                className="item"
-                onClick={() => this.handleClickFolderMenu(item)}
-                key={item.key}
-              >
+              <div title={item.label} className="item" key={item.key}>
                 <span className="space"></span>
                 {item.is_leaf === 1 ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
                 <Checkbox
@@ -377,8 +295,10 @@ class Material extends Component {
                   disabled={!!item.is_default}
                   checked={item.checked}
                   onChange={this.handleOnCheckSelectFolderMenu}
-                ></Checkbox>{' '}
-                {Tool.replaceExceedEnd(item.label, 25)}
+                ></Checkbox>
+                <span onClick={() => this.handleClickFolderMenu(item)}>
+                  {Tool.replaceExceedEnd(item.label, 22)}
+                </span>
               </div>
               {item.children && item.children.length && (
                 <ul>
@@ -388,11 +308,7 @@ class Material extends Component {
                         key={`${childrenItem.key}_${idx}`}
                         className={`pad01 ${childrenItem.active ? 'active-second' : ''}`}
                       >
-                        <div
-                          title={childrenItem.label}
-                          className="item item-second"
-                          onClick={() => this.handleClickFolderMenuSecond(childrenItem)}
-                        >
+                        <div title={childrenItem.label} className="item item-second">
                           <span className="space"></span>
                           {childrenItem.is_default === 0 ? (
                             childrenItem.is_leaf === 1 ? (
@@ -406,8 +322,13 @@ class Material extends Component {
                             disabled={!!childrenItem.is_default}
                             checked={childrenItem.checked}
                             onChange={this.handleOnCheckSelectFolderMenu}
-                          ></Checkbox>{' '}
-                          {Tool.replaceExceedEnd(childrenItem.label, 25)}
+                          ></Checkbox>
+                          <span
+                            className="label"
+                            onClick={() => this.handleClickFolderMenuSecond(childrenItem)}
+                          >
+                            {Tool.replaceExceedEnd(childrenItem.label, 22)}
+                          </span>
                         </div>
                         {childrenItem.children && childrenItem.children.length && (
                           <ul key={`${childrenItem.key}_${idx}_ul`}>
@@ -417,11 +338,7 @@ class Material extends Component {
                                   key={`${children2Item.key}_${idx2}`}
                                   className={`pad02 ${children2Item.active ? 'active-third' : ''}`}
                                 >
-                                  <div
-                                    title={children2Item.label}
-                                    className="item item-third"
-                                    onClick={() => this.handleClickFolderMenuThird(children2Item)}
-                                  >
+                                  <div title={children2Item.label} className="item item-third">
                                     <span className="space"></span>
                                     {children2Item.is_default === 0 ? (
                                       children2Item.is_leaf === 1 ? (
@@ -436,42 +353,53 @@ class Material extends Component {
                                       checked={children2Item.checked}
                                       onChange={this.handleOnCheckSelectFolderMenu}
                                     ></Checkbox>
-                                    {Tool.replaceExceedEnd(children2Item.label, 25)}
+                                    <span
+                                      className="label"
+                                      onClick={() => this.handleClickFolderMenuThird(children2Item)}
+                                    >
+                                      {Tool.replaceExceedEnd(children2Item.label, 22)}
+                                    </span>
                                   </div>
                                   {children2Item.children && children2Item.children.length && (
                                     <ul key={`${children2Item.key}_${idx2}_ul`}>
                                       {children2Item.children.map(
                                         (children3Item: any, idx3: number) => {
-                                          <li
-                                            key={`${children3Item.key}_${idx3}`}
-                                            className={`pad03 ${
-                                              children3Item.active ? 'active-fourth' : ''
-                                            }`}
-                                          >
-                                            <div
-                                              title={children3Item.label}
-                                              className="item item-fourth"
-                                              onClick={() =>
-                                                this.handleClickFolderMenuFourth(children3Item)
-                                              }
+                                          return (
+                                            <li
+                                              key={`${children3Item.key}_${idx3}`}
+                                              className={`pad03 ${
+                                                children3Item.active ? 'active-fourth' : ''
+                                              }`}
                                             >
-                                              <span className="space"></span>
-                                              {children3Item.is_default === 0 ? (
-                                                children3Item.is_leaf === 1 ? (
-                                                  <MinusSquareOutlined />
-                                                ) : (
-                                                  <PlusSquareOutlined />
-                                                )
-                                              ) : null}
-                                              <Checkbox
-                                                value={children3Item.key}
-                                                disabled={!!children3Item.is_default}
-                                                checked={children3Item.checked}
-                                                onChange={this.handleOnCheckSelectFolderMenu}
-                                              ></Checkbox>
-                                              {Tool.replaceExceedEnd(children3Item.label, 25)}
-                                            </div>
-                                          </li>;
+                                              <div
+                                                title={children3Item.label}
+                                                className="item item-fourth"
+                                              >
+                                                <span className="space"></span>
+                                                {children3Item.is_default === 0 ? (
+                                                  children3Item.is_leaf === 1 ? (
+                                                    <MinusSquareOutlined />
+                                                  ) : (
+                                                    <PlusSquareOutlined />
+                                                  )
+                                                ) : null}
+                                                <Checkbox
+                                                  value={children3Item.key}
+                                                  disabled={!!children3Item.is_default}
+                                                  checked={children3Item.checked}
+                                                  onChange={this.handleOnCheckSelectFolderMenu}
+                                                ></Checkbox>
+                                                <span
+                                                  className="label"
+                                                  onClick={() =>
+                                                    this.handleClickFolderMenuFourth(children3Item)
+                                                  }
+                                                >
+                                                  {Tool.replaceExceedEnd(children3Item.label, 22)}
+                                                </span>
+                                              </div>
+                                            </li>
+                                          );
                                         },
                                       )}
                                     </ul>
@@ -491,15 +419,10 @@ class Material extends Component {
         } else {
           html.push(
             <li
-              key={`${item.key}_${item.is_defaul}`}
+              key={`${item.key}_${item.is_default}`}
               className={`pad00 ${item.active ? 'active' : ''}`}
             >
-              <div
-                title={item.label}
-                className="item"
-                onClick={() => this.handleClickFolderMenu(item)}
-                key={item.key}
-              >
+              <div title={item.label} className="item" key={item.key}>
                 <span className="space"></span>
                 {item.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
                 <Checkbox
@@ -508,7 +431,9 @@ class Material extends Component {
                   checked={item.checked}
                   onChange={this.handleOnCheckSelectFolderMenu}
                 ></Checkbox>
-                {Tool.replaceExceedEnd(item.label, 25)}
+                <span className="label" onClick={() => this.handleClickFolderMenu(item)}>
+                  {Tool.replaceExceedEnd(item.label, 22)}
+                </span>
               </div>
             </li>,
           );

@@ -45,9 +45,9 @@ const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCa
           mapObj.set(item.key, Object.assign({}, item, { checked: false }));
         });
       newRows.push(Object.assign({}, rows[1], { title: rows[1] && rows[1].label, checked: false }));
-      const tree = listToTreeSelf(newRows);
-      setFolderDirectory(tree);
-      setCurrentFolderDirectory(tree[0]);
+      const { rowsTree } = listToTreeSelf(newRows);
+      setFolderDirectory(rowsTree);
+      setCurrentFolderDirectory(rowsTree[0]);
     }
   };
   // 获取图片素材数据

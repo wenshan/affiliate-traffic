@@ -24,6 +24,46 @@ import { Modal, message } from 'antd';
 import QueryString from 'query-string';
 import { history } from 'umi';
 
+const defaultProductDetail = {
+  product_id: '',
+  item_group_id: '',
+  age_group: 'adult',
+  gender: 'unisex',
+  pattern: '',
+  size: '',
+  size_type: 'regular',
+  size_system: 'US',
+  gtin: '',
+  brand: '',
+  offer_id: '',
+  product_main_id: 0,
+  language: 'zh-CN',
+  monetary_unit: 'USD',
+  title: '',
+  title_main: '',
+  description: '',
+  link: '',
+  mobile_link: '',
+  image_link: [],
+  additional_image_link: [],
+  lifestyle_image_link: [],
+  google_product_category: '',
+  google_product_category_id: '',
+  product_type: { key: '', title: '' },
+  product_type_id: '',
+  color: '',
+  material: '',
+  price: '',
+  sale_price: '',
+  product_detail: [], // 商品属性
+  product_highlight: '',
+  product_height: '',
+  product_length: '',
+  product_width: '',
+  product_weight: '',
+  availability: 'in_stock',
+};
+
 export default {
   namespace: 'product',
   state: {
@@ -121,45 +161,7 @@ export default {
       { value: 'plus', label: '加大' },
     ],
     productList: [],
-    productDetail: {
-      product_id: '',
-      item_group_id: '',
-      age_group: 'adult',
-      gender: 'unisex',
-      pattern: '',
-      size: '',
-      size_type: 'regular',
-      size_system: 'US',
-      gtin: '',
-      brand: '',
-      offer_id: '',
-      product_main_id: 0,
-      language: 'zh-CN',
-      monetary_unit: 'USD',
-      title: '',
-      title_main: '',
-      description: '',
-      link: '',
-      mobile_link: '',
-      image_link: [],
-      additional_image_link: [],
-      lifestyle_image_link: [],
-      google_product_category: '',
-      google_product_category_id: '',
-      product_type: { key: '', title: '' },
-      product_type_id: '',
-      color: '',
-      material: '',
-      price: '',
-      sale_price: '',
-      product_detail: [], // 商品属性
-      product_highlight: '',
-      product_height: '',
-      product_length: '',
-      product_width: '',
-      product_weight: '',
-      availability: 'in_stock',
-    },
+    productDetail: defaultProductDetail,
     productMainOfferIds: [],
   },
 
@@ -559,6 +561,12 @@ export default {
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
           // message.warning({ content: '添加商品SKU分类成功'});
+          yield put({
+            type: 'update',
+            payload: {
+              productDetail: defaultProductDetail,
+            },
+          });
           Modal.confirm({
             title: '创建成功',
             content: '创建商品SKU,返回到列表页面',
@@ -683,6 +691,12 @@ export default {
         const result = yield call(editProduct, { ...productDetail });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
+          yield put({
+            type: 'update',
+            payload: {
+              productDetail: defaultProductDetail,
+            },
+          });
           Modal.confirm({
             title: '编辑成功',
             content: '编辑商品SKU成功,返回到列表页面',

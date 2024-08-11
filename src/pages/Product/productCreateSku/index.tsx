@@ -1,9 +1,10 @@
+import listToTreeSelf from '@/utils/listToTreeSelf';
+import Tool from '@/utils/tool.js';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Image, Input, Radio, Select, Table, message } from 'antd';
 import QueryString from 'query-string';
 import { Component, JSX } from 'react';
 import { connect } from 'umi';
-import Tool from '../../../utils/tool.js';
 import CustomProductType from '../components/CustomProductType';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
@@ -297,11 +298,15 @@ class ProductCreateSku extends Component {
     });
   };
 
-  handelFolderMenuSelect = (currentItem: any, folderDirectory: any) => {
+  handelFolderMenuSelect = (currentItem: any) => {
+    const { folderDirectoryRows } = this.props.material;
+    const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
     this.props.dispatch({
       type: 'material/update',
       payload: {
-        folderDirectory,
+        folderDirectory: rowsTree,
+        folderDirectoryRows: rowsList,
+        currentFolderDirectory: currentItem,
       },
     });
     this.props.dispatch({

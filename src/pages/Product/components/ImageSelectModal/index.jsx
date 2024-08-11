@@ -38,18 +38,8 @@ class ImageSelectModal extends Component {
 
   valueInputHandle = () => {};
   handleClickFolderMenu = (currentItem) => {
-    const { folderDirectory } = this.props;
-    const newFolderDirectory = [];
-    // eslint-disable-next-line array-callback-return
-    folderDirectory.map((item) => {
-      if (item.key === currentItem.key) {
-        newFolderDirectory.push(Object.assign({}, item, { active: true }));
-      } else {
-        newFolderDirectory.push(Object.assign({}, item, { active: false }));
-      }
-    });
-    if (this.props.folderMenuSelectCallback) {
-      this.props.folderMenuSelectCallback(currentItem, newFolderDirectory);
+    if (this.props.folderMenuSelectCallback && currentItem && currentItem.key) {
+      this.props.folderMenuSelectCallback(currentItem);
     }
   };
 
@@ -61,10 +51,10 @@ class ImageSelectModal extends Component {
       folderDirectory.map((item, index) => {
         if (item.children) {
           html.push(
-            <li key={`${item.key}_${index}`} className="pad00">
+            <li key={`${item.key}_${index}`} className={`pad00 ${item.active ? 'active' : ''}`}>
               <div
                 title={item.label}
-                className={`item ${item.active ? 'active' : ''}`}
+                className="item"
                 onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
               >
@@ -76,10 +66,13 @@ class ImageSelectModal extends Component {
                 <ul>
                   {item.children.map((childrenItem, idx) => {
                     return (
-                      <li key={`${childrenItem.key}_${idx}`} className="pad01">
+                      <li
+                        key={`${childrenItem.key}_${idx}`}
+                        className={`pad01 ${childrenItem.active ? 'active-second' : ''}`}
+                      >
                         <div
                           title={childrenItem.label}
-                          className={`item ${childrenItem.active ? 'active' : ''}`}
+                          className="item item-second"
                           onClick={() => this.handleClickFolderMenu(childrenItem)}
                         >
                           <span className="space"></span>
@@ -90,16 +83,19 @@ class ImageSelectModal extends Component {
                               <PlusSquareOutlined />
                             )
                           ) : null}
-                          {Tool.replaceExceedEnd(childrenItem.label, 25)}
+                          {Tool.replaceExceedEnd(childrenItem.label, 20)}
                         </div>
                         {childrenItem.children && childrenItem.children.length && (
                           <ul key={`${childrenItem.key}_${idx}_ul`}>
                             {childrenItem.children.map((children2Item, idx2) => {
                               return (
-                                <li key={`${children2Item.key}_${idx2}`} className="pad02">
+                                <li
+                                  key={`${children2Item.key}_${idx2}`}
+                                  className={`pad02 ${children2Item.active ? 'active-third' : ''}`}
+                                >
                                   <div
                                     title={children2Item.label}
-                                    className={`item ${children2Item.active ? 'active' : ''}`}
+                                    className="item item-third"
                                     onClick={() => this.handleClickFolderMenu(children2Item)}
                                   >
                                     <span className="space"></span>
@@ -115,25 +111,32 @@ class ImageSelectModal extends Component {
                                   {children2Item.children && children2Item.children.length && (
                                     <ul key={`${children2Item.key}_${idx2}_ul`}>
                                       {children2Item.children.map((children3Item, idx3) => {
-                                        <li key={`${children3Item.key}_${idx3}`} className="pad03">
-                                          <div
-                                            title={children3Item.label}
-                                            className={`${children3Item.active ? 'active' : ''}`}
-                                            onClick={() =>
-                                              this.handleClickFolderMenu(children3Item)
-                                            }
+                                        return (
+                                          <li
+                                            key={`${children3Item.key}_${idx3}`}
+                                            className={`pad03 ${
+                                              children3Item.active ? 'active-fourth' : ''
+                                            }`}
                                           >
-                                            <span className="space"></span>
-                                            {children3Item.is_default === 0 ? (
-                                              children3Item.is_leaf === 1 ? (
-                                                <MinusSquareOutlined />
-                                              ) : (
-                                                <PlusSquareOutlined />
-                                              )
-                                            ) : null}
-                                            {Tool.replaceExceedEnd(children3Item.label, 20)}
-                                          </div>
-                                        </li>;
+                                            <div
+                                              title={children3Item.label}
+                                              className="item item-fourth"
+                                              onClick={() =>
+                                                this.handleClickFolderMenu(children3Item)
+                                              }
+                                            >
+                                              <span className="space"></span>
+                                              {children3Item.is_default === 0 ? (
+                                                children3Item.is_leaf === 1 ? (
+                                                  <MinusSquareOutlined />
+                                                ) : (
+                                                  <PlusSquareOutlined />
+                                                )
+                                              ) : null}
+                                              {Tool.replaceExceedEnd(children3Item.label, 20)}
+                                            </div>
+                                          </li>
+                                        );
                                       })}
                                     </ul>
                                   )}
@@ -151,10 +154,13 @@ class ImageSelectModal extends Component {
           );
         } else {
           html.push(
-            <li key={`${item.key}_${item.is_defaul}`} className="pad00">
+            <li
+              key={`${item.key}_${item.is_default}`}
+              className={`pad00 ${item.active ? 'active' : ''}`}
+            >
               <div
                 title={item.label}
-                className={`item ${item.active ? 'active' : ''}`}
+                className="item"
                 onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
               >
@@ -197,7 +203,7 @@ class ImageSelectModal extends Component {
 
   /*
   UNSAFE_componentWillReceiveProps(nextProps) {
-    console.log('nextProps folderDirectory:', nextProps.folderDirectory);
+    // console.log('nextProps folderDirectory:', nextProps.folderDirectory);
     if (this.props.folderDirectory !== nextProps.folderDirectory || this.props.currentFolderDirectory !== nextProps.currentFolderDirectory) {
       this.setState({
         folderDirectory: nextProps.folderDirectory,

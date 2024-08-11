@@ -189,7 +189,7 @@ class ProductList extends Component {
         title: '详情图',
         dataIndex: 'lifestyle_image_link',
         key: 'lifestyle_image_link',
-        width: 90,
+        width: 190,
         render: (text: any, record: { lifestyle_image_link: string[] }) => {
           const html: JSX.Element[] = [];
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions

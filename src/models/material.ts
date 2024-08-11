@@ -34,7 +34,7 @@ export default {
       userid: '',
     },
     imageList: [],
-    currentFolderDirectory: {
+    defaultFolderDirectory: {
       label: '默认分组',
       key: '00000000',
       is_default: true,
@@ -43,6 +43,8 @@ export default {
       key_path: '',
       father_key: '',
     },
+    selectFolderDirectory: {},
+    currentFolderDirectory: {},
     addFolderDirectory: {
       label: '',
       is_default: false,
@@ -70,7 +72,9 @@ export default {
 
   effects: {
     *queryFolder({ payload }, { call, put, select }) {
-      const { currentFolderDirectory } = yield select((state) => state.material);
+      const { currentFolderDirectory, selectFolderDirectory } = yield select(
+        (state) => state.material,
+      );
       const result = yield call(queryFolder);
       const map = new Map();
       if (result.status === 200 && result.data && result.data.rows) {
@@ -81,48 +85,48 @@ export default {
           rows.length &&
           rows.map((item: { key: string }) => {
             if (item.key !== '11111111') {
-              newRows.push(Object.assign({}, item, { title: item.label, checked: false }));
-            }
-            map.set(item.key, Object.assign({}, item, { checked: false }));
-          });
-        newRows.push(
-          Object.assign({}, rows[1], { title: rows[1] && rows[1].label, checked: false }),
-        );
-        const father_key = [];
-        if (currentFolderDirectory && currentFolderDirectory.key) {
-          father_key.push(currentFolderDirectory.key);
-          if (currentFolderDirectory.father_key) {
-            const father01 = map.get(currentFolderDirectory.father_key);
-            if (father01) {
-              father_key.push(father01.key);
-              if (father01.father_key) {
-                const father02 = map.get(father01.father_key);
-                father_key.push(father02.key);
-                if (father02.father_key) {
-                  const father03 = map.get(father02.father_key);
-                  father_key.push(father03.key);
-                  if (father03.father_key) {
-                    const father04 = map.get(father02.father_key);
-                    father_key.push(father04.key);
-                  }
-                }
+              if (
+                selectFolderDirectory &&
+                selectFolderDirectory.key &&
+                selectFolderDirectory.key === item.key
+              ) {
+                newRows.push(Object.assign({}, item, { title: item.label, checked: true }));
+              } else {
+                newRows.push(Object.assign({}, item, { title: item.label, checked: false }));
               }
             }
-          }
-        }
-        const tree = listToTreeSelf(newRows, father_key);
-        // console.log('tree:', tree); folderDirectoryRows currentFolderDirectory
-        // 当前的 初始化 currentFolderDirectory
+            if (
+              selectFolderDirectory &&
+              selectFolderDirectory.key &&
+              selectFolderDirectory.key === item.key
+            ) {
+              map.set(item.key, Object.assign({}, item, { checked: true }));
+            } else {
+              map.set(item.key, Object.assign({}, item, { checked: false }));
+            }
+          });
+        newRows.push(
+          Object.assign({}, rows[1], {
+            title: rows[1] && rows[1].label,
+            checked: false,
+            active: 1,
+          }),
+        );
+        const { rowsTree, rowsList } = listToTreeSelf(newRows, currentFolderDirectory);
+        const initFolderDirectory =
+          currentFolderDirectory && currentFolderDirectory.key
+            ? currentFolderDirectory
+            : Object.assign({}, rowsTree[0], { active: 1 });
         yield put({
           type: 'update',
-          payload: { folderDirectory: tree, folderDirectoryRows: newRows },
-        });
-        yield put({
-          type: 'update',
-          payload: { currentFolderDirectory: tree[0], folderDirectoryMap: map },
+          payload: {
+            folderDirectory: rowsTree,
+            folderDirectoryRows: rowsList,
+            currentFolderDirectory: initFolderDirectory,
+          },
         });
         // 初始化默认文件夹素材
-        yield put({ type: 'queryFolderMaterial', payload: { ...tree[0] } });
+        yield put({ type: 'queryFolderMaterial', payload: { ...rowsTree[0] } });
       }
     },
     // subscriptions 更新当前的用户信息
