@@ -1,0 +1,61 @@
+.personInfo {
+  .container {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .avatar {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    overflow: hidden;
+    .ant-avatar {
+      display: block;
+      margin: 0 auto;
+      margin-left: 100px;
+      text-align: center;
+    }
+    .title {
+      height: 40px;
+      padding-left: 100px;
+      line-height: 40px;
+      text-align: left;
+    }
+    .update {
+      padding: 10px;
+      text-align: center;
+    }
+  }
+  .list {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    overflow: hidden;
+    ul {
+      width: 100%;
+      li {
+        .ant-form-item {
+          display: inline-block;
+          margin-bottom: 10px;
+        }
+        .status {
+          display: inline-block;
+          height: 40px;
+          padding-left: 20px;
+          color: #666;
+          line-height: 40px;
+        }
+        .edit {
+          float: right;
+          height: 40px;
+          color: #1890ff;
+          line-height: 40px;
+        }
+      }
+    }
+  }
+}

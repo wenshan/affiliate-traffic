@@ -100,6 +100,19 @@ export default [
       },
     ],
   },
+  {
+    name: '账户',
+    path: '/account',
+    icon: 'crown',
+    layout: true,
+    routes: [
+      {
+        name: '基础信息',
+        path: '/account/PersonInfo',
+        component: './Account/PersonInfo',
+      },
+    ],
+  },
   /*
   {
     name: '查询表格',

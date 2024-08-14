@@ -53,7 +53,6 @@ export async function outLogin(options?: { [key: string]: any }) {
 
 /** 登录接口 POST /api/user/login */
 export async function login(params: API.LoginParams, options?: { [key: string]: any }) {
-  console.log('params:', params);
   return request<API.LoginResult>('/api/user/login', {
     method: 'POST',
     data: params,
@@ -62,7 +61,6 @@ export async function login(params: API.LoginParams, options?: { [key: string]: 
 
 // register
 export async function register(params: API.LoginParams, options?: { [key: string]: any }) {
-  console.log('params:', params);
   return request<API.RegisterParams>('/api/user/register', {
     method: 'POST',
     data: params,

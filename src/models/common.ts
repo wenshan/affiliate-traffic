@@ -23,6 +23,7 @@ export default {
       email: '',
       scope: '',
       token_type: 'Bearer',
+      user_project_group_id: 1,
     },
   },
 
