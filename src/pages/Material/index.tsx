@@ -41,62 +41,57 @@ class Material extends Component {
     const { selectFolderDirectory } = this.props.material;
     let addFolderDirectory = Object.assign({}, operateFolderDirectory);
     if (selectFolderDirectory && selectFolderDirectory.key) {
-      this.setState(
-        {
-          folderOpenStatus: false,
-        },
-        () => {
-          if (optionAction === 1) {
-            this.props.dispatch({
-              type: 'material/editFolder',
-              payload: {
-                ...addFolderDirectory,
-              },
-            });
-          } else {
-            // 默认分组直接建立目录
-            if (selectFolderDirectory.key === '00000000') {
-              addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-                father_key: '',
-                key_path: '',
-                key: '',
-                is_leaf: 1,
-                active: false,
-                is_default: false,
-              });
-            } else {
-              if (selectFolderDirectory.father_key) {
-                addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-                  father_key: selectFolderDirectory.key,
-                  key_path: `${selectFolderDirectory.father_key}/${selectFolderDirectory.key}`,
-                  key: '',
-                  is_leaf: 1,
-                  active: false,
-                  is_default: false,
-                });
-              } else {
-                addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-                  father_key: selectFolderDirectory.key,
-                  key_path: `${selectFolderDirectory.key}`,
-                  key: '',
-                  is_leaf: 1,
-                  active: false,
-                  is_default: false,
-                });
-              }
-            }
-            this.props.dispatch({
-              type: 'material/createFolder',
-              payload: {
-                ...addFolderDirectory,
-              },
-            });
-          }
-        },
-      );
+      if (selectFolderDirectory.father_key) {
+        addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+          father_key: selectFolderDirectory.key,
+          key_path: `${selectFolderDirectory.father_key}/${selectFolderDirectory.key}`,
+          key: '',
+          is_leaf: 1,
+          active: false,
+          is_default: false,
+        });
+      } else {
+        addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+          father_key: selectFolderDirectory.key,
+          key_path: `${selectFolderDirectory.key}`,
+          key: '',
+          is_leaf: 1,
+          active: false,
+          is_default: false,
+        });
+      }
     } else {
-      message.info('选择当前文件夹');
+      addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+        father_key: '',
+        key_path: '',
+        key: '',
+        is_leaf: 1,
+        active: false,
+        is_default: false,
+      });
     }
+    this.setState(
+      {
+        folderOpenStatus: false,
+      },
+      () => {
+        if (optionAction === 1) {
+          this.props.dispatch({
+            type: 'material/editFolder',
+            payload: {
+              ...addFolderDirectory,
+            },
+          });
+        } else {
+          this.props.dispatch({
+            type: 'material/createFolder',
+            payload: {
+              ...addFolderDirectory,
+            },
+          });
+        }
+      },
+    );
   };
   handelCreateFolder = () => {
     this.setState({
@@ -166,22 +161,24 @@ class Material extends Component {
     const { folderDirectoryRows } = this.props.material;
     const key = event.target.value;
     const newRows: any[] = [];
-    let currentItem;
+    let currentItem = {};
     if (key && folderDirectoryRows) {
       folderDirectoryRows.map((item: { key: any; checked: any }) => {
         if (item.key === key) {
           let tempItem;
           if (item && item.checked) {
             tempItem = Object.assign({}, item, { checked: false });
+            currentItem = {};
           } else {
             tempItem = Object.assign({}, item, { checked: true });
+            currentItem = tempItem;
           }
           newRows.push(tempItem);
-          currentItem = tempItem;
         } else {
           newRows.push(Object.assign({}, item, { checked: false }));
         }
       });
+      console.log('currentItem:', currentItem);
       const { rowsTree, rowsList } = listToTreeSelf(newRows, currentItem);
       this.props.dispatch({
         type: 'material/update',

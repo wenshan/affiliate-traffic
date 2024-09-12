@@ -89,7 +89,7 @@ const Tool = {
    *
    */
 
-  objectToString(object, separator) {
+  objectToString(object, separator = '&') {
     if (!object) {
       return false;
     }

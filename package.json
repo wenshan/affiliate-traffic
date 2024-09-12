@@ -72,6 +72,7 @@
     "react-intl": "^6.6.8",
     "react-quill": "^2.0.0",
     "react-quilljs": "^2.0.4",
+    "react18-json-view": "^0.2.8",
     "store2": "^2.14.3"
   },
   "devDependencies": {

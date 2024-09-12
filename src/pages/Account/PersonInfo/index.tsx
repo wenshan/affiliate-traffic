@@ -10,8 +10,8 @@ const PersonInfo: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   const [currentUser, setCurrentUser] = useState(initialState.currentUser);
   const getCurrentUser = async () => {
-    const currentUserNew = await initialState.fetchUserInfo();
-    setCurrentUser(currentUserNew);
+    // const currentUserNew = await initialState.fetchUserInfo();
+    setCurrentUser(initialState.currentUser);
   };
   useEffect(() => {
     getCurrentUser();

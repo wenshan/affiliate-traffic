@@ -1,20 +1,14 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Component } from 'react';
+import React from 'react';
 
-class Welcome extends Component {
-  constructor(props) {
-    super(props);
-    console.log('props:', props);
-    this.state = {};
-  }
-  componentDidMount() {}
-  render() {
-    return (
+const Welcome: React.FC = () => {
+  return (
+    <div className="container">
       <PageContainer>
         <h1>欢迎</h1>
       </PageContainer>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Welcome;

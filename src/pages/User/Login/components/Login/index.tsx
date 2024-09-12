@@ -1,16 +1,17 @@
-import { login } from '@/services/api/login';
+import { getOAuthUrl, googleGetToken, login } from '@/services/api/login';
 import {
   AlipayCircleOutlined,
+  GoogleOutlined,
   LockOutlined,
   MailOutlined,
   TaobaoCircleOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
-import { history, useModel } from '@umijs/max';
+import { history, useModel, useSearchParams } from '@umijs/max';
 import { Alert, message } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 
 import './index.less';
@@ -20,7 +21,18 @@ const useStyles = createStyles(({ token }) => {
     action: {
       marginLeft: '8px',
       color: 'rgba(0, 0, 0, 0.2)',
-      fontSize: '24px',
+      fontSize: '26px',
+      verticalAlign: 'middle',
+      cursor: 'pointer',
+      transition: 'color 0.3s',
+      '&:hover': {
+        color: token.colorPrimaryActive,
+      },
+    },
+    action_google: {
+      marginLeft: '8px',
+      color: 'rgba(0, 0, 0, 0.2)',
+      fontSize: '28px',
       verticalAlign: 'middle',
       cursor: 'pointer',
       transition: 'color 0.3s',
@@ -42,7 +54,6 @@ const useStyles = createStyles(({ token }) => {
     container: {
       display: 'flex',
       flexDirection: 'column',
-      height: '100vh',
       overflow: 'auto',
       backgroundImage:
         "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
@@ -54,8 +65,23 @@ const useStyles = createStyles(({ token }) => {
 const ActionIcons = () => {
   const { styles } = useStyles();
 
+  const googleAuthLoginButton = async () => {
+    const result = await getOAuthUrl();
+    console.log('getOAuthUrl:', result);
+    if (result && result.status === 200 && result.data && result.data.url) {
+      window.location.href = result.data.url;
+    } else {
+      message.info('授权登录失败');
+    }
+  };
+
   return (
     <>
+      <GoogleOutlined
+        key="GoogleOutlined"
+        className={styles.action_google}
+        onClick={googleAuthLoginButton}
+      />
       <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
       <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
       <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
@@ -79,11 +105,15 @@ const LoginMessage: React.FC<{
 };
 
 const Login: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({
     status: 200,
   });
   const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
+
+  const state = searchParams.get('state');
+  const code = searchParams.get('code');
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
@@ -96,6 +126,26 @@ const Login: React.FC = () => {
       });
     }
   };
+
+  const getOAuth2UserInfo = async () => {
+    if (state && code) {
+      const result = await googleGetToken({ state, code });
+      if (result && result.status === 200) {
+        const defaultLoginSuccessMessage = '登录成功！';
+        message.success(defaultLoginSuccessMessage);
+        await fetchUserInfo();
+        const urlParams = new URL(window.location.href).searchParams;
+        history.push(urlParams.get('redirect') || '/Welcome');
+        return;
+      } else {
+        setUserLoginState(result);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getOAuth2UserInfo();
+  }, [state, code]);
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
@@ -116,15 +166,11 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
+
   const { status, msg } = userLoginState;
   return (
     <div className={styles.container}>
-      <div
-        style={{
-          flex: '1',
-          padding: '32px 0',
-        }}
-      >
+      <div>
         <LoginForm
           contentStyle={{
             minWidth: 280,

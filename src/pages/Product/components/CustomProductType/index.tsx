@@ -123,7 +123,6 @@ class CustomProductType extends Component {
         title: '操作',
         dataIndex: 'operate',
         render: (_: any, record: any) => {
-          console.log('record:', record);
           return (
             <div className="operate">
               <span

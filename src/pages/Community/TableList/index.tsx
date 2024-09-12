@@ -342,6 +342,13 @@ const TableList: React.FC = () => {
       },
     },
     {
+      title: '房号',
+      dataIndex: 'room',
+      hideInForm: true,
+      hideInSearch: true,
+      hideInTable: false,
+    },
+    {
       title: '产权类型',
       valueType: 'select',
       dataIndex: 'propertyType',

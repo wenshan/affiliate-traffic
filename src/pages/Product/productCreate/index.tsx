@@ -6,6 +6,19 @@ import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';
 
+const defaultCurrentProductMain = {
+  id: '',
+  title: '',
+  offer_id: '',
+  google_product_category: {
+    key: 4,
+    title: '动物/宠物用品>宠物用品>猫用品',
+  },
+  google_product_category_id: 4,
+  gtin: '',
+  brand: 'Limeet',
+};
+
 @connect(({ product, common, material }) => ({
   product,
   common,
@@ -32,6 +45,7 @@ class ProductCreate extends Component {
       type: 'product/update',
       payload: {
         productStatusAll: newProductStatusAll,
+        currentProductMain: defaultCurrentProductMain,
       },
     });
   };
@@ -70,7 +84,6 @@ class ProductCreate extends Component {
 
   // table
   handelTableCreateSku = (record) => {
-    console.log('record:', record);
     const { currentProductMain } = this.props.product;
     const newCurrentProductMain = Object.assign({}, currentProductMain, record);
     this.props.dispatch({

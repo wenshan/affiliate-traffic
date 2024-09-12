@@ -145,14 +145,7 @@ export default {
             yield put({ type: 'queryFolder' });
           }
         } else {
-          if (data.is_leaf === 0 && (!data.children || data.children.length === 0)) {
-            const result = yield call(delFolder, data);
-            if (result.status === 200 && result.data) {
-              yield put({ type: 'queryFolder' });
-            }
-          } else {
-            message.error('节点逐级删除');
-          }
+          message.error('不是根节点不能删除');
         }
       }
     },

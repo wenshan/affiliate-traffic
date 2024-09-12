@@ -313,10 +313,9 @@ class ProductList extends Component {
             <div className="operate">
               <a
                 className="tx"
-                rel="nofollow"
-                onClick={() => {
-                  this.handelTableView(record);
-                }}
+                rel="noreferrer"
+                target="_blank"
+                href={`https://www.limeetpet.com/detail.html?id=${record.id}&lang=${record.language}`}
               >
                 详情
               </a>
@@ -339,6 +338,15 @@ class ProductList extends Component {
                 }}
               >
                 删除
+              </a>
+              <a
+                className="tx"
+                rel="nofollow"
+                onClick={() => {
+                  this.handelGoogleMerchantUpdate({ id: record.id, language: record.language });
+                }}
+              >
+                同步Google Merchant
               </a>
             </div>
           );
@@ -405,6 +413,17 @@ class ProductList extends Component {
       `/product/productCreateSku?product_main_id=${record.product_main_id}&product_sku_option_status=1`,
     );
   };
+
+  // 同步google 购物
+  handelGoogleMerchantUpdate = (data) => {
+    if (data && data.id) {
+      this.props.dispatch({
+        type: 'product/shoppingProductInsert',
+        payload: data,
+      });
+    }
+  };
+
   handelTableDel = (record) => {
     console.log(record);
     // eslint-disable-next-line @typescript-eslint/no-this-alias

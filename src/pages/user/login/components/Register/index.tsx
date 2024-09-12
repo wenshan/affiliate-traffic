@@ -41,7 +41,6 @@ const useStyles = createStyles(({ token }) => {
     container: {
       display: 'flex',
       flexDirection: 'column',
-      height: '100vh',
       overflow: 'auto',
       backgroundImage:
         "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
@@ -116,12 +115,7 @@ const Register: React.FC = () => {
   const { status, msg } = userLoginState;
   return (
     <div className={styles.container}>
-      <div
-        style={{
-          flex: '1',
-          padding: '32px 0',
-        }}
-      >
+      <div>
         <LoginForm
           contentStyle={{
             minWidth: 280,
@@ -165,11 +159,11 @@ const Register: React.FC = () => {
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
-                placeholder="nickname"
+                placeholder="Nickname"
                 rules={[
                   {
                     required: true,
-                    message: '请输入nickname!',
+                    message: '请输入Nickname!',
                   },
                 ]}
               />

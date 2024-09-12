@@ -1,6 +1,7 @@
 /* eslint-disable */
 /* @ts-ignore */
 
+import { shoppingProductInsert } from '@/services/api/google';
 import {
   createProduct,
   delProduct,
@@ -57,11 +58,33 @@ const defaultProductDetail = {
   sale_price: '',
   product_detail: [], // 商品属性
   product_highlight: '',
-  product_height: '',
-  product_length: '',
-  product_width: '',
+  productHeight: '',
+  productLength: '',
+  productWidth: '',
   product_weight: '',
   availability: 'in_stock',
+  sizeUnit: 'cm',
+  weightUnit: 'g',
+  channel: 'online',
+  feedLabel: null,
+  adult: 'no',
+  kind: 'content#product',
+  identifierExists: false,
+  contentLanguage: 'zh',
+  targetCountry: 'CN',
+  projectId: '',
+};
+const defaultCurrentProductMain = {
+  id: '',
+  title: '',
+  offer_id: '',
+  google_product_category: {
+    key: 4,
+    title: '动物/宠物用品>宠物用品>猫用品',
+  },
+  google_product_category_id: 4,
+  gtin: '',
+  brand: 'Limeet',
 };
 
 export default {
@@ -72,6 +95,38 @@ export default {
       pageSize: 50,
       total: 0,
     },
+    productSizeUnitUnitOption: [
+      {
+        value: 'mm',
+        label: 'mm',
+      },
+      {
+        value: 'cm',
+        label: 'cm',
+      },
+      {
+        value: 'm',
+        label: 'm',
+      },
+      {
+        value: 'in',
+        label: 'in',
+      },
+    ],
+    productWeightUnitOption: [
+      {
+        value: 'g',
+        label: 'g',
+      },
+      {
+        value: 'kg',
+        label: 'kg',
+      },
+      {
+        value: 'lb',
+        label: 'lb',
+      },
+    ],
     searchParams: {
       keyword: '',
       offer_id: 'all',
@@ -108,18 +163,7 @@ export default {
     ],
     productTypeOption: [],
     googleProductCategoryOption: {},
-    currentProductMain: {
-      id: '',
-      title: '',
-      offer_id: '',
-      google_product_category: {
-        key: 4,
-        title: '动物/宠物用品>宠物用品>猫用品',
-      },
-      google_product_category_id: 4,
-      gtin: '',
-      brand: 'Limeet',
-    },
+    currentProductMain: defaultCurrentProductMain,
     productMainList: [],
     productAttributeOption: [
       {
@@ -757,6 +801,19 @@ export default {
           },
         });
         console.log('删除商品SKU分类成功');
+      }
+    },
+    /** 同步google 购物数据 */
+    *shoppingProductInsert({ payload: data }, { call, put, select }) {
+      if (data && data.id) {
+        const result = yield call(shoppingProductInsert, data);
+        if (result && result.status && result.status === 200) {
+          message.success({ content: '同步成功' });
+        } else {
+          message.error({ content: '同步失败' });
+        }
+      } else {
+        message.error({ content: '缺少参数' });
       }
     },
   },

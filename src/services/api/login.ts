@@ -2,20 +2,19 @@
 /* eslint-disable */
 // import { request } from '@umijs/max';
 import request from '@/utils/request';
-import requestToken from '@/utils/requestToken';
 /** google 授权 */
+
+export const getOAuthUrl = async (params?: { [key: string]: any }) => {
+  return request<{ data: any }>('/api/googleOauth/getOAuthUrl', {
+    method: 'POST',
+    data: {},
+  });
+};
+
 export const googleGetToken = async (params?: { [key: string]: any }) => {
   return request<{ data: any }>('/api/googleOauth/getToken', {
     method: 'POST',
     data: params,
-  });
-};
-
-export const googleGetJwtToken = async (params: { url: any }) => {
-  return requestToken({
-    url: params.url,
-    method: 'POST',
-    data: {},
   });
 };
 

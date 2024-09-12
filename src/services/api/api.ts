@@ -68,6 +68,15 @@ export async function register(params: API.LoginParams, options?: { [key: string
     data: params,
   });
 }
+// getUserEmail
+export async function getUserEmail(options?: { [key: string]: any }) {
+  return request<{
+    data: API.CurrentUser;
+  }>('/api/user/getUserEmail', {
+    method: 'POST',
+    data: options,
+  });
+}
 
 /** 此处后端没有提供注释 GET /api/notices */
 export async function getNotices(options?: { [key: string]: any }) {

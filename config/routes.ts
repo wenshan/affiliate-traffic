@@ -41,6 +41,12 @@ export default [
     component: './Material',
   },
   {
+    name: '项目管理',
+    path: '/project',
+    icon: 'profile',
+    component: './ProjectGroup',
+  },
+  {
     name: '商品管理',
     path: '/product',
     layout: true,

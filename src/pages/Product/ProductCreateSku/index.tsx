@@ -121,34 +121,6 @@ class ProductCreateSku extends Component {
       },
     });
   };
-  // 商品尺寸
-  productLengthInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        product_length: value,
-      },
-    });
-  };
-  productWidthInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        product_width: value,
-      },
-    });
-  };
-  productHeightInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        product_height: value,
-      },
-    });
-  };
   // 商品重量
   productWeightInputHandle = (e) => {
     const { value } = e.target;
@@ -156,6 +128,36 @@ class ProductCreateSku extends Component {
       type: 'product/updateProduct',
       payload: {
         product_weight: value,
+      },
+    });
+  };
+  // 尺寸 长宽高
+  productLengthInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        productLength: value,
+      },
+    });
+  };
+
+  productWidthInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        productWidth: value,
+      },
+    });
+  };
+
+  productHeightInputHandle = (e) => {
+    const { value } = e.target;
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        productHeight: value,
       },
     });
   };
@@ -209,7 +211,6 @@ class ProductCreateSku extends Component {
     });
   };
   productAttributeCallbackOk = (selectedRowsProductAttr) => {
-    console.log('selectedRowsProductAttr:', selectedRowsProductAttr);
     this.setState(
       {
         isProductAttributeModal: false,
@@ -461,6 +462,24 @@ class ProductCreateSku extends Component {
       },
     });
   };
+  // 重量单位选择
+  weightUnitSelectHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        weightUnit: value,
+      },
+    });
+  };
+  // 尺寸单位选择
+  sizeUnitSelectHandle = (value) => {
+    this.props.dispatch({
+      type: 'product/updateProduct',
+      payload: {
+        sizeUnit: value,
+      },
+    });
+  };
   // 自定义商品分类
   productTypeButtonHandle = () => {
     const { productDetail } = this.props.product;
@@ -585,6 +604,8 @@ class ProductCreateSku extends Component {
       genderOption,
       ageGroupOption,
       productTypeOption,
+      productSizeUnitUnitOption,
+      productWeightUnitOption,
     } = this.props.product;
     const { folderDirectory, imageList } = this.props.material;
     console.log('productDetail:', productDetail);
@@ -615,6 +636,11 @@ class ProductCreateSku extends Component {
       size,
       size_type,
       size_system,
+      weightUnit,
+      sizeUnit,
+      productHeight,
+      productLength,
+      productWidth,
     } = productDetail;
     return (
       <PageContainer>
@@ -887,12 +913,48 @@ class ProductCreateSku extends Component {
               {/**== 尺码类型 [size_type] */}
               {/**== 尺码体系 [size_system] */}
               <div className="form-item">
+                <LabelHelpTip keyLabel="productSize"></LabelHelpTip>
+                <Input
+                  placeholder="长"
+                  style={{ width: 100 }}
+                  value={productLength}
+                  onChange={this.productLengthInputHandle}
+                />
+                <Input
+                  placeholder="宽"
+                  style={{ width: 100 }}
+                  value={productWidth}
+                  onChange={this.productWidthInputHandle}
+                />
+                <Input
+                  placeholder="高"
+                  style={{ width: 100 }}
+                  value={productHeight}
+                  onChange={this.productHeightInputHandle}
+                />
+                <LabelHelpTip keyLabel="sizeUnit"></LabelHelpTip>
+                <Select
+                  value={sizeUnit}
+                  style={{ width: 80 }}
+                  onChange={this.sizeUnitSelectHandle}
+                  options={productSizeUnitUnitOption}
+                />
+              </div>
+              {/**== 重量尺寸体系 [product_weight] */}
+              <div className="form-item">
                 <LabelHelpTip keyLabel="product_weight"></LabelHelpTip>
                 <Input
                   placeholder="商品重量"
                   style={{ width: 350 }}
                   value={product_weight}
                   onChange={this.productWeightInputHandle}
+                />
+                <LabelHelpTip keyLabel="weightUnit"></LabelHelpTip>
+                <Select
+                  value={weightUnit}
+                  style={{ width: 60 }}
+                  onChange={this.weightUnitSelectHandle}
+                  options={productWeightUnitOption}
                 />
               </div>
               <div className="form-item">

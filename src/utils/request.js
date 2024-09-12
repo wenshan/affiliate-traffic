@@ -3,7 +3,6 @@
 import { message } from 'antd';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import Store from 'store2';
 
 const limeet = 'https://api.limeetpet.com';
 const dreamstep = 'https://www.dreamstep.top';
@@ -91,11 +90,9 @@ instance.interceptors.response.use(
 
 export default (url, options = { method: 'GET', data, config }) => {
   const access_token = Cookies.get('access_token');
-  const currentUser = Store.session.get('currentUser');
-  const user_project_group_id = (currentUser && currentUser.user_project_group_id) || null;
   const config = Object.assign({}, initConfig, options.config);
   if (access_token && config.isAccess) {
-    options.data = Object.assign({}, options.data, { access_token, user_project_group_id });
+    options.data = Object.assign({}, options.data, { access_token });
   } else {
     options.data = Object.assign({}, options.data);
   }
