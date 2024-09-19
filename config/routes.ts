@@ -68,6 +68,11 @@ export default [
         path: '/product/ProductList',
         component: './Product/ProductList',
       },
+      {
+        name: 'Merchant Product',
+        path: '/product/ProductListMerchant',
+        component: './Product/ProductListMerchant',
+      },
     ],
   },
   {

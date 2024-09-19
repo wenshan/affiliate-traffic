@@ -31,8 +31,6 @@ export default {
       const access_token = Cookies.get('access_token');
       history.listen(({ pathname, search }) => {
         const query = QueryString.parse(search);
-        console.log('query:', query);
-        console.log('pathname:', pathname);
       });
     },
   },
@@ -48,7 +46,6 @@ export default {
     *getCurrentUserInfo({ payload: data }, { call, put, select }) {
       const { access_token } = data;
       const result = yield call(currentUser, { access_token });
-      console.log('getCurrentUserInfo-result:', result.data);
       if (result && result.data) {
         yield put({ type: 'update', payload: { currentUser: result.data } });
       }

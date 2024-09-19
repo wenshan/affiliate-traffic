@@ -69,8 +69,8 @@ export default {
     link: '',
   },
   google_product_category: {
-    title: 'Google 商品类别',
-    des: 'Google 为商品定义的商品类别',
+    title: 'Google商品类别',
+    des: 'Google为商品定义的商品类别',
     rule: '只添加一种类别。添加最相关的类别。添加类别的完整路径或数字形式的类别 ID（但不要同时添加两者）。建议使用类别 ID。',
     exam: '服饰与配饰 > 服装 > 外衣 > 外套与夹克',
     required: true,
@@ -170,27 +170,6 @@ export default {
     exam: 'AB12345',
     link: '',
   },
-  product_length: {
-    title: '商品长度',
-    des: '商品的长度',
-    rule: '添加尽可能多的商品计量属性。对每个商品尺寸属性（包括商品长度、宽度和高度）使用相同的计量单位。否则，系统将无法显示这些信息。',
-    exam: '20 in',
-    link: '',
-  },
-  product_width: {
-    title: '商品宽度',
-    des: '商品的宽度',
-    rule: '添加尽可能多的商品计量属性。对每个商品尺寸属性（包括商品长度、宽度和高度）使用相同的计量单位。否则，系统将无法显示这些信息。',
-    exam: '20 in',
-    link: '',
-  },
-  product_height: {
-    title: '商品高度',
-    des: '商品的高度',
-    rule: '添加尽可能多的商品计量属性。对每个商品尺寸属性（包括商品长度、宽度和高度）使用相同的计量单位。否则，系统将无法显示这些信息。',
-    exam: '20 in',
-    link: '',
-  },
   productLength: {
     title: '商品长度',
     des: '商品的长度',
@@ -212,7 +191,7 @@ export default {
     exam: '20 in',
     link: '',
   },
-  product_weight: {
+  productWeight: {
     title: '商品重量',
     des: '商品的重量',
     rule: '对于此属性，请使用组装后的实际商品重量。如果您的商品分成多个部分（例如多部分组成一个套装），请在商品详情中使用所有部分的整体总重。',
@@ -314,6 +293,13 @@ export default {
     title: '商品尺寸',
     des: '根据区域选择尺寸单位',
     rule: '',
+    exam: '',
+    link: '',
+  },
+  title_main: {
+    title: '主商品名称',
+    des: '创建主商品的标题',
+    rule: '商品分类标题',
     exam: '',
     link: '',
   },

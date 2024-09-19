@@ -7,14 +7,11 @@ import './index.less';
 class CustomProductType extends Component {
   constructor(props) {
     super(props);
-    console.log('props:', props);
     this.state = {
       selectedNodes: {},
     };
   }
   googleProductCategoryTreeHandle = (selectedKeys, event) => {
-    console.log('selectedKeys:', selectedKeys);
-    console.log('selectedNodes:', event.selectedNodes[0]);
     this.setState({
       selectedNodes: Object.assign({}, event.selectedNodes[0], { children: null }),
     });

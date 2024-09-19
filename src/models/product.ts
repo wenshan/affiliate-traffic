@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* @ts-ignore */
 
-import { shoppingProductInsert } from '@/services/api/google';
+import { shoppingProductInsert } from '@/services/api/googleAccount';
 import {
   createProduct,
   delProduct,
@@ -24,68 +24,7 @@ import { cerateType, delType, editType, queryType } from '@/services/api/product
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
 import { history } from 'umi';
-
-const defaultProductDetail = {
-  product_id: '',
-  item_group_id: '',
-  age_group: 'adult',
-  gender: 'unisex',
-  pattern: '',
-  size: '',
-  size_type: 'regular',
-  size_system: 'US',
-  gtin: '',
-  brand: '',
-  offer_id: '',
-  product_main_id: 0,
-  language: 'zh-CN',
-  monetary_unit: 'USD',
-  title: '',
-  title_main: '',
-  description: '',
-  link: '',
-  mobile_link: '',
-  image_link: [],
-  additional_image_link: [],
-  lifestyle_image_link: [],
-  google_product_category: '',
-  google_product_category_id: '',
-  product_type: { key: '', title: '' },
-  product_type_id: '',
-  color: '',
-  material: '',
-  price: '',
-  sale_price: '',
-  product_detail: [], // 商品属性
-  product_highlight: '',
-  productHeight: '',
-  productLength: '',
-  productWidth: '',
-  product_weight: '',
-  availability: 'in_stock',
-  sizeUnit: 'cm',
-  weightUnit: 'g',
-  channel: 'online',
-  feedLabel: null,
-  adult: 'no',
-  kind: 'content#product',
-  identifierExists: false,
-  contentLanguage: 'zh',
-  targetCountry: 'CN',
-  projectId: '',
-};
-const defaultCurrentProductMain = {
-  id: '',
-  title: '',
-  offer_id: '',
-  google_product_category: {
-    key: 4,
-    title: '动物/宠物用品>宠物用品>猫用品',
-  },
-  google_product_category_id: 4,
-  gtin: '',
-  brand: 'Limeet',
-};
+import { defaultCurrentProductMain, defaultProductDetail } from './../constant/defaultCurrentData';
 
 export default {
   namespace: 'product',
@@ -239,6 +178,12 @@ export default {
       const query = QueryString.parse(search);
       if (query && query.product_main_id) {
         yield put({ type: 'updateProduct', payload: { product_main_id: query.product_main_id } });
+      }
+      if (query && query.product_main_id && query.language) {
+        yield put({
+          type: 'updateProduct',
+          payload: { id: query.product_id, language: query.language },
+        });
       }
       if (query && query.product_sku_option_status) {
         yield put({
@@ -548,10 +493,10 @@ export default {
         sale_price,
         product_detail,
         product_highlight,
-        product_length,
-        product_height,
-        product_width,
-        product_weight,
+        productLength,
+        productHeight,
+        productWidth,
+        productWeight,
         availability,
         description,
         product_type,
@@ -593,10 +538,10 @@ export default {
           sale_price,
           product_detail,
           product_highlight,
-          product_height,
-          product_length,
-          product_width,
-          product_weight,
+          productHeight,
+          productLength,
+          productWidth,
+          productWeight,
           availability,
           offer_id,
           gtin,
@@ -780,27 +725,32 @@ export default {
               productDetail: result.data,
             },
           });
-          console.log('删除商品SKU分类成功');
         }
       }
     },
     *queryProductMainOfferId({ payload }, { call, put, select }) {
       const result = yield call(queryProductMainOfferId);
-      if (result && result.status && result.status === 200) {
+      if (result && result.status && result.status === 200 && result.data) {
         const temp = [
           {
             value: 'all',
             label: 'All',
           },
         ];
-        const newProductMainOfferIds = temp.concat(result.data);
+        // const newProductMainOfferIds = temp.concat(result.data);
+        result.data &&
+          result.data.length &&
+          result.data.map((item: any) => {
+            temp.push(item);
+          });
+
+        // console.log('newProductMainOfferIds:', newProductMainOfferIds);
         yield put({
           type: 'update',
           payload: {
-            productMainOfferIds: newProductMainOfferIds,
+            productMainOfferIds: temp,
           },
         });
-        console.log('删除商品SKU分类成功');
       }
     },
     /** 同步google 购物数据 */

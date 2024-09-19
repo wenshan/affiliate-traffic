@@ -67,7 +67,6 @@ const ActionIcons = () => {
 
   const googleAuthLoginButton = async () => {
     const result = await getOAuthUrl();
-    console.log('getOAuthUrl:', result);
     if (result && result.status === 200 && result.data && result.data.url) {
       window.location.href = result.data.url;
     } else {

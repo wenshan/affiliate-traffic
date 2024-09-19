@@ -2,22 +2,13 @@ import { PageContainer } from '@ant-design/pro-components';
 import { Button, Modal, Table } from 'antd';
 import { Component } from 'react';
 import { connect, history } from 'umi';
+import {
+  defaultCurrentProductMain,
+  defaultProductDetail,
+} from '../../../constant/defaultCurrentData';
 import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';
-
-const defaultCurrentProductMain = {
-  id: '',
-  title: '',
-  offer_id: '',
-  google_product_category: {
-    key: 4,
-    title: '动物/宠物用品>宠物用品>猫用品',
-  },
-  google_product_category_id: 4,
-  gtin: '',
-  brand: 'Limeet',
-};
 
 @connect(({ product, common, material }) => ({
   product,
@@ -63,8 +54,6 @@ class ProductCreate extends Component {
   };
   createMainModalCallbackOk = (currentProductMain) => {
     const { currentOptionActionStatus } = this.state;
-    console.log('currentProductMain:', currentProductMain);
-    console.log('currentOptionActionStatus:', currentOptionActionStatus);
     this.props.dispatch({
       type: 'product/update',
       payload: currentProductMain,
@@ -86,23 +75,19 @@ class ProductCreate extends Component {
   handelTableCreateSku = (record) => {
     const { currentProductMain } = this.props.product;
     const newCurrentProductMain = Object.assign({}, currentProductMain, record);
+    const newProductDetail = Object.assign({}, defaultProductDetail, {
+      product_main_id: record.id,
+      title_main: record.title,
+      gtin: record.gtin,
+      offer_id: record.offer_id,
+      google_product_category: record.google_product_category,
+      google_product_category_id: record.google_product_category_id,
+    });
     this.props.dispatch({
       type: 'product/update',
       payload: {
+        productDetail: newProductDetail,
         currentProductMain: newCurrentProductMain,
-      },
-    });
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        product_main_id: record.id,
-        title_main: record.title,
-        gtin: record.gtin,
-        offer_id: record.offer_id,
-        product_type: record.product_type,
-        product_type_id: record.product_type_id,
-        google_product_category: record.google_product_category,
-        google_product_category_id: record.google_product_category_id,
       },
     });
     history.push(
@@ -111,7 +96,6 @@ class ProductCreate extends Component {
   };
 
   handelTableEdit = (record) => {
-    console.log(' handelTableEdit record:', record);
     const { productStatusAll } = this.props.product;
     const newProductStatusAll = Object.assign({}, productStatusAll, {
       isCreateMainModalShow: true,
@@ -213,7 +197,6 @@ class ProductCreate extends Component {
         title: '操作',
         dataIndex: 'operate',
         render: (text: any, record: any) => {
-          console.log('record:', record);
           return (
             <div className="operate">
               <Button

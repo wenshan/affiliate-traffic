@@ -178,7 +178,6 @@ class Material extends Component {
           newRows.push(Object.assign({}, item, { checked: false }));
         }
       });
-      console.log('currentItem:', currentItem);
       const { rowsTree, rowsList } = listToTreeSelf(newRows, currentItem);
       this.props.dispatch({
         type: 'material/update',
@@ -192,7 +191,6 @@ class Material extends Component {
   };
 
   handleClickFolderMenu = (currentItem: any) => {
-    console.log('currentItem:', currentItem);
     const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
       const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
@@ -213,7 +211,6 @@ class Material extends Component {
     }
   };
   handleClickFolderMenuSecond = (currentItem: any) => {
-    console.log('currentItem:', currentItem);
     const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
       const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
@@ -234,7 +231,6 @@ class Material extends Component {
     }
   };
   handleClickFolderMenuThird = (currentItem: any) => {
-    console.log('currentItem:', currentItem);
     const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
       const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
@@ -255,7 +251,6 @@ class Material extends Component {
     }
   };
   handleClickFolderMenuFourth = (currentItem: any) => {
-    console.log('currentItem:', currentItem);
     const { folderDirectoryRows } = this.props.material;
     if (currentItem && currentItem.key) {
       const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);

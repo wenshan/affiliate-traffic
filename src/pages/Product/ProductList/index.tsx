@@ -1,6 +1,7 @@
+import Tool from '@/utils/tool';
 import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Col, Modal, Row, Select, Table } from 'antd';
+import { Button, Col, Modal, Row, Select, Spin, Table, message } from 'antd';
 import { Component, JSX, Key } from 'react';
 import { connect, history } from 'umi';
 
@@ -18,6 +19,7 @@ class ProductList extends Component {
       current: 1,
       pageSize: 20,
       language: 'en-US',
+      onLoading: false,
     };
   }
 
@@ -30,8 +32,8 @@ class ProductList extends Component {
         fixed: 'left',
         width: 60,
         render: (text, record) => {
-          if (record && record.image_link[0]) {
-            return <img src={record.image_link[0]} width={50}></img>;
+          if (record && record.image_link) {
+            return <img src={record.image_link} width={50}></img>;
           } else {
             return '-';
           }
@@ -57,26 +59,19 @@ class ProductList extends Component {
         key: 'price',
         fixed: 'left',
         width: 100,
-        render: (text, record) => {
+        render: (_, record) => {
+          const html: any = [];
           if (record && record.price && record.monetary_unit) {
-            return `${record.price} ${record.monetary_unit}`;
+            html.push(`price: ${record.price} ${record.monetary_unit}`);
           } else {
-            return '-';
+            html.push(<span>-</span>);
           }
-        },
-      },
-      {
-        title: '售卖价格',
-        dataIndex: 'sale_price',
-        key: 'sale_price',
-        fixed: 'left',
-        width: 100,
-        render: (text, record) => {
-          if (record && record.sale_price && record.monetary_unit) {
-            return `${record.sale_price} ${record.monetary_unit}`;
+          if (record && record.sale_price && record.sale_price && record.monetary_unit) {
+            html.push(`salePrice: ${record.sale_price} ${record.monetary_unit}`);
           } else {
-            return '-';
+            html.push(<span>-</span>);
           }
+          return html;
         },
       },
       {
@@ -84,11 +79,11 @@ class ProductList extends Component {
         dataIndex: 'description',
         key: 'description',
         width: 220,
-        render: (text, record) => {
+        render: (_, record) => {
           if (record && record.description) {
             return (
               <div
-                className="clearfix"
+                className="table-text clearfix"
                 dangerouslySetInnerHTML={{ __html: record.description ? record.description : '' }}
               />
             );
@@ -108,38 +103,26 @@ class ProductList extends Component {
         dataIndex: 'link',
         key: 'link',
         width: 60,
-        render: (text, record) => {
+        render: (_, record: any) => {
+          const html: any = [];
           if (record.link) {
-            return (
+            html.push(
               <a href={record.link} title={record.link} target="_blank" rel="noreferrer">
-                链接
-              </a>
+                link
+              </a>,
             );
-          } else {
-            return '-';
           }
-        },
-      },
-      {
-        title: '手机链接',
-        dataIndex: 'mobile_link',
-        key: 'mobile_link',
-        width: 90,
-        render: (text, record) => {
           if (record.mobile_link) {
-            return (
-              <a
-                href={record.mobile_link}
-                title={record.mobile_link}
-                target="_blank"
-                rel="noreferrer"
-              >
-                链接
-              </a>
+            html.push(
+              <a href={record.link} title={record.mobile_link} target="_blank" rel="noreferrer">
+                mobileLink
+              </a>,
             );
-          } else {
-            return '-';
           }
+          if (!record.link && !record.mobile_link) {
+            html.push(<span>-</span>);
+          }
+          return html;
         },
       },
       {
@@ -160,7 +143,7 @@ class ProductList extends Component {
         dataIndex: 'google_product_category',
         key: 'google_product_category',
         width: 110,
-        render: (text, record) => {
+        render: (_, record) => {
           if (record.google_product_category && record.google_product_category.title) {
             return record.google_product_category.title;
           } else {
@@ -177,7 +160,7 @@ class ProductList extends Component {
           const html: JSX.Element[] = [];
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
           record &&
-            record.additional_image_link &&
+            Tool.isArray(record.additional_image_link) &&
             record.additional_image_link.length &&
             record.additional_image_link.map((item: string, idx: Key) => {
               html.push(<img key={idx} src={item} width={50}></img>);
@@ -194,8 +177,8 @@ class ProductList extends Component {
           const html: JSX.Element[] = [];
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
           record &&
-            record.lifestyle_image_link &&
-            record.lifestyle_image_link.length &&
+            Tool.isArray(record.lifestyle_image_link) &&
+            record.lifestyle_image_link.length > 0 &&
             record.lifestyle_image_link.map((item: string, idx: Key) => {
               html.push(<img key={idx} src={item} width={30}></img>);
             });
@@ -219,12 +202,30 @@ class ProductList extends Component {
         dataIndex: 'size',
         key: 'size',
         width: 200,
-        render: (text: any, record: any) => {
+        render: (_: any, record: any) => {
           if (record.size && record.size_type && record.size_system) {
             return (
               <>
                 <p>{`尺寸: ${record.size}`}</p>
                 <p>{`尺码类型: ${record.size_type} 尺码体系: ${record.size_system}`}</p>
+              </>
+            );
+          } else {
+            return '-';
+          }
+        },
+      },
+      {
+        title: '商品尺寸',
+        dataIndex: 'product_size',
+        key: 'product_size',
+        width: 200,
+        render: (_: any, record: any) => {
+          if (record.productHeight && record.productLength && record.sizeUnit) {
+            return (
+              <>
+                <p>{`LWH: ${record.productLength}x${record.productWidth}x${record.productHeight} ${record.sizeUnit}`}</p>
+                <p>{`W: ${record.productWeight} ${record.weightUnit}`}</p>
               </>
             );
           } else {
@@ -279,10 +280,17 @@ class ProductList extends Component {
         },
       },
       {
-        title: '商品亮点',
+        title: '亮点',
         dataIndex: 'product_highlight',
         key: 'product_highlight',
+        ellipsis: true,
         width: 200,
+        render: (_, record) => (
+          <span
+            className="table-text clearfix"
+            dangerouslySetInnerHTML={{ __html: record.product_highlight }}
+          ></span>
+        ),
       },
       {
         title: '库存',
@@ -343,10 +351,14 @@ class ProductList extends Component {
                 className="tx"
                 rel="nofollow"
                 onClick={() => {
-                  this.handelGoogleMerchantUpdate({ id: record.id, language: record.language });
+                  this.handelGoogleMerchantUpdate({
+                    id: record.id,
+                    language: record.language,
+                    googleAccess: record.googleAccess,
+                  });
                 }}
               >
-                同步Google Merchant
+                {record.merchant_status > 0 ? '更新Merchant' : '同步Merchant'}
               </a>
             </div>
           );
@@ -402,7 +414,6 @@ class ProductList extends Component {
     console.log(record);
   };
   handelTableEdit = (record) => {
-    console.log(record);
     this.props.dispatch({
       type: 'product/update',
       payload: {
@@ -410,17 +421,21 @@ class ProductList extends Component {
       },
     });
     history.push(
-      `/product/productCreateSku?product_main_id=${record.product_main_id}&product_sku_option_status=1`,
+      `/product/productCreateSku?product_main_id=${record.product_main_id}&product_id=${record.id}&language=${record.language}&product_sku_option_status=1`,
     );
   };
 
   // 同步google 购物
   handelGoogleMerchantUpdate = (data) => {
-    if (data && data.id) {
-      this.props.dispatch({
-        type: 'product/shoppingProductInsert',
-        payload: data,
-      });
+    if (data.googleAccess) {
+      if (data && data.id) {
+        this.props.dispatch({
+          type: 'product/shoppingProductInsert',
+          payload: data,
+        });
+      }
+    } else {
+      message.info('无权限，同步google merchant需要项目管理者权限。');
     }
   };
 
@@ -444,7 +459,19 @@ class ProductList extends Component {
   };
 
   // 翻页
-  handelTablePagination = () => {};
+  handelTablePagination = (page) => {
+    const { pagination } = this.props.product;
+    const newPagination = Object.assign({}, pagination, { current: page });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        pagination: newPagination,
+      },
+    });
+    this.props.dispatch({
+      type: 'product/queryProductAll',
+    });
+  };
   languageRadioHandle = (value) => {
     this.props.dispatch({
       type: 'product/update',
@@ -461,6 +488,14 @@ class ProductList extends Component {
   };
   // 检索
   handelSearchParamsButton = () => {
+    const { pagination } = this.props.product;
+    const newPagination = Object.assign({}, pagination, { current: 1 });
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        pagination: newPagination,
+      },
+    });
     this.props.dispatch({
       type: 'product/queryProductAll',
     });
@@ -554,6 +589,7 @@ class ProductList extends Component {
             <div className="footer"></div>
           </div>
         </div>
+        <Spin size="large" spinning={this.state.onLoading} fullscreen />
       </PageContainer>
     );
   }

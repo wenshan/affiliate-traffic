@@ -127,7 +127,7 @@ class ProductCreateSku extends Component {
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
-        product_weight: value,
+        productWeight: value,
       },
     });
   };
@@ -263,7 +263,7 @@ class ProductCreateSku extends Component {
       this.props.dispatch({
         type: 'product/updateProduct',
         payload: {
-          image_link: imageSrc,
+          image_link: imageSrc[0],
         },
       });
     }
@@ -557,8 +557,6 @@ class ProductCreateSku extends Component {
   };
   // 富文本编辑器回调
   callbackTextEditorProductHighlight = (value) => {
-    console.log('====', value);
-    console.log(value);
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
@@ -576,12 +574,20 @@ class ProductCreateSku extends Component {
     // 获取主商品详细
     const search = window.document.location.search;
     const query = QueryString.parse(search);
-    console.log('query===:', query);
     if (query && query.product_main_id) {
       this.props.dispatch({
         type: 'product/queryProductMainDetail',
         payload: {
           id: query.product_main_id,
+        },
+      });
+    }
+    if (query && query.product_id && query.language) {
+      this.props.dispatch({
+        type: 'product/queryProductDetail',
+        payload: {
+          id: query.product_id,
+          language: query.language,
         },
       });
     }
@@ -608,8 +614,6 @@ class ProductCreateSku extends Component {
       productWeightUnitOption,
     } = this.props.product;
     const { folderDirectory, imageList } = this.props.material;
-    console.log('productDetail:', productDetail);
-    console.log('product_sku_option_status:', product_sku_option_status);
     const {
       language,
       monetary_unit,
@@ -627,7 +631,7 @@ class ProductCreateSku extends Component {
       material,
       product_highlight,
       availability,
-      product_weight,
+      productWeight,
       product_detail,
       item_group_id,
       age_group,
@@ -641,11 +645,51 @@ class ProductCreateSku extends Component {
       productHeight,
       productLength,
       productWidth,
+      title_main,
+      offer_id,
+      gtin,
+      brand,
+      google_product_category,
     } = productDetail;
     return (
       <PageContainer>
         <div className="page">
           <div className="product-sku">
+            <div className="header">
+              <div className="sub-header">主数据</div>
+            </div>
+            <div className="content form-box">
+              <div className="form-item">
+                <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
+                <Input
+                  placeholder="主商品标题"
+                  style={{ width: 350 }}
+                  value={title_main}
+                  disabled
+                />
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
+                <Input placeholder="商品货号" style={{ width: 350 }} value={offer_id} disabled />
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
+                <Input
+                  placeholder="选择Google商品类目"
+                  style={{ width: 350 }}
+                  value={(google_product_category && google_product_category.title) || ''}
+                  disabled
+                />
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
+                <Input placeholder="商品GTIN码" style={{ width: 350 }} value={gtin} disabled />
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="brand"></LabelHelpTip>
+                <Input placeholder="商品GTIN码" style={{ width: 350 }} value={brand} disabled />
+              </div>
+            </div>
             <div className="header">
               <div className="sub-header">基本商品数据</div>
             </div>
@@ -658,6 +702,7 @@ class ProductCreateSku extends Component {
                   value={language}
                   onChange={this.languageRadioHandle}
                   options={languageOption}
+                  disabled={product_sku_option_status > 0}
                 ></Radio.Group>
               </div>
               <div className="form-item">
@@ -714,7 +759,7 @@ class ProductCreateSku extends Component {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('image_link', 5);
+                      this.imageSelectModel('image_link', 1);
                     }}
                   >
                     添加主图
@@ -731,7 +776,7 @@ class ProductCreateSku extends Component {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      this.imageSelectModel('additional_image_link', 10);
+                      this.imageSelectModel('additional_image_link', 5);
                     }}
                   >
                     添加附属图片
@@ -752,7 +797,7 @@ class ProductCreateSku extends Component {
                         this.imageSelectModel('lifestyle_image_link', 10);
                       }}
                     >
-                      添加附属图片
+                      添加生活图片
                     </Button>
                   </div>
                   <div className="line-box">
@@ -940,13 +985,13 @@ class ProductCreateSku extends Component {
                   options={productSizeUnitUnitOption}
                 />
               </div>
-              {/**== 重量尺寸体系 [product_weight] */}
+              {/**== 重量尺寸体系 [productWeight] */}
               <div className="form-item">
-                <LabelHelpTip keyLabel="product_weight"></LabelHelpTip>
+                <LabelHelpTip keyLabel="productWeight"></LabelHelpTip>
                 <Input
                   placeholder="商品重量"
-                  style={{ width: 350 }}
-                  value={product_weight}
+                  style={{ width: 300 }}
+                  value={productWeight}
                   onChange={this.productWeightInputHandle}
                 />
                 <LabelHelpTip keyLabel="weightUnit"></LabelHelpTip>

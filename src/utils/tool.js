@@ -192,13 +192,13 @@ const Tool = {
     substr = `${substr1}   ${substr2}`;
     return substr;
   },
-  // 判断是否是isIphoneX
-  isIphoneX() {
-    if (window.screen) {
-      return /iphone/gi.test(navigator.userAgent) && screen.height == 812 && screen.width == 375;
-    } else {
-      return false;
-    }
+  isArray(value) {
+    return Object.prototype.toString.call(value) === '[object Array]';
+  },
+  isNonEmptyObject(obj) {
+    return (
+      obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length > 0
+    );
   },
 };
 

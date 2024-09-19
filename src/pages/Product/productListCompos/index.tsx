@@ -253,13 +253,18 @@ class ProductListCompos extends Component {
       },
       {
         title: '商品尺寸',
-        dataIndex: 'color',
-        key: 'color',
         width: 200,
         render: (text: any, record: any) => {
           return (
-            <div>{`${record.product_length}x${record.product_width}x${record.product_height}`}</div>
+            <div>{`${record.productLength}x${record.productWidth}x${record.productHeight} ${record.sizeUnit}`}</div>
           );
+        },
+      },
+      {
+        title: '商品重量',
+        width: 200,
+        render: (text: any, record: any) => {
+          return <div>{`${record.productWeight} ${record.weightUnit}`}</div>;
         },
       },
       {
@@ -328,7 +333,6 @@ class ProductListCompos extends Component {
     console.log(record);
   };
   handelTableEdit = (record) => {
-    console.log(record);
     this.props.dispatch({
       type: 'product/update',
       payload: {
@@ -340,7 +344,6 @@ class ProductListCompos extends Component {
     );
   };
   handelTableDel = (record) => {
-    console.log(record);
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     Modal.confirm({

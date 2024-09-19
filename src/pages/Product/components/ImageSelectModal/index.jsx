@@ -196,7 +196,7 @@ class ImageSelectModal extends Component {
       html = '商品附加图片（选择5张图片）';
       // eslint-disable-next-line eqeqeq
     } else if (selectedType == 'lifestyleImageLinks') {
-      html = '添加商品详情（最多选择20张图片）';
+      html = '添加商品详情（最多选择10张图片）';
     }
     return html;
   };

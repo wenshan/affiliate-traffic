@@ -4,7 +4,7 @@ import {
   googleMerchantAccountInsert,
   queryProjectList,
   setDefault,
-} from '@/services/api/google';
+} from '@/services/api/googleAccount';
 import { PlusOutlined } from '@ant-design/icons';
 import {
   ModalForm,

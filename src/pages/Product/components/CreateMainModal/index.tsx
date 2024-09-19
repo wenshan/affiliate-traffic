@@ -68,7 +68,6 @@ class CreateMainModal extends Component {
   };
   // GoogleProductCategory
   productCategoryCallBackOk = (option) => {
-    console.log('option:', option);
     const { currentProductMain } = this.state;
     const newCurrentProductMain = Object.assign({}, currentProductMain, {
       google_product_category: option,
@@ -87,7 +86,6 @@ class CreateMainModal extends Component {
   // Modal
   handleOk = () => {
     const { currentProductMain } = this.state;
-    console.log('currentProductMain:', currentProductMain);
     const { google_product_category, google_product_category_id, title, offer_id, brand } =
       currentProductMain;
     if (google_product_category && google_product_category_id && title && offer_id && brand) {
@@ -155,7 +153,7 @@ class CreateMainModal extends Component {
             <div className="form-item">
               <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
               <Input
-                placeholder="选择Google 商品类目"
+                placeholder="选择Google商品类目"
                 style={{ width: 350 }}
                 value={google_product_category.title}
                 disabled
@@ -166,7 +164,7 @@ class CreateMainModal extends Component {
                   size="small"
                   onClick={this.googleProductCategoryButtonHandle}
                 >
-                  选择Google 商品类目
+                  选择Google商品类目
                 </Button>
               </span>
             </div>

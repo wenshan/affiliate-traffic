@@ -2,7 +2,7 @@
 /* eslint-disable */
 import request from '@/utils/request';
 /** google  shopping */
-export const shoppingProductInsert = async (params: any) => {
+export const shoppingProductInsert = async (params?: { [key: string]: any }) => {
   return request('/api/shopping/product/insert', {
     method: 'POST',
     data: params,
@@ -61,9 +61,9 @@ export const setDefaultState = async (params: any) => {
     data: params,
   });
 };
-// /api/project/setDefault
+// /api/shopping/setDefault
 export const setDefault = async (params: any) => {
-  return request('/api/project/setDefault', {
+  return request('/api/shopping/setDefault', {
     method: 'POST',
     data: params,
   });
