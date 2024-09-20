@@ -52,10 +52,10 @@ const defaultCurrentProductMain = {
   title: '',
   offer_id: '',
   google_product_category: {
-    key: 4,
+    key: '4',
     title: '动物/宠物用品>宠物用品>猫用品',
   },
-  google_product_category_id: 4,
+  google_product_category_id: '4',
   gtin: '',
   brand: 'Limeet',
 };

@@ -1,11 +1,8 @@
+import { defaultCurrentProductMain, defaultProductDetail } from '@/constant/defaultCurrentData';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Modal, Table } from 'antd';
 import { Component } from 'react';
 import { connect, history } from 'umi';
-import {
-  defaultCurrentProductMain,
-  defaultProductDetail,
-} from '../../../constant/defaultCurrentData';
 import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';

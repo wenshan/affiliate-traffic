@@ -1,6 +1,6 @@
 import { Button, Input, Modal, message } from 'antd';
 import { Component } from 'react';
-// import GoogleProductCategory from '../GoogleProductCategory';
+import GoogleProductCategory from '../GoogleProductCategory';
 import LabelHelpTip from '../LabelHelpTip';
 
 import './index.less';
@@ -14,10 +14,10 @@ class CreateMainModal extends Component {
         title: '',
         offer_id: '',
         google_product_category: {
-          key: 4,
+          key: '4',
           title: '动物/宠物用品>宠物用品>猫用品',
         },
-        google_product_category_id: 4,
+        google_product_category_id: '4',
         gtin: '',
         brand: 'Limeet',
       },
@@ -116,7 +116,8 @@ class CreateMainModal extends Component {
 
   render() {
     const { currentProductMain } = this.state;
-    const { title, offer_id, google_product_category, gtin, brand } = currentProductMain;
+    const { title, offer_id, google_product_category, google_product_category_id, gtin, brand } =
+      currentProductMain;
     return (
       <div className="custom-product-type">
         <Modal
@@ -187,14 +188,12 @@ class CreateMainModal extends Component {
               />
             </div>
           </div>
-          {/*
-
           <GoogleProductCategory
             open={this.state.isProductCategoryShow}
             callbackCancel={this.productCategoryCallBackCancel}
             callbackOk={this.productCategoryCallBackOk}
+            selectedKeys={[Number(google_product_category_id)]}
           ></GoogleProductCategory>
-                      */}
         </Modal>
       </div>
     );

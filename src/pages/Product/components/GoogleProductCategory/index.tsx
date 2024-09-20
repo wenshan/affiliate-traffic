@@ -1,9 +1,11 @@
+import tableData3 from '@/utils/google_product_category3';
+import listToTreeSelf from '@/utils/listToTreeSelf';
 import { Modal, Tree } from 'antd';
 import { Component } from 'react';
-import tableData from '../../../../utils/google_product_category2';
 
 import './index.less';
 
+const treeData = listToTreeSelf(tableData3);
 class CustomProductType extends Component {
   constructor(props) {
     super(props);
@@ -37,7 +39,7 @@ class CustomProductType extends Component {
         <Modal
           title="选择Google商品类目"
           open={this.props.open}
-          width={600}
+          width={800}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
@@ -45,9 +47,11 @@ class CustomProductType extends Component {
             checkStrictly
             defaultExpandParent={false}
             multiple={false}
-            treeData={tableData}
+            treeData={treeData && treeData.rowsTree}
             height={500}
             defaultExpandAll={false}
+            defaultExpandedKeys={this.props.selectedKeys}
+            selectedKeys={this.props.selectedKeys}
             onSelect={this.googleProductCategoryTreeHandle}
           />
         </Modal>
