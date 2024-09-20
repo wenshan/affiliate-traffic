@@ -5,7 +5,6 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { Link, history } from '@umijs/max';
-import Store from 'store2';
 import defaultSettings from '../config/defaultSettings';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -13,27 +12,26 @@ const loginPath = '/user/login';
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
+const fetchUserInfo = async () => {
+  try {
+    const result = await currentUser();
+    if (result && result.status === 200 && result.data) {
+      return result.data;
+    } else {
+      history.push(loginPath);
+      return null;
+    }
+  } catch (error) {
+    history.push(loginPath);
+  }
+  return undefined;
+};
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
-  const fetchUserInfo = async () => {
-    try {
-      const result = await currentUser();
-      if (result && result.status === 200 && result.data) {
-        Store.session.set('currentUser', result.data);
-        return result.data;
-      } else {
-        history.push(loginPath);
-        return null;
-      }
-    } catch (error) {
-      history.push(loginPath);
-    }
-    return undefined;
-  };
   // 如果不是登录页面，执行
   const { location } = history;
   if (location.pathname !== loginPath) {

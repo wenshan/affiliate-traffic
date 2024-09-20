@@ -81,11 +81,11 @@ const Register: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfoHandler = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
       flushSync(() => {
-        setInitialState((s) => ({
+        setInitialState((s: any) => ({
           ...s,
           currentUser: userInfo,
         }));
@@ -97,10 +97,9 @@ const Register: React.FC = () => {
     try {
       // 登录
       const result = await register(values);
-      if (result.status === 200) {
-        const defaultLoginSuccessMessage = '登录成功！';
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
+      if (result && result.status === 200 && result.data) {
+        message.success(result.msg || '登录成功！');
+        await fetchUserInfoHandler();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/Welcome');
         return;

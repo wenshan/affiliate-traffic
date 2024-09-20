@@ -440,7 +440,6 @@ class ProductList extends Component {
   };
 
   handelTableDel = (record) => {
-    console.log(record);
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     Modal.confirm({

@@ -114,11 +114,11 @@ const Login: React.FC = () => {
   const state = searchParams.get('state');
   const code = searchParams.get('code');
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfoHandler = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
       flushSync(() => {
-        setInitialState((s) => ({
+        setInitialState((s: any) => ({
           ...s,
           currentUser: userInfo,
         }));
@@ -129,12 +129,9 @@ const Login: React.FC = () => {
   const getOAuth2UserInfo = async () => {
     if (state && code) {
       const result = await googleGetToken({ state, code });
-      if (result && result.status === 200) {
-        const defaultLoginSuccessMessage = '登录成功！';
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/Welcome');
+      if (result && result.status === 200 && result.data) {
+        message.success(result.msg || '登录成功！');
+        await fetchUserInfoHandler();
         return;
       } else {
         setUserLoginState(result);
@@ -150,10 +147,9 @@ const Login: React.FC = () => {
     try {
       // 登录
       const result = await login(values);
-      if (result.status === 200) {
-        const defaultLoginSuccessMessage = '登录成功！';
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
+      if (result && result.status === 200 && result.data) {
+        message.success(result.msg || '登录成功！');
+        await fetchUserInfoHandler();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/Welcome');
         return;

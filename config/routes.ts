@@ -115,6 +115,7 @@ export default [
       },
     ],
   },
+  /*
   {
     name: '管理页',
     path: '/admin',
@@ -132,6 +133,7 @@ export default [
       },
     ],
   },
+  */
   {
     name: '账户',
     path: '/account',
