@@ -38,16 +38,21 @@ export async function getInitialState(): Promise<{
   const { location } = history;
   if (location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
+    if (currentUser && currentUser.status === 200 && currentUser.data) {
+      return {
+        fetchUserInfo,
+        currentUser,
+        settings: defaultSettings as Partial<LayoutSettings>,
+        loading: false,
+      };
+    }
+  } else {
     return {
       fetchUserInfo,
-      currentUser,
       settings: defaultSettings as Partial<LayoutSettings>,
+      loading: false,
     };
   }
-  return {
-    fetchUserInfo,
-    settings: defaultSettings as Partial<LayoutSettings>,
-  };
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout

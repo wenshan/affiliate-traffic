@@ -158,6 +158,5 @@ export default defineConfig({
     { name: 'keywords', content: 'umi, umijs' },
     { name: 'description', content: 'React framework.' },
     { name: 'google-site-verification', content: 'KxHWtVZGvgcLVkcM4l40FNpLvHf3tA_z7D_jE83_wXM' },
-    // { 'http-equiv': 'Content-Security-Policy', content: "default-src https://accounts.google.com/gsi/; child-src 'none'; object-src 'none'" },
   ],
 });

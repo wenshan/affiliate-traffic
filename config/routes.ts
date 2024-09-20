@@ -32,19 +32,40 @@ export default [
     name: '广告管理',
     path: '/banner',
     icon: 'table',
-    component: './Banner',
+    layout: true,
+    routes: [
+      {
+        name: 'Banner广告',
+        path: '/banner/index',
+        component: './Banner',
+      },
+    ],
   },
   {
     name: '素材管理',
     path: '/material',
     icon: 'profile',
-    component: './Material',
+    layout: true,
+    routes: [
+      {
+        name: '素材列表',
+        path: '/material/index',
+        component: './Material',
+      },
+    ],
   },
   {
     name: '项目管理',
     path: '/project',
     icon: 'profile',
-    component: './ProjectGroup',
+    layout: true,
+    routes: [
+      {
+        name: '项目列表',
+        path: '/project/index',
+        component: './ProjectGroup',
+      },
+    ],
   },
   {
     name: '商品管理',
