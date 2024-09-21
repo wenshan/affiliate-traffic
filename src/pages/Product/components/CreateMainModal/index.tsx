@@ -1,4 +1,5 @@
-import { Button, Input, Modal, message } from 'antd';
+import { defaultCurrentProductMain } from '@/constant/defaultCurrentData';
+import { Button, Input, Modal, Switch, message } from 'antd';
 import { Component } from 'react';
 import GoogleProductCategory from '../GoogleProductCategory';
 import LabelHelpTip from '../LabelHelpTip';
@@ -10,17 +11,7 @@ class CreateMainModal extends Component {
     super(props);
     this.state = {
       isProductCategoryShow: false,
-      currentProductMain: {
-        title: '',
-        offer_id: '',
-        google_product_category: {
-          key: '4',
-          title: '动物/宠物用品>宠物用品>猫用品',
-        },
-        google_product_category_id: '4',
-        gtin: '',
-        brand: 'Limeet',
-      },
+      currentProductMain: defaultCurrentProductMain,
     };
   }
   // 商品名称
@@ -66,6 +57,16 @@ class CreateMainModal extends Component {
       currentProductMain: newCurrentProductMain,
     });
   };
+  // identifierExists
+  identifierExistsSwitchHandler = (checked: boolean) => {
+    const { currentProductMain } = this.state;
+    const newCurrentProductMain = Object.assign({}, currentProductMain, {
+      identifierExists: checked,
+    });
+    this.setState({
+      currentProductMain: newCurrentProductMain,
+    });
+  };
   // GoogleProductCategory
   productCategoryCallBackOk = (option) => {
     const { currentProductMain } = this.state;
@@ -86,8 +87,21 @@ class CreateMainModal extends Component {
   // Modal
   handleOk = () => {
     const { currentProductMain } = this.state;
-    const { google_product_category, google_product_category_id, title, offer_id, brand } =
-      currentProductMain;
+    const {
+      google_product_category,
+      google_product_category_id,
+      title,
+      offer_id,
+      brand,
+      gtin,
+      identifierExists,
+    } = currentProductMain;
+    if (identifierExists) {
+      if (!gtin) {
+        message.error('gitin开启生效，gtin为必填项');
+        return false;
+      }
+    }
     if (google_product_category && google_product_category_id && title && offer_id && brand) {
       if (this.props.callbackOk) {
         this.props.callbackOk(currentProductMain);
@@ -116,8 +130,15 @@ class CreateMainModal extends Component {
 
   render() {
     const { currentProductMain } = this.state;
-    const { title, offer_id, google_product_category, google_product_category_id, gtin, brand } =
-      currentProductMain;
+    const {
+      title,
+      offer_id,
+      google_product_category,
+      google_product_category_id,
+      gtin,
+      brand,
+      identifierExists,
+    } = currentProductMain;
     return (
       <div className="custom-product-type">
         <Modal
@@ -185,6 +206,15 @@ class CreateMainModal extends Component {
                 style={{ width: 350 }}
                 value={brand}
                 onChange={this.brandInputHandle}
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="identifierExists"></LabelHelpTip>
+              <Switch
+                checkedChildren="开启"
+                unCheckedChildren="关闭"
+                value={identifierExists}
+                onChange={this.identifierExistsSwitchHandler}
               />
             </div>
           </div>

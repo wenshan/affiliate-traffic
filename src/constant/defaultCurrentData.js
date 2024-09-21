@@ -40,7 +40,7 @@ const defaultProductDetail = {
   weightUnit: 'g',
   channel: 'online',
   feedLabel: null,
-  adult: 'no',
+  adult: false,
   kind: 'content#product',
   identifierExists: false,
   contentLanguage: 'zh',
@@ -58,5 +58,6 @@ const defaultCurrentProductMain = {
   google_product_category_id: '4',
   gtin: '',
   brand: 'Limeet',
+  identifierExists: false, // 如果商品没有适合其类别的唯一商品标识符（如 GTIN、MPN 和品牌），则为 false。
 };
 export { defaultCurrentProductMain, defaultProductDetail };

@@ -11,11 +11,14 @@ class CustomProductType extends Component {
     super(props);
     this.state = {
       selectedNodes: {},
+      selectedKeys: props.selectedKeys,
     };
   }
   googleProductCategoryTreeHandle = (selectedKeys, event) => {
+    console.log('selectedKeys:', selectedKeys);
     this.setState({
       selectedNodes: Object.assign({}, event.selectedNodes[0], { children: null }),
+      selectedKeys,
     });
   };
 
@@ -50,8 +53,8 @@ class CustomProductType extends Component {
             treeData={treeData && treeData.rowsTree}
             height={500}
             defaultExpandAll={false}
-            defaultExpandedKeys={this.props.selectedKeys}
-            selectedKeys={this.props.selectedKeys}
+            defaultExpandedKeys={this.state.selectedKeys}
+            selectedKeys={this.state.selectedKeys}
             onSelect={this.googleProductCategoryTreeHandle}
           />
         </Modal>

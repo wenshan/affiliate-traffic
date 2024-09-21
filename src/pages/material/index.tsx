@@ -6,6 +6,7 @@ import {
   MinusSquareOutlined,
   PlusSquareOutlined,
 } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
 import { Button, Checkbox, Col, Input, Modal, Row, message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'umi';
@@ -500,75 +501,77 @@ class Material extends Component {
     const { currentFolderDirectory, imageList, folderDirectory } = this.props.material;
     // console.log('currentFolderDirectory:', currentFolderDirectory);
     return (
-      <div className="page">
-        <div className="material">
-          <div className="content">
-            <Row>
-              <Col span={5}>
-                <div className="folder-menu">
-                  <div className="header">
-                    {' '}
-                    <FolderOpenOutlined /> 文件目录
+      <PageContainer>
+        <div className="page">
+          <div className="material">
+            <div className="content">
+              <Row>
+                <Col span={5}>
+                  <div className="folder-menu">
+                    <div className="header">
+                      {' '}
+                      <FolderOpenOutlined /> 文件目录
+                    </div>
+                    <div className="menu-wrap">
+                      <ul>
+                        {folderDirectory &&
+                          currentFolderDirectory &&
+                          currentFolderDirectory.key &&
+                          this.folderMenuHtml()}
+                      </ul>
+                    </div>
                   </div>
-                  <div className="menu-wrap">
-                    <ul>
-                      {folderDirectory &&
-                        currentFolderDirectory &&
-                        currentFolderDirectory.key &&
-                        this.folderMenuHtml()}
-                    </ul>
-                  </div>
-                </div>
-              </Col>
-              <Col span={19}>
-                <div className="container">
-                  <div className="header">
-                    <Button onClick={this.handleClickDropdownDel}>删除</Button>
-                    <Button onClick={this.handleClickDropdownEdit}>编辑</Button>
-                    <Button icon={<FolderAddOutlined />} onClick={this.handelCreateFolder}>
-                      新建文件目录
-                    </Button>
-                    <UploadFile
-                      callbackOk={this.handelUploadOk}
-                      callbackFailed={this.handelUploadFailed}
-                      data={currentFolderDirectory}
-                    ></UploadFile>
-                  </div>
-                  <ImgList
-                    dataSource={imageList || []}
-                    delMaterialCallback={this.delMaterialCallback}
-                    checked={['1085370435/22159932/limeet_logo_绿色.png']}
-                    onChangeCallback={this.handelCheckCallback}
-                  ></ImgList>
-                  {currentFolderDirectory &&
-                    currentFolderDirectory.label &&
-                    currentFolderDirectory.key && (
-                      <Modal
-                        title={this.state.optionAction > 0 ? '编辑文件目录' : '添加文件目录'}
-                        open={this.state.folderOpenStatus}
-                        width={500}
-                        onOk={this.handelFolderOk}
-                        onCancel={this.handelFolderCancel}
-                      >
-                        <div className="content">
-                          <div className="form-item">
-                            <span className="label">文件夹名称: </span>
-                            <Input
-                              placeholder="文件夹名称"
-                              style={{ width: 250 }}
-                              value={this.state.operateFolderDirectory.label}
-                              onChange={this.folderInputHandle}
-                            />
+                </Col>
+                <Col span={19}>
+                  <div className="container">
+                    <div className="header">
+                      <Button onClick={this.handleClickDropdownDel}>删除</Button>
+                      <Button onClick={this.handleClickDropdownEdit}>编辑</Button>
+                      <Button icon={<FolderAddOutlined />} onClick={this.handelCreateFolder}>
+                        新建文件目录
+                      </Button>
+                      <UploadFile
+                        callbackOk={this.handelUploadOk}
+                        callbackFailed={this.handelUploadFailed}
+                        data={currentFolderDirectory}
+                      ></UploadFile>
+                    </div>
+                    <ImgList
+                      dataSource={imageList || []}
+                      delMaterialCallback={this.delMaterialCallback}
+                      checked={['1085370435/22159932/limeet_logo_绿色.png']}
+                      onChangeCallback={this.handelCheckCallback}
+                    ></ImgList>
+                    {currentFolderDirectory &&
+                      currentFolderDirectory.label &&
+                      currentFolderDirectory.key && (
+                        <Modal
+                          title={this.state.optionAction > 0 ? '编辑文件目录' : '添加文件目录'}
+                          open={this.state.folderOpenStatus}
+                          width={500}
+                          onOk={this.handelFolderOk}
+                          onCancel={this.handelFolderCancel}
+                        >
+                          <div className="content">
+                            <div className="form-item">
+                              <span className="label">文件夹名称: </span>
+                              <Input
+                                placeholder="文件夹名称"
+                                style={{ width: 250 }}
+                                value={this.state.operateFolderDirectory.label}
+                                onChange={this.folderInputHandle}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </Modal>
-                    )}
-                </div>
-              </Col>
-            </Row>
+                        </Modal>
+                      )}
+                  </div>
+                </Col>
+              </Row>
+            </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 }

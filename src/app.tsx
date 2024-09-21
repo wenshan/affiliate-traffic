@@ -36,7 +36,7 @@ export async function getInitialState(): Promise<{
   const { location } = history;
   if (location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
-    if (currentUser && currentUser.status === 200 && currentUser.data) {
+    if (currentUser) {
       return {
         fetchUserInfo,
         currentUser,

@@ -191,6 +191,14 @@ class ProductCreate extends Component {
         key: 'brand',
       },
       {
+        title: '不存在gtin',
+        dataIndex: 'identifierExists',
+        key: 'identifierExists',
+        render: (_: any, record: any) => {
+          return <span>{record.identifierExists ? '是' : '否'}</span>;
+        },
+      },
+      {
         title: '操作',
         dataIndex: 'operate',
         render: (text: any, record: any) => {

@@ -1,7 +1,7 @@
+import labelHelpTip from '@/constant/helpTip';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Tooltip } from 'antd';
 import { Component } from 'react';
-import labelHelpTip from '../../../../constant/helpTip';
 
 import './index.less';
 

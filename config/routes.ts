@@ -33,6 +33,7 @@ export default [
     path: '/banner',
     icon: 'table',
     layout: true,
+    component: './Banner',
     routes: [
       {
         name: 'Banner广告',
@@ -46,6 +47,7 @@ export default [
     path: '/material',
     icon: 'profile',
     layout: true,
+    component: './Material',
     routes: [
       {
         name: '素材列表',
@@ -59,6 +61,7 @@ export default [
     path: '/project',
     icon: 'profile',
     layout: true,
+    component: './ProjectGroup',
     routes: [
       {
         name: '项目列表',
@@ -72,6 +75,7 @@ export default [
     path: '/product',
     layout: true,
     icon: 'profile',
+    component: './Product/ProductList',
     routes: [
       {
         name: '创建主商品',
@@ -102,6 +106,7 @@ export default [
     icon: 'profile',
     access: 'canAdmin',
     layout: true,
+    component: './Community/Dashboard',
     routes: [
       {
         name: '数据面板',
@@ -139,6 +144,7 @@ export default [
     path: '/account',
     icon: 'crown',
     layout: true,
+    component: './Account/PersonInfo',
     routes: [
       {
         name: '基础信息',

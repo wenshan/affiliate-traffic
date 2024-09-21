@@ -25,7 +25,7 @@ type GoogleMerchant = {
   targetCountry: string;
   feedLabel: string;
   channel: string;
-  adult: string;
+  adult: boolean;
   kind: string;
   brand: string;
   color: string;

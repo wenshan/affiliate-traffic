@@ -1,6 +1,7 @@
 /* eslint-disable */
 /* @ts-ignore */
 
+import { defaultCurrentProductMain, defaultProductDetail } from '@/constant/defaultCurrentData';
 import { shoppingProductInsert } from '@/services/api/googleAccount';
 import {
   createProduct,
@@ -24,7 +25,6 @@ import { cerateType, delType, editType, queryType } from '@/services/api/product
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
 import { history } from 'umi';
-import { defaultCurrentProductMain, defaultProductDetail } from './../constant/defaultCurrentData';
 
 export default {
   namespace: 'product',
@@ -291,6 +291,9 @@ export default {
             google_product_category: result.data.google_product_category,
             google_product_category_id: result.data.google_product_category_id,
             offer_id: result.data.offer_id,
+            brand: result.data.brand,
+            gtin: result.data.gtin,
+            identifierExists: result.data.identifierExists || false,
           });
           yield put({
             type: 'update',

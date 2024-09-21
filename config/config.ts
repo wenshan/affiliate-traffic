@@ -152,7 +152,7 @@ export default defineConfig({
   },
   esbuildMinifyIIFE: true,
   requestRecord: {},
-  scripts: [{ src: 'https://accounts.google.com/gsi/client', defer: true, async: true }],
+  // scripts: [{ src: 'https://accounts.google.com/gsi/client', defer: true, async: true }],
   metas: [
     { charset: 'utf-8' },
     { name: 'keywords', content: 'umi, umijs' },
