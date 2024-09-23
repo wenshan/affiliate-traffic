@@ -67,8 +67,6 @@ export default () => {
     }
   };
   const tableDropdownAction = (param, record: any) => {
-    console.log('tableDropdownAction-params:', param);
-    console.log('tableDropdownAction-record:', record);
     if (record.googleAccess) {
       setParams({ action: 'init' });
       if (param === 'delete' && record.projectId && record.merchant_product_id) {

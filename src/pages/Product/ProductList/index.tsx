@@ -51,7 +51,7 @@ class ProductList extends Component {
         dataIndex: 'offer_id',
         key: 'offer_id',
         fixed: 'left',
-        width: 60,
+        width: 70,
       },
       {
         title: '价格',
@@ -375,9 +375,6 @@ class ProductList extends Component {
         searchParams: newSearchParams,
       },
     });
-    this.props.dispatch({
-      type: 'product/queryTypeSearch',
-    });
   };
   searchKeywordInputHandle = (event) => {
     const { value } = event.target;
@@ -505,9 +502,6 @@ class ProductList extends Component {
     });
     this.props.dispatch({
       type: 'product/queryProductAll',
-    });
-    this.props.dispatch({
-      type: 'product/queryTypeSearch',
     });
     this.props.dispatch({
       type: 'product/queryProductMainOfferId',

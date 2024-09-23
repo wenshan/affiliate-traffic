@@ -382,17 +382,6 @@ class ProductListCompos extends Component {
     this.props.dispatch({
       type: 'product/initQueryParams',
     });
-    this.props.dispatch({
-      type: 'product/queryType',
-    });
-    /*
-    this.props.dispatch({
-      type: 'product/queryProductAll',
-    });
-    this.props.dispatch({
-      type: 'product/queryProductMainAll',
-    });
-    */
     // queryProductMainAllCompos
     this.props.dispatch({
       type: 'product/queryProductMainAllCompos',

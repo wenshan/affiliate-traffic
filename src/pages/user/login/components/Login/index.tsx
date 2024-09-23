@@ -115,14 +115,18 @@ const Login: React.FC = () => {
   const code = searchParams.get('code');
 
   const fetchUserInfoHandler = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s: any) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
+    if (initialState && initialState.fetchUserInfo) {
+      const userInfo = await initialState?.fetchUserInfo?.();
+      if (userInfo) {
+        flushSync(() => {
+          setInitialState((s: any) => ({
+            ...s,
+            currentUser: userInfo,
+          }));
+        });
+      }
+    } else {
+      message.error('资源依赖加载失败，请重试！');
     }
   };
 

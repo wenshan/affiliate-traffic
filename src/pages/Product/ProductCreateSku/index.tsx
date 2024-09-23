@@ -1,18 +1,18 @@
+import { costsExchangeTypeCurrency } from '@/constant/defaultCurrentData';
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool.js';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Image, Input, Radio, Select, Table, message } from 'antd';
+import { Button, Col, Image, Input, Radio, Row, Select, Table } from 'antd';
 import QueryString from 'query-string';
 import { Component, JSX } from 'react';
 import { connect } from 'umi';
-import CustomProductType from '../components/CustomProductType';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
 import RichTextEditor from '../components/RichTextEditor';
 
 import './index.less';
-
+const { TextArea } = Input;
 @connect(({ product, common, material }) => ({
   product,
   common,
@@ -26,7 +26,6 @@ class ProductCreateSku extends Component {
       isProductImageModal: false,
       currentImageProductType: 'image_link',
       imageLimitNum: 20,
-      isProductTypeShow: false,
       typeTextEditor: 'product_highlight',
       isTextEditorState: false,
       initValuerTextEditor: '',
@@ -44,10 +43,16 @@ class ProductCreateSku extends Component {
   };
   // 货币单位
   monetaryUnitSelectHandle = (value) => {
+    const { currentProductMain, costsExchange } = this.props.product;
+    const { preSalePrice } = currentProductMain;
+    const price = (costsExchange[value] * preSalePrice).toFixed(2);
+    console.log(preSalePrice, costsExchange[value]);
+    console.log('price:', price);
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
         monetary_unit: value,
+        price,
       },
     });
   };
@@ -480,71 +485,6 @@ class ProductCreateSku extends Component {
       },
     });
   };
-  // 自定义商品分类
-  productTypeButtonHandle = () => {
-    const { productDetail } = this.props.product;
-    const { language } = productDetail;
-    if (language) {
-      this.setState({
-        isProductTypeShow: true,
-      });
-      this.props.dispatch({
-        type: 'product/queryType',
-      });
-    } else {
-      message.warning({ content: '请先选择语言' });
-    }
-  };
-  // CustomProductType
-  productTypeCallBackCancel = () => {
-    this.setState({
-      isProductTypeShow: false,
-    });
-  };
-  // 管理页面回调
-  productTypeCallBackOk = (item: { key: any }[]) => {
-    if (item && item[0] && item[0].key) {
-      this.setState({
-        isProductTypeShow: false,
-      });
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          product_type: item[0],
-          product_type_id: item[0].key,
-        },
-      });
-    } else {
-      message.warning({ content: '获取数据有问题' });
-    }
-  };
-  // 删除商品分类
-  handelDelProductType = (item) => {
-    this.props.dispatch({
-      type: 'product/delType',
-      payload: {
-        ...item,
-      },
-    });
-  };
-  // 添加新产品分类
-  handelAddProductType = (item, type) => {
-    if (type) {
-      this.props.dispatch({
-        type: 'product/editType',
-        payload: {
-          ...item,
-        },
-      });
-    } else {
-      this.props.dispatch({
-        type: 'product/cerateType',
-        payload: {
-          ...item,
-        },
-      });
-    }
-  };
 
   // 富文本编辑器回调
   callbackTextEditorDescription = (value) => {
@@ -591,11 +531,6 @@ class ProductCreateSku extends Component {
         },
       });
     }
-    /*
-    this.props.dispatch({
-      type: 'product/queryType',
-    });
-    */
   }
 
   render() {
@@ -609,9 +544,9 @@ class ProductCreateSku extends Component {
       sizeSystemOption,
       genderOption,
       ageGroupOption,
-      productTypeOption,
       productSizeUnitUnitOption,
       productWeightUnitOption,
+      costsExchange,
     } = this.props.product;
     const { folderDirectory, imageList } = this.props.material;
     const {
@@ -650,7 +585,13 @@ class ProductCreateSku extends Component {
       gtin,
       brand,
       google_product_category,
+      targetCountry,
+      contentLanguage,
+      costPrice,
+      preSalePrice,
+      summaryKeywords,
     } = productDetail;
+
     return (
       <PageContainer>
         <div className="page">
@@ -658,37 +599,102 @@ class ProductCreateSku extends Component {
             <div className="header">
               <div className="sub-header">主数据</div>
             </div>
+
             <div className="content form-box">
-              <div className="form-item">
-                <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
-                <Input
-                  placeholder="主商品标题"
-                  style={{ width: 350 }}
-                  value={title_main}
-                  disabled
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
-                <Input placeholder="商品货号" style={{ width: 350 }} value={offer_id} disabled />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
-                <Input
-                  placeholder="选择Google商品类目"
-                  style={{ width: 350 }}
-                  value={(google_product_category && google_product_category.title) || ''}
-                  disabled
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
-                <Input placeholder="商品GTIN码" style={{ width: 350 }} value={gtin} disabled />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="brand"></LabelHelpTip>
-                <Input placeholder="商品GTIN码" style={{ width: 350 }} value={brand} disabled />
-              </div>
+              <Row gutter={[16, 0]}>
+                <Col span={12}>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
+                    <Input
+                      placeholder="主商品标题"
+                      style={{ width: 350 }}
+                      value={title_main}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
+                    <Input
+                      placeholder="商品货号"
+                      style={{ width: 350 }}
+                      value={offer_id}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
+                    <Input
+                      placeholder="选择Google商品类目"
+                      style={{ width: 350 }}
+                      value={(google_product_category && google_product_category.title) || ''}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="product_type"></LabelHelpTip>
+                    <Input
+                      placeholder="自定商品分类"
+                      style={{ width: 350 }}
+                      value={
+                        contentLanguage && product_type && product_type[`title_${contentLanguage}`]
+                      }
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
+                    <Input placeholder="商品GTIN码" style={{ width: 350 }} value={gtin} disabled />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="brand"></LabelHelpTip>
+                    <Input placeholder="商品品牌" style={{ width: 350 }} value={brand} disabled />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
+                    <Input
+                      placeholder="商品成本价"
+                      addonBefore="￥"
+                      style={{ width: 350 }}
+                      value={costPrice}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="preSalePrice"></LabelHelpTip>
+                    <Input
+                      placeholder="商品预估售价"
+                      addonBefore="￥"
+                      style={{ width: 350 }}
+                      value={preSalePrice}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip
+                      keyLabel={costsExchangeTypeCurrency[targetCountry]}
+                    ></LabelHelpTip>
+                    <Input
+                      placeholder="汇率"
+                      addonBefore={costsExchangeTypeCurrency[targetCountry]}
+                      style={{ width: 350 }}
+                      value={costsExchange[costsExchangeTypeCurrency[targetCountry]]}
+                      disabled
+                    />
+                  </div>
+                  <div className="form-item">
+                    <LabelHelpTip keyLabel="summaryKeywords"></LabelHelpTip>
+                    <TextArea
+                      placeholder="关键词"
+                      rows={2}
+                      style={{ width: 350 }}
+                      value={summaryKeywords}
+                      disabled
+                    />
+                  </div>
+                </Col>
+              </Row>
             </div>
             <div className="header">
               <div className="sub-header">基本商品数据</div>
@@ -706,26 +712,10 @@ class ProductCreateSku extends Component {
                 ></Radio.Group>
               </div>
               <div className="form-item">
-                <span className="label">
-                  <i>*</i> 自定商品分类:
-                </span>
-                <Input
-                  placeholder="自定商品分类"
-                  style={{ width: 350 }}
-                  value={product_type && product_type.title}
-                  disabled
-                />
-                <span className="operate">
-                  <Button type="primary" size="small" onClick={this.productTypeButtonHandle}>
-                    管理自定商品分类
-                  </Button>
-                </span>
-              </div>
-              <div className="form-item">
                 <LabelHelpTip keyLabel="title"></LabelHelpTip>
                 <Input
                   placeholder="商品名称"
-                  style={{ width: 350 }}
+                  style={{ width: 550 }}
                   value={title}
                   onChange={this.titleInputHandle}
                 />
@@ -809,7 +799,7 @@ class ProductCreateSku extends Component {
                 <LabelHelpTip keyLabel="link"></LabelHelpTip>
                 <Input
                   placeholder="商品着陆页"
-                  style={{ width: 350 }}
+                  style={{ width: 550 }}
                   value={link}
                   onChange={this.linkInputHandle}
                 />
@@ -818,7 +808,7 @@ class ProductCreateSku extends Component {
                 <LabelHelpTip keyLabel="mobile_link"></LabelHelpTip>
                 <Input
                   placeholder="商品着陆页"
-                  style={{ width: 350 }}
+                  style={{ width: 550 }}
                   value={mobile_link}
                   onChange={this.mobileLinkInputHandle}
                 />
@@ -833,6 +823,7 @@ class ProductCreateSku extends Component {
                   <i>*</i> 选择货币单位:
                 </span>
                 <Select
+                  defaultValue={[costsExchangeTypeCurrency[targetCountry]]}
                   value={monetary_unit}
                   style={{ width: 120 }}
                   onChange={this.monetaryUnitSelectHandle}
@@ -1056,14 +1047,6 @@ class ProductCreateSku extends Component {
           selectedType={this.state.currentImageProductType}
           imageLimitNum={this.state.imageLimitNum}
         ></ImageSelectModal>
-        <CustomProductType
-          dataSource={{ productTypeOption, product_type }}
-          open={this.state.isProductTypeShow}
-          callbackCancel={this.productTypeCallBackCancel}
-          callbackOk={this.productTypeCallBackOk}
-          callbackAddOk={this.handelAddProductType}
-          callbackDelOk={this.handelDelProductType}
-        ></CustomProductType>
       </PageContainer>
     );
   }

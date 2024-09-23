@@ -23,6 +23,8 @@ const defaultProductDetail = {
   lifestyle_image_link: [],
   google_product_category: '',
   google_product_category_id: '',
+  product_type: '',
+  product_type_id: '',
   product_type: { key: '', title: '' },
   product_type_id: '',
   color: '',
@@ -49,7 +51,7 @@ const defaultProductDetail = {
 };
 const defaultCurrentProductMain = {
   id: '',
-  title: '',
+  title_main: '',
   offer_id: '',
   google_product_category: {
     key: '4',
@@ -59,5 +61,44 @@ const defaultCurrentProductMain = {
   gtin: '',
   brand: 'Limeet',
   identifierExists: false, // 如果商品没有适合其类别的唯一商品标识符（如 GTIN、MPN 和品牌），则为 false。
+  costPrice: 0,
+  costFirstLegFreightRatio: 10,
+  costFbaRatio: 50,
+  costsAdvertisingRatio: 5,
+  targetProfitRatio: 30,
+  preSalePrice: 0,
+  summaryKeywords: '',
 };
-export { defaultCurrentProductMain, defaultProductDetail };
+
+const defaultCostsExchange = {
+  costFirstLegFreightRatio: 10,
+  costFbaRatio: 50,
+  costsAdvertisingRatio: 5,
+  targetProfitRatio: 30,
+  USD: 0.14,
+  JPY: 20.5,
+  KRW: 188,
+  CNY: 1,
+};
+
+const costsExchangeTypeCurrency = {
+  US: 'USD',
+  JP: 'JPY',
+  KR: 'KRW',
+  CN: 'CNY',
+};
+
+const defaultProductCustomType = {
+  title_zh: '',
+  title_en: '',
+  title_ja: '',
+  title_ko: '',
+};
+
+export {
+  costsExchangeTypeCurrency,
+  defaultCostsExchange,
+  defaultCurrentProductMain,
+  defaultProductCustomType,
+  defaultProductDetail,
+};

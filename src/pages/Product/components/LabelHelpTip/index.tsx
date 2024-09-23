@@ -6,7 +6,7 @@ import { Component } from 'react';
 import './index.less';
 
 class LabelHelpTip extends Component {
-  constructor(props) {
+  constructor(props: { keyLabel: any }) {
     super(props);
     this.state = {};
   }

@@ -1,8 +1,13 @@
 /* eslint-disable */
 /* @ts-ignore */
 
-import { defaultCurrentProductMain, defaultProductDetail } from '@/constant/defaultCurrentData';
+import {
+  costsExchangeTypeCurrency,
+  defaultCurrentProductMain,
+  defaultProductDetail,
+} from '@/constant/defaultCurrentData';
 import { shoppingProductInsert } from '@/services/api/googleAccount';
+import { costsExchangeQuery } from '@/services/api/googleMerchant';
 import {
   createProduct,
   delProduct,
@@ -80,9 +85,6 @@ export default {
         { value: 'ko_KR', label: '韩语' },
       ],
     },
-    productStatusAll: {
-      isCreateMainModalShow: false,
-    }, // 统一的用户操作状态
     product_sku_option_status: 0,
     languageOption: [
       { value: 'zh-CN', label: '中文' },
@@ -94,11 +96,7 @@ export default {
       { value: 'CNY', label: '人民币' },
       { value: 'USD', label: '美元' },
       { value: 'JPY', label: '日元' },
-      { value: 'EUR', label: '欧元' },
-      { value: 'GPB', label: '英镑' },
       { value: 'KRW', label: '韩元' },
-      { value: 'CAD', label: '加拿大' },
-      { value: 'AUD', label: '澳大利亚' },
     ],
     productTypeOption: [],
     googleProductCategoryOption: {},
@@ -143,29 +141,22 @@ export default {
       { value: 'tall', label: '高' },
       { value: 'plus', label: '加大' },
     ],
+    costsExchange: {
+      costFirstLegFreightRatio: 10,
+      costFbaRatio: 50,
+      costsAdvertisingRatio: 5,
+      targetProfitRatio: 30,
+      USD: 0.14,
+      JPY: 20.5,
+      KRW: 188,
+      CNY: 1,
+    },
     productList: [],
     productDetail: defaultProductDetail,
     productMainOfferIds: [],
   },
 
-  subscriptions: {
-    setup({ dispatch, history }) {
-      history.listen(({ pathname, search }) => {
-        const query = QueryString.parse(search);
-        if (query.product_main_id) {
-          console.log('query:', query);
-          /*
-          dispatch({
-            type: 'updateProduct',
-            payload: {
-              product_main_id: query.product_main_id,
-            }
-          });
-          */
-        }
-      });
-    },
-  },
+  subscriptions: {},
 
   effects: {
     *initQueryParams({ payload }, { call, put, select }) {
@@ -207,30 +198,49 @@ export default {
     *editProductMain({ payload: data }, { call, put, select }) {
       const {
         id,
-        title,
+        title_main,
         offer_id,
         google_product_category,
         google_product_category_id,
         gtin,
         brand,
+        costPrice,
+        preSalePrice,
+        summaryKeywords,
+        targetProfitRatio,
+        costsAdvertisingRatio,
+        costFbaRatio,
+        costFirstLegFreightRatio,
+        identifierExists,
       } = data;
-      const { productStatusAll } = yield select((state) => state.product);
-      const newProductStatusAll = Object.assign({}, productStatusAll, {
-        isCreateMainModalShow: false,
-      });
-      if (title && google_product_category && google_product_category_id && id && offer_id) {
+      if (
+        title_main &&
+        google_product_category &&
+        google_product_category_id &&
+        id &&
+        offer_id &&
+        costPrice &&
+        preSalePrice
+      ) {
         const result = yield call(editProductMain, {
-          title,
+          title_main,
           offer_id,
           google_product_category,
           gtin,
           id,
           brand,
+          costPrice,
+          preSalePrice,
+          summaryKeywords,
+          targetProfitRatio,
+          costsAdvertisingRatio,
+          costFbaRatio,
+          costFirstLegFreightRatio,
+          identifierExists,
         });
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
           const current = 1;
-          yield put({ type: 'update', payload: { productStatusAll: newProductStatusAll } });
           yield put({ type: 'queryProductMainAll', payload: { current, pageSize } });
         }
       }
@@ -253,25 +263,49 @@ export default {
       }
     },
     *createProductMain({ payload: data }, { call, put, select }) {
-      const { title, offer_id, google_product_category, google_product_category_id, gtin, brand } =
-        data;
-      const { productStatusAll } = yield select((state) => state.product);
-      const newProductStatusAll = Object.assign({}, productStatusAll, {
-        isCreateMainModalShow: false,
-      });
-      if (title && google_product_category && google_product_category_id && offer_id) {
+      const {
+        title_main,
+        offer_id,
+        google_product_category,
+        google_product_category_id,
+        gtin,
+        brand,
+        costPrice,
+        preSalePrice,
+        summaryKeywords,
+        targetProfitRatio,
+        costsAdvertisingRatio,
+        costFbaRatio,
+        costFirstLegFreightRatio,
+        identifierExists,
+      } = data;
+      if (
+        title_main &&
+        google_product_category &&
+        google_product_category_id &&
+        offer_id &&
+        costPrice &&
+        preSalePrice
+      ) {
         const result = yield call(createProductMain, {
-          title,
+          title_main,
           offer_id,
           google_product_category,
           google_product_category_id,
           gtin,
           brand,
+          costPrice,
+          preSalePrice,
+          summaryKeywords,
+          targetProfitRatio,
+          costsAdvertisingRatio,
+          costFbaRatio,
+          costFirstLegFreightRatio,
+          identifierExists,
         });
         if (result && result.status && result.status === 200) {
           const pageSize = 20;
           const current = 1;
-          yield put({ type: 'update', payload: { productStatusAll: newProductStatusAll } });
           yield put({ type: 'queryProductMainAll', payload: { current, pageSize } });
           message.success({ content: '创建主商品成功' });
         } else {
@@ -287,13 +321,19 @@ export default {
         const result = yield call(queryProductMainDetail, { id });
         if (result && result.status && result.status === 200) {
           const newProductDetail = Object.assign({}, productDetail, {
-            title_main: result.data.title,
+            title_main: result.data.title_main,
             google_product_category: result.data.google_product_category,
             google_product_category_id: result.data.google_product_category_id,
             offer_id: result.data.offer_id,
             brand: result.data.brand,
             gtin: result.data.gtin,
             identifierExists: result.data.identifierExists || false,
+            preSalePrice: result.data.preSalePrice,
+            costPrice: result.data.preSalePrice,
+            costFirstLegFreightRatio: result.data.costFirstLegFreightRatio,
+            costsAdvertisingRatio: result.data.costsAdvertisingRatio,
+            targetProfitRatio: result.data.targetProfitRatio,
+            summaryKeywords: result.data.summaryKeywords,
           });
           yield put({
             type: 'update',
@@ -313,7 +353,7 @@ export default {
       if (title && language) {
         const result = yield call(cerateType, { title, language });
         if (result && result.status && result.status === 200) {
-          yield put({ type: 'queryType' });
+          // yield put({ type: 'queryType' });
           message.success({ content: '添加商品分类成功' });
           console.log('添加商品分类成功');
         } else {
@@ -330,7 +370,7 @@ export default {
       if (id && key && title && language) {
         const result = yield call(editType, { ...data });
         if (result && result.status && result.status === 200) {
-          yield put({ type: 'queryType' });
+          // yield put({ type: 'queryType' });
           console.log('编辑商品分类成功');
         }
       }
@@ -340,7 +380,7 @@ export default {
       if (key) {
         const result = yield call(delType, { key });
         if (result && result.status && result.status === 200) {
-          yield put({ type: 'queryType' });
+          // yield put({ type: 'queryType' });
           console.log('删除商品分类成功');
         }
       }
@@ -718,14 +758,22 @@ export default {
       }
     },
     *queryProductDetail({ payload: data }, { call, put, select }) {
+      const { costsExchange } = yield select((state) => state.product);
       const { id, language } = data;
       if (id) {
         const result = yield call(queryProductDetail, { id, language });
-        if (result && result.status && result.status === 200) {
+        if (result && result.status && result.status === 200 && result.data) {
+          // 初始化计算 当前 语种下的 价格
+          const { targetCountry, preSalePrice } = result.data;
+          // 当前的货币单位 当前汇率 货币汇率计算
+          const targetCountryUnit = costsExchangeTypeCurrency[targetCountry];
+          const targetCountryValue = costsExchange[targetCountryUnit];
+          const price = (preSalePrice * targetCountryValue).toFixed(2);
+          const productDetail = Object.assign({}, result.data, { price });
           yield put({
             type: 'update',
             payload: {
-              productDetail: result.data,
+              productDetail,
             },
           });
         }
@@ -760,13 +808,30 @@ export default {
     *shoppingProductInsert({ payload: data }, { call, put, select }) {
       if (data && data.id) {
         const result = yield call(shoppingProductInsert, data);
-        if (result && result.status && result.status === 200) {
+        if (result && result.status && result.status === 200 && result.data) {
           message.success({ content: '同步成功' });
         } else {
           message.error({ content: '同步失败' });
         }
       } else {
         message.error({ content: '缺少参数' });
+      }
+    },
+    /** 成本&汇率 */
+    *shoppingCostsExchangeQuery({ payload: data }, { call, put, select }) {
+      const { currentProductMain } = yield select((state) => state.product);
+      const result = yield call(costsExchangeQuery);
+      if (result && result.status === 200 && result.data) {
+        const newCurrentProductMain = Object.assign({}, currentProductMain, result.data);
+        yield put({
+          type: 'update',
+          payload: {
+            costsExchange: result.data,
+            currentProductMain: newCurrentProductMain,
+          },
+        });
+      } else {
+        message.error({ content: '成本汇率同步失败' });
       }
     },
   },

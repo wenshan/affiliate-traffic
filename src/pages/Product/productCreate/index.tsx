@@ -16,56 +16,39 @@ class ProductCreate extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: null,
       pageSize: 20,
       current: 1,
-      currentOptionActionStatus: 0, // 0 添加 1 编辑
+      currentOptionActionStatus: false, // 0 添加 1 编辑
+      isCreateMainModalShow: false,
     };
   }
   createMainModalStatusHandle = () => {
     this.setState({
-      currentOptionActionStatus: 0,
-    });
-    const { productStatusAll } = this.props.product;
-    const newProductStatusAll = Object.assign({}, productStatusAll, {
+      currentOptionActionStatus: false,
       isCreateMainModalShow: true,
     });
+
     this.props.dispatch({
       type: 'product/update',
       payload: {
-        productStatusAll: newProductStatusAll,
         currentProductMain: defaultCurrentProductMain,
       },
     });
   };
-  createMainModalCallbackCancel = () => {
-    const { productStatusAll } = this.props.product;
-    const newProductStatusAll = Object.assign({}, productStatusAll, {
-      isCreateMainModalShow: false,
-    });
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        productStatusAll: newProductStatusAll,
-      },
-    });
-  };
-  createMainModalCallbackOk = (currentProductMain) => {
-    const { currentOptionActionStatus } = this.state;
+  createMainModalCallbackOk = (currentProductMain: any) => {
     this.props.dispatch({
       type: 'product/update',
       payload: currentProductMain,
     });
-    if (currentOptionActionStatus === 0) {
-      this.props.dispatch({
-        type: 'product/createProductMain',
-        payload: currentProductMain,
-      });
-    } else {
-      this.props.dispatch({
-        type: 'product/editProductMain',
-        payload: currentProductMain,
-      });
-    }
+    this.props.dispatch({
+      type: 'product/queryProductMainAll',
+    });
+  };
+  openStatusCallbackCreateMainModal = (value) => {
+    this.setState({
+      isCreateMainModalShow: value,
+    });
   };
 
   // table
@@ -92,25 +75,19 @@ class ProductCreate extends Component {
     );
   };
 
-  handelTableEdit = (record) => {
-    const { productStatusAll } = this.props.product;
-    const newProductStatusAll = Object.assign({}, productStatusAll, {
-      isCreateMainModalShow: true,
+  handelTableEdit = (record: any) => {
+    this.props.dispatch({
+      type: 'product/update',
+      payload: {
+        currentProductMain: Object.assign({}, record),
+      },
     });
-    this.setState(
-      {
-        currentOptionActionStatus: 1,
-      },
-      () => {
-        this.props.dispatch({
-          type: 'product/update',
-          payload: {
-            currentProductMain: record,
-            productStatusAll: newProductStatusAll,
-          },
-        });
-      },
-    );
+    const { id } = record;
+    this.setState({
+      id,
+      isCreateMainModalShow: true,
+      currentOptionActionStatus: true,
+    });
   };
 
   handelTableDel = (record: any) => {
@@ -158,14 +135,17 @@ class ProductCreate extends Component {
     this.props.dispatch({
       type: 'product/queryProductMainAll',
     });
+    this.props.dispatch({
+      type: 'product/shoppingCostsExchangeQuery',
+    });
   }
 
   tableColumnsMain = () => {
     return [
       {
         title: '商品名称',
-        dataIndex: 'title',
-        key: 'title',
+        dataIndex: 'title_main',
+        key: 'title_main',
       },
       {
         title: '商品货号',
@@ -181,6 +161,14 @@ class ProductCreate extends Component {
         },
       },
       {
+        title: '自定义商品分类',
+        dataIndex: 'product_type',
+        key: 'product_type',
+        render: (text: any, record: any) => {
+          return record.product_type.title_zh || '-';
+        },
+      },
+      {
         title: '商品GTIN码',
         dataIndex: 'gtin',
         key: 'gtin',
@@ -191,7 +179,7 @@ class ProductCreate extends Component {
         key: 'brand',
       },
       {
-        title: '不存在gtin',
+        title: 'Gtin码是否相关',
         dataIndex: 'identifierExists',
         key: 'identifierExists',
         render: (_: any, record: any) => {
@@ -238,10 +226,8 @@ class ProductCreate extends Component {
   };
 
   render() {
-    const { productTypeOption, currentProductMain, productMainList, pagination, productStatusAll } =
-      this.props.product;
-    const { isCreateMainModalShow } = productStatusAll;
-    const { currentOptionActionStatus } = this.state;
+    const { productMainList, pagination } = this.props.product;
+    const { currentOptionActionStatus, id, isCreateMainModalShow } = this.state;
     return (
       <PageContainer>
         <div className="page">
@@ -268,9 +254,9 @@ class ProductCreate extends Component {
             </div>
             <div className="footer">
               <CreateMainModal
-                dataSource={{ currentProductMain, productTypeOption }}
+                id={id}
                 open={isCreateMainModalShow}
-                callbackCancel={this.createMainModalCallbackCancel}
+                openStatusCallback={this.openStatusCallbackCreateMainModal}
                 callbackOk={this.createMainModalCallbackOk}
                 optionAction={currentOptionActionStatus}
               ></CreateMainModal>

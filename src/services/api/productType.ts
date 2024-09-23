@@ -31,3 +31,10 @@ export const queryType = async (params?: { [key: string]: any }) => {
     data: params,
   });
 };
+
+export const queryTypeAll = async () => {
+  return request<{ data: any }>('/api/product/queryTypeAll', {
+    method: 'POST',
+    data: {},
+  });
+};

@@ -69,3 +69,16 @@ export const setDefault = async (params: any) => {
     data: params,
   });
 };
+// 成本计算
+export const costsExchangeSave = async (params: any) => {
+  return request('/api/shopping/product/costsExchangeSave', {
+    method: 'POST',
+    data: params,
+  });
+};
+export const costsExchangeQuery = async () => {
+  return request('/api/shopping/product/costsExchangeQuery', {
+    method: 'POST',
+    data: {},
+  });
+};

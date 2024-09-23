@@ -49,7 +49,7 @@
   "dependencies": {
     "@ant-design/charts": "^2.1.1",
     "@ant-design/icons": "^4.8.1",
-    "@ant-design/pro-components": "^2.6.48",
+    "@ant-design/pro-components": "^2.7.19",
     "@lexical/react": "^0.16.1",
     "@umijs/route-utils": "^2.2.2",
     "ahooks": "^3.7.11",

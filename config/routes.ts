@@ -75,8 +75,17 @@ export default [
     path: '/product',
     layout: true,
     icon: 'profile',
-    component: './Product/ProductList',
     routes: [
+      {
+        name: '成本&汇率',
+        path: '/product/CostsExchange',
+        component: './Product/CostsExchange',
+      },
+      {
+        name: '商品分类',
+        path: '/product/ProductCustomType',
+        component: './Product/ProductCustomType',
+      },
       {
         name: '创建主商品',
         path: '/product/ProductCreate',

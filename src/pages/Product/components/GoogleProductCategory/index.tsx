@@ -1,66 +1,62 @@
 import tableData3 from '@/utils/google_product_category3';
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import { Modal, Tree } from 'antd';
-import { Component } from 'react';
+import { useState } from 'react';
 
 import './index.less';
 
+type Props = {
+  selectedKeys: string[] | number[];
+  open: boolean;
+  callbackCancel: any;
+  callbackOk: any;
+};
+
 const treeData = listToTreeSelf(tableData3);
-class CustomProductType extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedNodes: {},
-      selectedKeys: props.selectedKeys,
-    };
-  }
-  googleProductCategoryTreeHandle = (selectedKeys, event) => {
-    console.log('selectedKeys:', selectedKeys);
-    this.setState({
-      selectedNodes: Object.assign({}, event.selectedNodes[0], { children: null }),
-      selectedKeys,
-    });
+
+export default (props: Props) => {
+  const [selectedNodes, setSelectedNodes] = useState();
+  const [selectedKeys, setSelectedKeys] = useState(props.selectedKeys);
+
+  const googleProductCategoryTreeHandle = async (selectedKeys, event) => {
+    const selectedNodes = Object.assign({}, event.selectedNodes[0], { children: null });
+    setSelectedKeys(selectedKeys);
+    setSelectedNodes(selectedNodes);
   };
 
-  handleOk = () => {
-    const { selectedNodes } = this.state;
-    if (this.props.callbackOk && this.props.callbackCancel) {
-      this.props.callbackOk(selectedNodes);
-      this.props.callbackCancel();
+  const handleOk = async () => {
+    if (props.callbackOk && props.callbackCancel) {
+      props.callbackOk(selectedNodes);
+      props.callbackCancel();
+    }
+  };
+  const handleCancel = async () => {
+    if (props.callbackCancel) {
+      props.callbackCancel();
     }
   };
 
-  handleCancel = () => {
-    if (this.props.callbackCancel) {
-      this.props.callbackCancel();
-    }
-  };
-
-  render() {
-    return (
-      <div className="custom-product-type">
-        <Modal
-          title="选择Google商品类目"
-          open={this.props.open}
-          width={800}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-        >
-          <Tree
-            checkStrictly
-            defaultExpandParent={false}
-            multiple={false}
-            treeData={treeData && treeData.rowsTree}
-            height={500}
-            defaultExpandAll={false}
-            defaultExpandedKeys={this.state.selectedKeys}
-            selectedKeys={this.state.selectedKeys}
-            onSelect={this.googleProductCategoryTreeHandle}
-          />
-        </Modal>
-      </div>
-    );
-  }
-}
-
-export default CustomProductType;
+  return (
+    <div className="google-product-category">
+      <Modal
+        title="选择Google商品类目"
+        open={props.open}
+        width={800}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Tree
+          checkStrictly
+          defaultExpandParent={false}
+          multiple={false}
+          treeData={treeData && treeData.rowsTree}
+          height={500}
+          defaultExpandAll={false}
+          defaultExpandedKeys={selectedKeys}
+          selectedKeys={selectedKeys}
+          onSelect={googleProductCategoryTreeHandle}
+        />
+      </Modal>
+    </div>
+  );
+};
