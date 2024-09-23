@@ -1,22 +1,18 @@
 import labelHelpTip from '@/constant/helpTip';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Col, Row, Tooltip } from 'antd';
-import { Component } from 'react';
 
 import './index.less';
 
-class LabelHelpTip extends Component {
-  constructor(props: { keyLabel: any }) {
-    super(props);
-    this.state = {};
-  }
-
-  proHtml = ({ des, rule, exam }) => {
+type Props = {
+  keyLabel: string;
+};
+export default (props: Props) => {
+  const proHtml = async ({ des, rule, exam }) => {
     const ruleHtml = [];
     const ruleRrr = (rule.length && rule.indexOf('。') > 0 && rule.split('。')) || [];
-
     if (ruleRrr && ruleRrr.length) {
-      ruleRrr.map((item, idx) => {
+      ruleRrr.map((item: any, idx: any) => {
         ruleHtml.push(<dd key={idx}>{item}</dd>);
       });
     } else {
@@ -44,29 +40,24 @@ class LabelHelpTip extends Component {
     return html;
   };
 
-  render() {
-    if (!this.props.keyLabel) {
-      return;
-    }
-    const currentHelpObj = labelHelpTip[this.props.keyLabel];
-    // console.log('currentHelpObj:', currentHelpObj);
-    if (currentHelpObj && !currentHelpObj.title) {
-      return;
-    }
-    const { title, des, rule, exam, required } = currentHelpObj;
-
-    return (
-      <span className="label-help-tip">
-        <span className="label">
-          {required ? <i>*</i> : ''} {title}
-          <Tooltip title={() => this.proHtml({ des, rule, exam })} color="rgba(244, 244, 244, 0.9)">
-            <QuestionCircleOutlined />
-          </Tooltip>
-          :{' '}
-        </span>
-      </span>
-    );
+  if (!props.keyLabel) {
+    return;
   }
-}
 
-export default LabelHelpTip;
+  const currentHelpObj = props.keyLabel && labelHelpTip && labelHelpTip[props.keyLabel];
+  if (currentHelpObj && !currentHelpObj.title) {
+    return;
+  }
+  const { title, des, rule, exam, required } = currentHelpObj;
+  return (
+    <span className="label-help-tip">
+      <span className="label">
+        {required ? <i>*</i> : ''} {title}
+        <Tooltip title={() => proHtml({ des, rule, exam })} color="rgba(244, 244, 244, 0.9)">
+          <QuestionCircleOutlined />
+        </Tooltip>
+        :{' '}
+      </span>
+    </span>
+  );
+};
