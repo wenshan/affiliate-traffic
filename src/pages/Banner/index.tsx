@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import bannerChannel from '@/constant/bannerChannel';
 import bannerType from '@/constant/bannerType';
 import { createBanner, delBanner, editBanner, queryBanner } from '@/services/api/banner';
@@ -239,6 +240,7 @@ const Banner: React.FC = () => {
 
   return (
     <PageContainer>
+      <DefaultProject></DefaultProject>
       <ProTable<API.RuleListItem, API.PageParams>
         tableClassName="page-table"
         headerTitle="数据表"

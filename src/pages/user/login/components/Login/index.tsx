@@ -8,11 +8,11 @@ import {
   WeiboCircleOutlined,
 } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
-import { history, useModel, useSearchParams } from '@umijs/max';
 import { Alert, message } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { history, useModel, useSearchParams } from 'umi';
 
 import './index.less';
 
@@ -117,6 +117,7 @@ const Login: React.FC = () => {
   const fetchUserInfoHandler = async () => {
     if (initialState && initialState.fetchUserInfo) {
       const userInfo = await initialState?.fetchUserInfo?.();
+      console.log('userInfo:', userInfo);
       if (userInfo) {
         flushSync(() => {
           setInitialState((s: any) => ({
@@ -136,6 +137,8 @@ const Login: React.FC = () => {
       if (result && result.status === 200 && result.data) {
         message.success(result.msg || '登录成功！');
         await fetchUserInfoHandler();
+        const urlParams = new URL(window.location.href).searchParams;
+        history.push(urlParams.get('redirect') || '/Welcome');
         return;
       } else {
         setUserLoginState(result);

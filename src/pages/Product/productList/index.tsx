@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import Tool from '@/utils/tool';
 import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -514,6 +515,7 @@ class ProductList extends Component {
       <PageContainer>
         <div className="page">
           <div className="product-list">
+            <DefaultProject></DefaultProject>
             <div className="header">
               <Row>
                 <Col span={6}>

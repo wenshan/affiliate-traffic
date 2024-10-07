@@ -31,6 +31,7 @@ const defaultProductDetail = {
   material: '',
   price: '',
   sale_price: '',
+  discount: '',
   product_detail: [], // 商品属性
   product_highlight: '',
   productHeight: '',

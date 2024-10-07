@@ -25,6 +25,7 @@ export default {
       token_type: 'Bearer',
       user_project_group_id: 1,
     },
+    defaultProject: {},
   },
 
   subscriptions: {

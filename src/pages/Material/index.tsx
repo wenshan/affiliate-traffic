@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import {
@@ -504,6 +505,7 @@ class Material extends Component {
       <PageContainer>
         <div className="page">
           <div className="material">
+            <DefaultProject></DefaultProject>
             <div className="content">
               <Row>
                 <Col span={5}>

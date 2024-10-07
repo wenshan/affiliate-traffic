@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import { defaultCurrentProductMain, defaultProductDetail } from '@/constant/defaultCurrentData';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Modal, Table } from 'antd';
@@ -232,6 +233,7 @@ class ProductCreate extends Component {
       <PageContainer>
         <div className="page">
           <div className="product-create">
+            <DefaultProject></DefaultProject>
             <div className="header">
               <div className="creat-button">
                 <Button type="primary" size="large" onClick={this.createMainModalStatusHandle}>

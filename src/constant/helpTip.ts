@@ -68,6 +68,14 @@ export default {
     exam: '15.00 USD',
     link: '',
   },
+  discount: {
+    title: '价格折扣',
+    des: '商品的促销价 = 商品价格 * 折扣',
+    rule: '',
+    exam: '10',
+    required: true,
+    link: '',
+  },
   google_product_category: {
     title: 'Google商品类别',
     des: 'Google为商品定义的商品类别',

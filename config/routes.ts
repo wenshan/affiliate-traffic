@@ -29,6 +29,20 @@ export default [
     component: './Welcome',
   },
   {
+    name: '项目管理',
+    path: '/project',
+    icon: 'profile',
+    layout: true,
+    component: './ProjectGroup',
+    routes: [
+      {
+        name: '项目列表',
+        path: '/project/index',
+        component: './ProjectGroup',
+      },
+    ],
+  },
+  {
     name: '广告管理',
     path: '/banner',
     icon: 'table',
@@ -53,20 +67,6 @@ export default [
         name: '素材列表',
         path: '/material/index',
         component: './Material',
-      },
-    ],
-  },
-  {
-    name: '项目管理',
-    path: '/project',
-    icon: 'profile',
-    layout: true,
-    component: './ProjectGroup',
-    routes: [
-      {
-        name: '项目列表',
-        path: '/project/index',
-        component: './ProjectGroup',
       },
     ],
   },

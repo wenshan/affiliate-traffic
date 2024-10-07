@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
@@ -395,6 +396,7 @@ class ProductListCompos extends Component {
       <PageContainer>
         <div className="page">
           <div className="product-list">
+            <DefaultProject></DefaultProject>
             <div className="header">
               <Space>
                 <div className="form-item">

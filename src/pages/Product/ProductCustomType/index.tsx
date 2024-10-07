@@ -1,8 +1,9 @@
+import DefaultProject from '@/components/DefaultProject';
 import { defaultProductCustomType } from '@/constant/defaultCurrentData';
 import { delType, queryTypeAll } from '@/services/api/productType';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, Modal, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import ProductCustomTypeModal from '../components/ProductCustomTypeModal';
@@ -136,35 +137,38 @@ export default () => {
   ];
 
   return (
-    <div className="product-custom-type">
-      <ProTable<ProductCustomType>
-        columns={columns}
-        actionRef={actionRef}
-        rowKey="id"
-        pagination={false}
-        dataSource={dataTypeList}
-        headerTitle="自定义分类列表"
-        search={false}
-        toolBarRender={() => [
-          <Button
-            key="button"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              handelTableAdd();
-            }}
-            type="primary"
-          >
-            新建
-          </Button>,
-        ]}
-      />
-      <ProductCustomTypeModal
-        open={isProductTypeShow}
-        optionAction={productTypeOptionAction}
-        openStatusCallback={productTypeOpenStatusCallback}
-        initData={initData}
-        callbackOk={productTypeCallBackOk}
-      ></ProductCustomTypeModal>
-    </div>
+    <PageContainer>
+      <div className="product-custom-type">
+        <DefaultProject></DefaultProject>
+        <ProTable<ProductCustomType>
+          columns={columns}
+          actionRef={actionRef}
+          rowKey="id"
+          pagination={false}
+          dataSource={dataTypeList}
+          headerTitle="自定义分类列表"
+          search={false}
+          toolBarRender={() => [
+            <Button
+              key="button"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                handelTableAdd();
+              }}
+              type="primary"
+            >
+              新建
+            </Button>,
+          ]}
+        />
+        <ProductCustomTypeModal
+          open={isProductTypeShow}
+          optionAction={productTypeOptionAction}
+          openStatusCallback={productTypeOpenStatusCallback}
+          initData={initData}
+          callbackOk={productTypeCallBackOk}
+        ></ProductCustomTypeModal>
+      </div>
+    </PageContainer>
   );
 };

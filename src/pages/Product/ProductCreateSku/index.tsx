@@ -1,8 +1,9 @@
+import DefaultProject from '@/components/DefaultProject';
 import { costsExchangeTypeCurrency } from '@/constant/defaultCurrentData';
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool.js';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Col, Image, Input, Radio, Row, Select, Table } from 'antd';
+import { Button, Col, Image, Input, InputNumber, Radio, Row, Select, Table } from 'antd';
 import QueryString from 'query-string';
 import { Component, JSX } from 'react';
 import { connect } from 'umi';
@@ -46,8 +47,6 @@ class ProductCreateSku extends Component {
     const { currentProductMain, costsExchange } = this.props.product;
     const { preSalePrice } = currentProductMain;
     const price = (costsExchange[value] * preSalePrice).toFixed(2);
-    console.log(preSalePrice, costsExchange[value]);
-    console.log('price:', price);
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
@@ -105,6 +104,29 @@ class ProductCreateSku extends Component {
         sale_price: value,
       },
     });
+  };
+  // 商品折扣
+  discountInputHandle = (value: number) => {
+    const { currentProductMain } = this.props.product;
+    const { sale_price } = currentProductMain;
+    if (value > 0) {
+      const initSalePrice = sale_price * ((100 - value) / 100).toFixed(2);
+      this.props.dispatch({
+        type: 'product/updateProduct',
+        payload: {
+          discount: value,
+          sale_price: initSalePrice,
+        },
+      });
+    } else {
+      this.props.dispatch({
+        type: 'product/updateProduct',
+        payload: {
+          discount: value,
+          sale_price,
+        },
+      });
+    }
   };
   // lifestyle_image_link 生活风格图片链接
   productLifestyleImageLinkInputHandle = (e) => {
@@ -562,6 +584,7 @@ class ProductCreateSku extends Component {
       title,
       price,
       sale_price,
+      discount,
       color,
       material,
       product_highlight,
@@ -596,6 +619,7 @@ class ProductCreateSku extends Component {
       <PageContainer>
         <div className="page">
           <div className="product-sku">
+            <DefaultProject></DefaultProject>
             <div className="header">
               <div className="sub-header">主数据</div>
             </div>
@@ -838,6 +862,18 @@ class ProductCreateSku extends Component {
                   value={price}
                   onChange={this.priceInputHandle}
                   suffix={monetary_unit}
+                />
+              </div>
+              <div className="form-item">
+                <LabelHelpTip keyLabel="discount"></LabelHelpTip>
+                <InputNumber
+                  placeholder="折扣"
+                  style={{ width: 120 }}
+                  max={50}
+                  min={0}
+                  value={discount}
+                  onChange={this.discountInputHandle}
+                  suffix="%"
                 />
               </div>
               <div className="form-item">

@@ -178,7 +178,6 @@ class ImageSelectModal extends Component {
   };
   // 图片素材操作
   handelCheckCallback = (items) => {
-    console.log('items:', items);
     this.setState({
       selectedMaterial: items,
     });
@@ -200,18 +199,6 @@ class ImageSelectModal extends Component {
     }
     return html;
   };
-
-  /*
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    // console.log('nextProps folderDirectory:', nextProps.folderDirectory);
-    if (this.props.folderDirectory !== nextProps.folderDirectory || this.props.currentFolderDirectory !== nextProps.currentFolderDirectory) {
-      this.setState({
-        folderDirectory: nextProps.folderDirectory,
-        currentFolderDirectory: nextProps.currentFolderDirectory,
-      });
-    }
-  }
-  */
 
   render() {
     const { imageLimitNum, imageList, folderDirectory } = this.props;

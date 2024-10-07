@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import { deleteGoogleMerchant, getProductListAll } from '@/services/api/googleMerchant';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -279,6 +280,7 @@ export default () => {
   ];
   return (
     <PageContainer>
+      <DefaultProject></DefaultProject>
       <ProTable<GoogleMerchant>
         columns={columns}
         actionRef={actionRef}

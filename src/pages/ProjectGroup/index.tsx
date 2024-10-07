@@ -1,3 +1,4 @@
+import DefaultProject from '@/components/DefaultProject';
 import { getUserEmail } from '@/services/api/api';
 import {
   googleMerchantAccountGet,
@@ -85,6 +86,11 @@ export default () => {
       title: 'name',
       dataIndex: 'name',
       key: 'name',
+    },
+    {
+      title: '项目ID',
+      dataIndex: 'projectId',
+      key: 'projectId',
     },
     {
       title: '网站',
@@ -218,6 +224,7 @@ export default () => {
   return (
     <PageContainer className="project-group">
       <div className="google-account">
+        <DefaultProject></DefaultProject>
         <div className="header">
           <h3>验证&查询 Google Merchant 账号信息</h3>
         </div>

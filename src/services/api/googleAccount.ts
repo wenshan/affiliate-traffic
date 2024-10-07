@@ -68,3 +68,9 @@ export const setDefault = async (params: any) => {
     data: params,
   });
 };
+export const getDefaultProject = async () => {
+  return request('/api/shopping/getDefaultProject', {
+    method: 'POST',
+    data: {},
+  });
+};
