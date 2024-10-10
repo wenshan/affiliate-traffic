@@ -1,61 +1,53 @@
-import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { Col, Modal, Row } from 'antd';
-import { useEffect, useState } from 'react';
-import { useModel } from 'umi';
+import { Component } from 'react';
 import ImgList from '../../../Material/components/ImgList';
 
 import './index.less';
 
-function ImageSelectModal(props) {
-  console.log('ImageSelectModal props:', props);
-  const {
-    queryFolderFetch,
-    selectFolderDirectory,
-    createFolderFetch,
-    editFolderFetch,
-    currentFolderDirectory,
-    delFolderFetch,
-    folderDirectoryRows,
-    setFolderDirectory,
-    setFolderDirectoryRows,
-    setSelectFolderDirectory,
-    queryFolderMaterialFetch,
-    folderDirectory,
-    setCheckFolderDirectory,
-    checkFolderDirectory,
-    otherFolderDirectory,
-    setOtherFolderDirectory,
-    selectedMaterial,
-    setSelectedMaterial,
-  } = useModel('material');
-  const [limit] = useState(props.imageLimitNum || 20);
-  const [selectedType] = useState(props.selectedType);
+class ImageSelectModal extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      folderDirectory: props.folderDirectory,
+      limit: props.imageLimitNum,
+      selectedMaterial: [],
+    };
+  }
 
-  const handleOk = () => {
-    if (props.callbackOk) {
-      props.callbackOk(selectedMaterial);
+  handelTableAdd = () => {};
+
+  handelTableDel = () => {};
+
+  // Modal
+  handleOk = () => {
+    const { selectedMaterial } = this.state;
+    if (this.props.callbackOk) {
+      this.props.callbackOk(selectedMaterial);
     }
   };
-  const handleCancel = () => {
-    if (props.callbackCancel) {
-      props.callbackCancel();
-    }
-    setSelectedMaterial([]);
-  };
-  const handleClickFolderMenu = async (currentItem) => {
-    if (currentItem && currentItem.key) {
-      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      setSelectFolderDirectory(currentItem);
-      await queryFolderMaterialFetch(currentItem);
+
+  handleCancel = () => {
+    if (this.props.callbackCancel) {
+      this.props.callbackCancel();
     }
   };
-  const folderMenuHtml = () => {
+
+  nameInputHandle = () => {};
+
+  valueInputHandle = () => {};
+  handleClickFolderMenu = (currentItem) => {
+    if (this.props.folderMenuSelectCallback && currentItem && currentItem.key) {
+      this.props.folderMenuSelectCallback(currentItem);
+    }
+  };
+
+  folderMenuHtml = () => {
     const html = [];
+    const { folderDirectory } = this.props;
     if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
+      // eslint-disable-next-line array-callback-return
       folderDirectory.map((item, index) => {
         if (item.children) {
           html.push(
@@ -63,7 +55,7 @@ function ImageSelectModal(props) {
               <div
                 title={item.label}
                 className="item"
-                onClick={() => handleClickFolderMenu(item)}
+                onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
               >
                 <span className="space"></span>
@@ -81,7 +73,7 @@ function ImageSelectModal(props) {
                         <div
                           title={childrenItem.label}
                           className="item item-second"
-                          onClick={() => handleClickFolderMenu(childrenItem)}
+                          onClick={() => this.handleClickFolderMenu(childrenItem)}
                         >
                           <span className="space"></span>
                           {childrenItem.is_default === 0 ? (
@@ -104,7 +96,7 @@ function ImageSelectModal(props) {
                                   <div
                                     title={children2Item.label}
                                     className="item item-third"
-                                    onClick={() => handleClickFolderMenu(children2Item)}
+                                    onClick={() => this.handleClickFolderMenu(children2Item)}
                                   >
                                     <span className="space"></span>
                                     {children2Item.is_default === 0 ? (
@@ -129,7 +121,9 @@ function ImageSelectModal(props) {
                                             <div
                                               title={children3Item.label}
                                               className="item item-fourth"
-                                              onClick={() => handleClickFolderMenu(children3Item)}
+                                              onClick={() =>
+                                                this.handleClickFolderMenu(children3Item)
+                                              }
                                             >
                                               <span className="space"></span>
                                               {children3Item.is_default === 0 ? (
@@ -167,7 +161,7 @@ function ImageSelectModal(props) {
               <div
                 title={item.label}
                 className="item"
-                onClick={() => handleClickFolderMenu(item)}
+                onClick={() => this.handleClickFolderMenu(item)}
                 key={item.key}
               >
                 <span className="space"></span>
@@ -182,57 +176,71 @@ function ImageSelectModal(props) {
 
     return html;
   };
-  const imageSubTitle = () => {
+  // 图片素材操作
+  handelCheckCallback = (items) => {
+    this.setState({
+      selectedMaterial: items,
+    });
+  };
+
+  // subTile
+  imageSubTitle = () => {
     let html = '';
-    const { selectedType, imageLimitNum } = props;
-    if (selectedType === 'image_link') {
-      html = `选择商品主图（选择${imageLimitNum}张图片）`;
-    } else if (selectedType === 'additional_image_link') {
-      html = `商品附加图片（选择${imageLimitNum}张图片）`;
+    const { selectedType } = this.props;
+    // eslint-disable-next-line eqeqeq
+    if (selectedType == 'image_link') {
+      html = '选择商品主图（选择1张图片）';
       // eslint-disable-next-line eqeqeq
-    } else if (selectedType === 'lifestyle_image_link') {
-      html = `添加商品详情（最多选择${imageLimitNum}张图片）`;
+    } else if (selectedType == 'additionalImageLinks') {
+      html = '商品附加图片（选择5张图片）';
+      // eslint-disable-next-line eqeqeq
+    } else if (selectedType == 'lifestyleImageLinks') {
+      html = '添加商品详情（最多选择10张图片）';
     }
     return html;
   };
 
-  useEffect(() => {
-    queryFolderFetch();
-  }, []);
-
-  return (
-    <div className="image-select-modal">
-      <Modal
-        className="wrap-select-modal"
-        title="选择图片素材 "
-        open={props.open}
-        width={1000}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <div className="content">
-          <Row>
-            <Col span={5}>
-              <div className="folder-menu">
-                <div className="header">
-                  <FolderOpenOutlined /> 文件目录
+  render() {
+    const { imageLimitNum, imageList, folderDirectory } = this.props;
+    return (
+      <div className="image-select-modal">
+        <Modal
+          className="wrap-select-modal"
+          title="选择图片素材 "
+          open={this.props.open}
+          width={1100}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+        >
+          <div className="content">
+            <Row>
+              <Col span={5}>
+                <div className="folder-menu">
+                  <div className="header">
+                    {' '}
+                    <FolderOpenOutlined /> 文件目录
+                  </div>
+                  <div className="menu-wrap">
+                    <ul>{folderDirectory && this.folderMenuHtml()}</ul>
+                  </div>
                 </div>
-                <div className="menu-wrap">
-                  <ul>{folderDirectory && folderMenuHtml()}</ul>
+              </Col>
+              <Col span={19}>
+                <div className="sub-title">{this.imageSubTitle()}</div>
+                <div className="imglist-modal">
+                  <ImgList
+                    limit={imageLimitNum}
+                    dataSource={imageList || []}
+                    onChangeCallback={this.handelCheckCallback}
+                  ></ImgList>
                 </div>
-              </div>
-            </Col>
-            <Col span={19}>
-              <div className="sub-title">{imageSubTitle()}</div>
-              <div className="imglist-modal">
-                <ImgList limit={props.imageLimitNum}></ImgList>
-              </div>
-            </Col>
-          </Row>
-        </div>
-      </Modal>
-    </div>
-  );
+              </Col>
+            </Row>
+          </div>
+        </Modal>
+      </div>
+    );
+  }
 }
 
 export default ImageSelectModal;

@@ -355,7 +355,6 @@ export default {
         if (result && result.status && result.status === 200) {
           // yield put({ type: 'queryType' });
           message.success({ content: '添加商品分类成功' });
-          console.log('添加商品分类成功');
         } else {
           message.error({ content: result.msg });
         }
@@ -514,10 +513,12 @@ export default {
       const { productDetail, currentProductMain } = yield select((state) => state.product);
       const {
         id,
-        title: title_main,
+        title_main,
         offer_id,
         google_product_category,
         google_product_category_id,
+        product_type,
+        product_type_id,
         gtin,
         brand,
       } = currentProductMain;
@@ -542,8 +543,7 @@ export default {
         productWeight,
         availability,
         description,
-        product_type,
-        product_type_id,
+        discount,
       } = productDetail;
       if (
         title &&
@@ -557,7 +557,10 @@ export default {
         id &&
         product_type &&
         google_product_category &&
-        offer_id
+        offer_id &&
+        sale_price &&
+        price &&
+        product_highlight
       ) {
         const result = yield call(createProduct, {
           title,
@@ -589,6 +592,7 @@ export default {
           offer_id,
           gtin,
           brand,
+          discount,
         });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });
@@ -831,14 +835,13 @@ export default {
           },
         });
       } else {
-        message.error({ content: '成本汇率同步失败' });
+        message.error({ content: '请在【成本&汇率】页面完成成本&汇率基本设置' });
       }
     },
   },
 
   reducers: {
     updateProduct(state, { payload: data }) {
-      console.log(data);
       const { productDetail } = state;
       const newProductDetail = Object.assign({}, productDetail, data);
       return Object.assign({}, state, { productDetail: newProductDetail });

@@ -88,6 +88,7 @@ class ProductCreateSku extends Component {
   // 商品价格
   priceInputHandle = (e) => {
     const { value } = e.target;
+    console.log('sale_price:', value);
     this.props.dispatch({
       type: 'product/updateProduct',
       payload: {
@@ -107,10 +108,11 @@ class ProductCreateSku extends Component {
   };
   // 商品折扣
   discountInputHandle = (value: number) => {
-    const { currentProductMain } = this.props.product;
-    const { sale_price } = currentProductMain;
+    const { productDetail } = this.props.product;
+    const { price, sale_price } = productDetail;
     if (value > 0) {
-      const initSalePrice = sale_price * ((100 - value) / 100).toFixed(2);
+      const rate = ((100 - value) / 100).toFixed(2);
+      const initSalePrice = (price * rate).toFixed(2);
       this.props.dispatch({
         type: 'product/updateProduct',
         payload: {
@@ -345,11 +347,11 @@ class ProductCreateSku extends Component {
     });
   };
 
-  imageRenderView = (data: string[]) => {
+  imageRenderView = (data: string[] | string) => {
     const html: JSX.Element[] = [];
     if (data && Tool.isArray(data) && data.length) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      data.map((item: string) => {
+      // @ts-ignore
+      data.forEach((item: string) => {
         html.push(
           <>
             <div className="add-img-item" key={item}>
@@ -371,7 +373,7 @@ class ProductCreateSku extends Component {
     return html;
   };
   // 提交创建SKU
-  handelSubmitCreateSku = (product_sku_option_status) => {
+  handelSubmitCreateSku = (product_sku_option_status: number) => {
     if (product_sku_option_status > 0) {
       this.props.dispatch({
         type: 'product/editProduct',
@@ -570,7 +572,6 @@ class ProductCreateSku extends Component {
       productWeightUnitOption,
       costsExchange,
     } = this.props.product;
-    const { folderDirectory, imageList } = this.props.material;
     const {
       language,
       monetary_unit,
@@ -849,7 +850,7 @@ class ProductCreateSku extends Component {
                 <Select
                   defaultValue={[costsExchangeTypeCurrency[targetCountry]]}
                   value={monetary_unit}
-                  style={{ width: 120 }}
+                  style={{ width: 130 }}
                   onChange={this.monetaryUnitSelectHandle}
                   options={monetaryUnitOption}
                 />
@@ -858,18 +859,18 @@ class ProductCreateSku extends Component {
                 <LabelHelpTip keyLabel="price"></LabelHelpTip>
                 <Input
                   placeholder="价格"
-                  style={{ width: 120 }}
+                  style={{ width: 130 }}
                   value={price}
-                  onChange={this.priceInputHandle}
                   suffix={monetary_unit}
+                  disabled
                 />
               </div>
               <div className="form-item">
                 <LabelHelpTip keyLabel="discount"></LabelHelpTip>
                 <InputNumber
                   placeholder="折扣"
-                  style={{ width: 120 }}
-                  max={50}
+                  style={{ width: 130 }}
+                  max={60}
                   min={0}
                   value={discount}
                   onChange={this.discountInputHandle}
@@ -880,7 +881,7 @@ class ProductCreateSku extends Component {
                 <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
                 <Input
                   placeholder="售卖价格"
-                  style={{ width: 120 }}
+                  style={{ width: 130 }}
                   value={sale_price}
                   onChange={this.salePriceInputHandle}
                   suffix={monetary_unit}
@@ -1077,9 +1078,6 @@ class ProductCreateSku extends Component {
           open={this.state.isProductImageModal}
           callbackCancel={this.productImageCallbackCancel}
           callbackOk={this.productImageCallbackOk}
-          folderDirectory={folderDirectory}
-          imageList={imageList}
-          folderMenuSelectCallback={this.handelFolderMenuSelect}
           selectedType={this.state.currentImageProductType}
           imageLimitNum={this.state.imageLimitNum}
         ></ImageSelectModal>

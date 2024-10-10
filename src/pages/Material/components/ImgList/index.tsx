@@ -1,24 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import {
   DeleteOutlined,
   DownloadOutlined,
   RotateRightOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
-import { Image, message } from 'antd';
-import React, { Component } from 'react';
+import { Image, Modal, message } from 'antd';
+import React, { useEffect } from 'react';
+import { useModel } from 'umi';
 
 import './index.less';
 
-class ImgList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      imageList: props.dataSource,
-      limit: props.limit || 20,
-    };
-  }
-  onDownload = (item) => {
+function ImgList(props: { limit: any }) {
+  const {
+    imageList,
+    setImageList,
+    delRemoteMaterialFetch,
+    delMaterialFetch,
+    selectedMaterial,
+    setSelectedMaterial,
+  } = useModel('material');
+  // const [ limit] = useState(props.limit || 20);
+  const onDownload = async (item: { url: string | URL | Request }) => {
     fetch(item.url)
       .then((response) => response.blob())
       .then((blob) => {
@@ -32,91 +34,83 @@ class ImgList extends Component {
         link.remove();
       });
   };
-
-  handelDelMaterial = (item) => {
-    if (this.props.delMaterialCallback && item) {
-      this.props.delMaterialCallback(item);
-    }
-  };
-
-  handelSelectCurrent = (currentItem) => {
-    const { imageList, limit } = this.state;
-    const checkedData = [];
-    // 单选
-    if (limit === 1) {
-      // eslint-disable-next-line array-callback-return
-      imageList.map((item: any[], idx: number) => {
-        if (item.keys === currentItem.keys) {
-          imageList[idx] = Object.assign({}, item, { current: true });
-          checkedData.push(Object.assign({}, item, { current: true }));
-        } else {
-          imageList[idx] = Object.assign({}, item, { current: false });
-          // checkedData.push(item);
-        }
+  const handelDelMaterial = async (item: any) => {
+    if (item.status === 1) {
+      Modal.confirm({
+        title: '确认删除',
+        content: '彻底删除服务文件，资源地址将失去访问',
+        onOk: async () => {
+          await delRemoteMaterialFetch(item);
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
       });
     } else {
-      // eslint-disable-next-line array-callback-return
-      imageList.map((item: any[], idx: number) => {
+      Modal.confirm({
+        title: '确认删除',
+        content: '当前的素材移动到垃圾桶内',
+        onOk: async () => {
+          await delMaterialFetch(item);
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    }
+  };
+  const handelSelectCurrent = async (currentItem: any) => {
+    const checkedData: any[] = [];
+    const { limit } = props;
+
+    if (imageList && imageList.length > 0) {
+      imageList.map((item: any) => {
         if (item.keys === currentItem.keys) {
           if (currentItem.current) {
-            imageList[idx] = Object.assign({}, item, { current: false });
           } else {
-            imageList[idx] = Object.assign({}, item, { current: true });
             checkedData.push(Object.assign({}, item, { current: true }));
           }
         } else {
-          if (item.current) {
+          if (item && item.current) {
             checkedData.push(item);
           }
         }
       });
-    }
 
-    if (limit > 1 && checkedData && checkedData.length > limit) {
-      message.success(`当前场景下素材一次操作限制${limit}张素材`);
-      return false;
+      if (checkedData && checkedData.length > limit) {
+        message.success(`当前场景下素材一次操作限制${limit}张素材`);
+        return false;
+      }
+      // @ts-ignore
+      setSelectedMaterial(checkedData);
+      // handelCheckCallback(checkedData);
     }
-
-    this.setState(
-      {
-        imageList,
-      },
-      () => {
-        if (this.props.onChangeCallback) {
-          this.props.onChangeCallback(checkedData);
-        }
-      },
-    );
   };
-
-  htmlLi = () => {
+  const htmlLi = () => {
     const html: React.JSX.Element[] = [];
-    const { imageList } = this.state;
-    // eslint-disable-next-line array-callback-return
-    imageList &&
-      imageList.length &&
-      imageList.map((item: { url: string | undefined; keys: string }) => {
+    if (imageList && imageList.length) {
+      imageList.forEach((item: any) => {
         html.push(
           <li className="item" key={item.keys}>
             <div className={item.current ? 'style current' : 'style'}>
-              <div className="checkbox_input" onClick={() => this.handelSelectCurrent(item)}>
+              <div className="checkbox_input" onClick={() => handelSelectCurrent(item)}>
                 <span className="checkbox_inner"></span>
               </div>
-              <div className="img-box" onClick={() => this.handelSelectCurrent(item)}>
+              <div className="img-box" onClick={() => handelSelectCurrent(item)}>
                 <Image width={160} src={item.url} preview={false} />
               </div>
               <div className="line"></div>
               <div className="tool">
-                <DeleteOutlined onClick={() => this.handelDelMaterial(item)} />
+                <DeleteOutlined onClick={() => handelDelMaterial(item)} />
                 <RotateRightOutlined />
                 <SwapOutlined />
-                <DownloadOutlined onClick={() => this.onDownload(item)} />
+                <DownloadOutlined onClick={() => onDownload(item)} />
               </div>
               <div className="line"></div>
               <div
                 className="title ellipsis"
                 title={item.filename}
-                onClick={() => this.handelSelectCurrent(item)}
+                onClick={() => handelSelectCurrent(item)}
               >
                 {item.filename}
               </div>
@@ -124,31 +118,45 @@ class ImgList extends Component {
           </li>,
         );
       });
+    }
+
     return html;
   };
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    // console.log('nextProps:', nextProps);
-    if (nextProps.dataSource !== this.props.dataSource) {
-      this.setState({
-        imageList: nextProps.dataSource,
-        checked: nextProps.checked,
-        limit: nextProps.limit,
-      });
+  const initSelectedMaterial = async () => {
+    const newImageList: any[] = [];
+    if (imageList && imageList.length > 0) {
+      if (selectedMaterial && selectedMaterial.length > 0) {
+        const mapMaterial = new Map();
+        selectedMaterial.forEach((item: { keys: any }) => {
+          mapMaterial.set(item.keys, item);
+        });
+        imageList.forEach((item: any[]) => {
+          if (item && item.keys && mapMaterial.get(item.keys)) {
+            newImageList.push(Object.assign({}, item, { current: true }));
+          } else {
+            newImageList.push(item);
+          }
+        });
+      } else {
+        imageList.forEach((item: any[]) => {
+          newImageList.push(Object.assign({}, item, { current: false }));
+        });
+      }
+      setImageList(newImageList);
     }
-  }
-
-  render() {
-    return (
-      <div className="imglist">
-        <div className="content">
-          <div className="list-owflow">
-            <ul className="list-ul">{this.htmlLi()}</ul>
-          </div>
+  };
+  useEffect(() => {
+    initSelectedMaterial();
+  }, [selectedMaterial]);
+  return (
+    <div className="imglist">
+      <div className="content">
+        <div className="list-owflow">
+          <ul className="list-ul">{imageList && htmlLi()}</ul>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default ImgList;

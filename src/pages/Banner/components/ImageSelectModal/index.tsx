@@ -130,7 +130,7 @@ const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCa
   };
 
   const folderMenuHtml = () => {
-    const html = [];
+    const html: React.JSX.Element[] = [];
     if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
       // eslint-disable-next-line array-callback-return
       folderDirectory.map((item, index) => {
@@ -327,7 +327,12 @@ const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCa
       }
     }
   };
-  const imageListOnDownload = (item) => {
+  const imageListOnDownload = (item: {
+    url: any;
+    keys?: string;
+    current?: any;
+    filename?: any;
+  }) => {
     fetch(item.url)
       .then((response) => response.blob())
       .then((blob) => {
@@ -388,6 +393,7 @@ const ImageSelectModal: React.FC = ({ open, selectedType, callbackOk, callbackCa
         open={open}
         width={1200}
         onOk={handleOk}
+        zIndex={999}
         onCancel={handleCancel}
       >
         <div className="content">

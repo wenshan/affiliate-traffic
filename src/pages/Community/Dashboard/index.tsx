@@ -146,172 +146,78 @@ const Dashboard: React.FC = () => {
                       <div className="list clearfix" key={`${item.unit}_${idx}list`}>
                         {item.room &&
                           item.room.length > 0 &&
-                          item.room.map(
-                            (
-                              list: {
-                                [x: string]: ReactNode;
-                                unit: any;
-                                room:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | null
-                                  | undefined;
-                                areas: any;
-                                region: any;
-                                build: any;
-                                name:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | React.ReactPortal
-                                  | null
-                                  | undefined;
-                                mobile:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | React.ReactPortal
-                                  | null
-                                  | undefined;
-                                propertyType: number;
-                                owner: number;
-                                submitConfirmation: number;
-                                signatureFile: string | undefined;
-                                contractPath: string | undefined;
-                                is_checkSignature: number;
-                                reviewer:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | React.ReactPortal
-                                  | null
-                                  | undefined;
-                                feedback:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | React.ReactPortal
-                                  | null
-                                  | undefined;
-                                createdAt:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | React.ReactPortal
-                                  | null
-                                  | undefined;
-                              },
-                              index: any,
-                            ) => (
-                              <Popover
-                                key={`${list.unit}_${index}_${list.room}_popover`}
-                                content={
-                                  <>
-                                    <p>
-                                      户号：
-                                      {`${list.areas}-${list.region}区-${list.build}幢-${list.unit}单元-${list.room}室`}
-                                    </p>
-                                    <p>姓名：{list.name}</p>
-                                    <p>userid：{list.userid}</p>
-                                    <p>Mobile：{list.mobile}</p>
-                                    <p>
-                                      产权类型：
-                                      {list.propertyType > 0 ? (
-                                        <>{list.propertyType === 1 ? '个人' : '公司'}</>
-                                      ) : (
-                                        '未知'
-                                      )}
-                                    </p>
-                                    <p>
-                                      是否拥有产权：
-                                      {list.owner > 0 ? (
-                                        <>{list.owner === 2 ? '有' : '没有'}</>
-                                      ) : (
-                                        '未知'
-                                      )}
-                                    </p>
-                                    <p>
-                                      意愿申报：
-                                      {list.submitConfirmation > 0 ? (
-                                        <>{list.submitConfirmation === 2 ? '同意' : '不同意'}</>
-                                      ) : (
-                                        '未知'
-                                      )}
-                                    </p>
-                                    {list.signatureFile && (
-                                      <p>
-                                        <img src={list.signatureFile} width={120} />
-                                      </p>
+                          item.room.map((list, index: any) => (
+                            <Popover
+                              key={`${list.unit}_${index}_${list.room}_popover`}
+                              content={
+                                <>
+                                  <p>
+                                    户号：
+                                    {`${list.areas}-${list.region}区-${list.build}幢-${list.unit}单元-${list.room}室`}
+                                  </p>
+                                  <p>姓名：{list.name}</p>
+                                  <p>userid：{list.userid}</p>
+                                  <p>Mobile：{list.mobile}</p>
+                                  <p>
+                                    产权类型：
+                                    {list.propertyType > 0 ? (
+                                      <>{list.propertyType === 1 ? '个人' : '公司'}</>
+                                    ) : (
+                                      '未知'
                                     )}
-                                    {list.contractPath && (
-                                      <p>
-                                        申报协议：
-                                        <a
-                                          href={list.contractPath}
-                                          target="_blank"
-                                          rel="noreferrer"
-                                        >
-                                          点击查看
-                                        </a>
-                                      </p>
+                                  </p>
+                                  <p>
+                                    是否拥有产权：
+                                    {list.owner > 0 ? (
+                                      <>{list.owner === 2 ? '有' : '没有'}</>
+                                    ) : (
+                                      '未知'
                                     )}
+                                  </p>
+                                  <p>
+                                    意愿申报：
+                                    {list.submitConfirmation > 0 ? (
+                                      <>{list.submitConfirmation === 2 ? '同意' : '不同意'}</>
+                                    ) : (
+                                      '未知'
+                                    )}
+                                  </p>
+                                  {list.signatureFile && (
                                     <p>
-                                      审核状态：{list.is_checkSignature === 1 ? '已审核' : '未审核'}
+                                      <img src={list.signatureFile} width={120} />
                                     </p>
-                                    <p>审核人：{list.reviewer ? list.reviewer : '未审核'}</p>
-                                    <p>反馈信息：{list.feedback ? list.feedback : '无'}</p>
-                                    <p>申报时间：{list.createdAt}</p>
-                                  </>
-                                }
-                                title="详情"
-                              >
-                                {list.submitConfirmation > 0 ? (
-                                  <Space>
-                                    <Tag
-                                      color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}
-                                    >
-                                      {list.room} {list.feedback && <MessageOutline />}
-                                    </Tag>
-                                  </Space>
-                                ) : (
-                                  <Space>
-                                    <Tag>{list.room}</Tag>
-                                  </Space>
-                                )}
-                              </Popover>
-                            ),
-                          )}
+                                  )}
+                                  {list.contractPath && (
+                                    <p>
+                                      申报协议：
+                                      <a href={list.contractPath} target="_blank" rel="noreferrer">
+                                        点击查看
+                                      </a>
+                                    </p>
+                                  )}
+                                  <p>
+                                    审核状态：{list.is_checkSignature === 1 ? '已审核' : '未审核'}
+                                  </p>
+                                  <p>审核人：{list.reviewer ? list.reviewer : '未审核'}</p>
+                                  <p>反馈信息：{list.feedback ? list.feedback : '无'}</p>
+                                  <p>申报时间：{list.createdAt}</p>
+                                </>
+                              }
+                              title="详情"
+                            >
+                              {list.submitConfirmation > 0 ? (
+                                <Space>
+                                  <Tag color={`${list.submitConfirmation === 2 ? 'green' : 'red'}`}>
+                                    {list.room} {list.feedback && <MessageOutline />}
+                                  </Tag>
+                                </Space>
+                              ) : (
+                                <Space>
+                                  <Tag>{list.room}</Tag>
+                                </Space>
+                              )}
+                            </Popover>
+                          ))}
                       </div>
                     </div>
                   </>,

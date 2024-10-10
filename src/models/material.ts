@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* @ts-ignore */
-
 import {
   createFolder,
   delFolder,
@@ -12,208 +11,206 @@ import {
 } from '@/services/api/material';
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import { message } from 'antd';
+import { useState } from 'react';
 
-export default {
-  namespace: 'material',
-  state: {
-    platform: 'pc', // wap:浏览器访问 wxwap: 微信访问
-    mobile: '',
-    type: 1, // 登录参数 1.微信 2.QQ 3.穿新衣 4.微信公众号 5.芝麻信用 6.京东 7.宝宝树 8.返利 9.QQ内部应用登录 10.微信积分购小程序 11. 支付宝无线换小程序 12.微信无线换小程序 13.微信穿新衣小程序
-    query: '',
-    code: '', // 微信code
-    state: '',
-    isAuthorized: false, // 是否已经授权
-    currentUser: {
-      access_token: '',
-      expires_in: '',
-      nickname: 'nickname',
-      refresh_token: '',
-      openid: '',
-      unionid: '',
-      email: '',
-      userid: '',
-    },
-    imageList: [],
-    defaultFolderDirectory: {
-      label: '默认分组',
-      key: '00000000',
-      is_default: true,
-      active: true,
-      is_leaf: 1,
-      key_path: '',
-      father_key: '',
-    },
-    selectFolderDirectory: {},
-    currentFolderDirectory: {},
-    addFolderDirectory: {
-      label: '',
-      is_default: false,
-      active: true,
-      is_leaf: 1,
-      father_key: '',
-    },
-    folderDirectoryRows: [],
-    folderDirectory: [
-      {
-        label: '默认分组',
-        key: '00000000',
-        is_default: true,
-        active: true,
-        data: {
-          count: 1,
-          rows: [],
-        },
-      },
-    ],
-    folderDirectoryMap: {},
-  },
-
-  subscriptions: {},
-
-  effects: {
-    *queryFolder({ payload }, { call, put, select }) {
-      const { currentFolderDirectory, selectFolderDirectory } = yield select(
-        (state) => state.material,
-      );
-      const result = yield call(queryFolder);
-      const map = new Map();
-      if (result.status === 200 && result.data && result.data.rows) {
-        // 已删除文件放在最后排序
-        const rows = result.data.rows;
-        const newRows: { key: string; father_key: string; is_leaf: any }[] = [];
-        rows &&
-          rows.length &&
-          rows.map((item: { key: string }) => {
-            if (item.key !== '11111111') {
-              if (
-                selectFolderDirectory &&
-                selectFolderDirectory.key &&
-                selectFolderDirectory.key === item.key
-              ) {
-                newRows.push(Object.assign({}, item, { title: item.label, checked: true }));
-              } else {
-                newRows.push(Object.assign({}, item, { title: item.label, checked: false }));
-              }
-            }
-            if (
-              selectFolderDirectory &&
-              selectFolderDirectory.key &&
-              selectFolderDirectory.key === item.key
-            ) {
-              map.set(item.key, Object.assign({}, item, { checked: true }));
-            } else {
-              map.set(item.key, Object.assign({}, item, { checked: false }));
-            }
-          });
-        newRows.push(
-          Object.assign({}, rows[1], {
-            title: rows[1] && rows[1].label,
-            checked: false,
-            active: 1,
-          }),
-        );
-        const { rowsTree, rowsList } = listToTreeSelf(newRows, currentFolderDirectory);
-        const initFolderDirectory =
-          currentFolderDirectory && currentFolderDirectory.key
-            ? currentFolderDirectory
-            : Object.assign({}, rowsTree[0], { active: 1 });
-        yield put({
-          type: 'update',
-          payload: {
-            folderDirectory: rowsTree,
-            folderDirectoryRows: rowsList,
-            currentFolderDirectory: initFolderDirectory,
-          },
-        });
-        // 初始化默认文件夹素材
-        yield put({ type: 'queryFolderMaterial', payload: { ...rowsTree[0] } });
-      }
-    },
-    // subscriptions 更新当前的用户信息
-    *editFolder({ payload: data }, { call, put, select }) {
-      const result = yield call(editFolder, data);
-      if (result.status === 200 && result.data) {
-        yield put({ type: 'queryFolder' });
-      }
-    },
-    // 删除文件夹
-    *delFolder({ payload: data }, { call, put, select }) {
-      if (data && data.key) {
-        if (data.is_leaf === 1) {
-          const result = yield call(delFolder, data);
-          if (result.status === 200 && result.data) {
-            yield put({ type: 'queryFolder' });
-          }
-        } else {
-          message.error('不是根节点不能删除');
-        }
-      }
-    },
-    *createFolder({ payload: data }, { call, put, select }) {
-      const result = yield call(createFolder, data);
-      if (result.status === 200 && result.data) {
-        yield put({ type: 'queryFolder' });
-      }
-    },
-    *queryFolderMaterial({ payload: data }, { call, put, select }) {
-      const { folderDirectory, currentFolderDirectory } = yield select((state) => state.material);
-      if (data) {
-        const paramsKeys = [];
-        paramsKeys.push(data.key);
-        if (data.children && data.children.length > 0) {
-          data.children.map((itemChildren) => {
-            paramsKeys.push(itemChildren.key);
-            if (itemChildren.children && itemChildren.children.length) {
-              itemChildren.children.map((itemChildren2) => {
-                paramsKeys.push(itemChildren2.key);
-                if (itemChildren2.children && itemChildren2.children.length) {
-                  itemChildren2.children.map((itemChildren3) => {
-                    paramsKeys.push(itemChildren3.key);
-                  });
-                }
-              });
-            }
-          });
-        }
-        const result = yield call(queryFolderMaterial, { key: paramsKeys.join(',') });
-        if (result.status === 200 && result.data && data && data.key) {
-          // console.log('folderDirectory:', folderDirectory);
-          // eslint-disable-next-line array-callback-return
-          folderDirectory.map((item: { key: any }, idx: string | number) => {
-            if (folderDirectory[idx] && item && Number(item.key) === Number(data.key)) {
-              folderDirectory[idx] = Object.assign({}, item, { data: result.data });
-            }
-          });
-          // console.log('folderDirectory:', folderDirectory);
-          yield put({
-            type: 'update',
-            payload: {
-              folderDirectory,
-              imageList: result.data.rows,
-            },
-          });
-        }
-      }
-    },
-    *delMaterial({ payload: data }, { call, put, select }) {
-      const { currentFolderDirectory } = yield select((state: { material: any }) => state.material);
-      const result = yield call(delMaterial, data);
-      if (result.status === 200 && result.data) {
-        yield put({ type: 'queryFolderMaterial', payload: currentFolderDirectory });
-      }
-    },
-    *delRemoteMaterial({ payload: data }, { call, put, select }) {
-      const { currentFolderDirectory } = yield select((state: { material: any }) => state.material);
-      const result = yield call(delRemoteMaterial, data);
-      if (result.status === 200 && result.data) {
-        yield put({ type: 'queryFolderMaterial', payload: currentFolderDirectory });
-      }
-    },
-  },
-
-  reducers: {
-    update(state, { payload: data }) {
-      return { ...state, ...data };
-    },
-  },
+type ImageListObject = {
+  [key: string]: any;
 };
+
+type DefaultFolderDirectoryType = {
+  label: string;
+  key: string;
+  is_default: boolean;
+  active: number;
+  is_leaf: string;
+  key_path: string;
+  father_key: string;
+  [key: string]: any;
+};
+const defaultFolderDirectory = {
+  label: '默认分组',
+  key: '00000000',
+  is_default: true,
+  active: true,
+  is_leaf: 1,
+  key_path: '',
+  father_key: '',
+};
+const addFolderDirectoryInit = {
+  label: '',
+  is_default: false,
+  active: true,
+  is_leaf: 1,
+  father_key: '',
+};
+
+const folderDirectoryInit = [
+  {
+    label: '默认分组',
+    key: '00000000',
+    is_default: true,
+    active: true,
+    data: {
+      count: 1,
+      rows: [],
+    },
+  },
+];
+
+const otherFolderDirectoryInit = {
+  key: '11111111',
+  label: '垃圾桶',
+  is_default: false,
+  active: false,
+  is_leaf: 1,
+};
+
+function Material() {
+  const [imageList, setImageList] = useState<ImageListObject>();
+  const [checkFolderDirectory, setCheckFolderDirectory] = useState<DefaultFolderDirectoryType>();
+  const [selectFolderDirectory, setSelectFolderDirectory] = useState<DefaultFolderDirectoryType>();
+  const [currentFolderDirectory, setCurrentFolderDirectory] =
+    useState<DefaultFolderDirectoryType>();
+  const [otherFolderDirectory, setOtherFolderDirectory] = useState(otherFolderDirectoryInit);
+  const [folderDirectoryRows, setFolderDirectoryRows] = useState([]);
+  const [folderDirectory, setFolderDirectory] = useState([]);
+  const [selectedMaterial, setSelectedMaterial] = useState([]); // 选取的素材
+  // 获取 分类
+  const queryFolderFetch = async () => {
+    const result = await queryFolder();
+    const map = new Map();
+    if (result.status === 200 && result.data && result.data.rows) {
+      // 已删除文件放在最后排序
+      const rows = result.data.rows;
+      const newRows: {
+        key: string;
+        father_key: string;
+        is_leaf: any;
+        label: string;
+        [key: string]: any;
+      }[] = [];
+      rows.forEach((item: { label: string; key: string }) => {
+        // @ts-ignore
+        newRows.push(Object.assign({}, item, { title: item.label, checked: false, active: 0 }));
+      });
+      // @ts-ignore
+      const initFolderDirectory =
+        selectFolderDirectory && selectFolderDirectory.key
+          ? selectFolderDirectory
+          : Object.assign({}, newRows[0], { active: 1 });
+      const { rowsTree, rowsList } = listToTreeSelf(newRows, initFolderDirectory);
+      setFolderDirectory(rowsTree);
+      setFolderDirectoryRows(rowsList);
+      setCurrentFolderDirectory(initFolderDirectory);
+      await queryFolderMaterialFetch(rowsTree[0]);
+    } else {
+      message.error(result.msg);
+    }
+  };
+  const editFolderFetch = async (data) => {
+    const result = await editFolder(data);
+    if (result && result.status === 200 && result.data) {
+      await queryFolderFetch();
+    } else {
+      message.error(result.msg);
+    }
+  };
+  const delFolderFetch = async (data: { [key: string]: any } | undefined) => {
+    if (data && data.key) {
+      if (data.is_leaf === 1) {
+        const result = await delFolder(data);
+        if (result && result.status === 200 && result.data) {
+          await queryFolderFetch();
+        } else {
+          message.error(result.msg);
+        }
+      } else {
+        message.error('不是根节点不能删除');
+      }
+    }
+  };
+  const createFolderFetch = async (data) => {
+    const result = await createFolder(data);
+    if (result && result.status === 200 && result.data) {
+      await queryFolderFetch();
+    } else {
+      message.error(result.msg);
+    }
+  };
+  const queryFolderMaterialFetch = async (data: { key: any; children?: any } | undefined) => {
+    if (
+      data &&
+      data.key &&
+      folderDirectory &&
+      folderDirectory.length > 0 &&
+      folderDirectoryRows &&
+      folderDirectoryRows.length > 0
+    ) {
+      const paramsKeys = [];
+      paramsKeys.push(data.key);
+      if (data.children && data.children.length > 0) {
+        data.children.map((itemChildren: { key: any; children: any[] }) => {
+          paramsKeys.push(itemChildren.key);
+          if (itemChildren.children && itemChildren.children.length) {
+            itemChildren.children.map((itemChildren2) => {
+              paramsKeys.push(itemChildren2.key);
+              if (itemChildren2.children && itemChildren2.children.length) {
+                itemChildren2.children.map((itemChildren3: { key: any }) => {
+                  paramsKeys.push(itemChildren3.key);
+                });
+              }
+            });
+          }
+        });
+      }
+      const result = await queryFolderMaterial({ key: paramsKeys.join(',') });
+      if (result.status === 200 && result.data && data && data.key) {
+        setImageList(result.data.rows);
+      } else {
+        message.error(result.msg);
+      }
+    }
+  };
+  const delMaterialFetch = async (data) => {
+    const result = await delMaterial(data);
+    if (result && result.status === 200 && result.data) {
+      await queryFolderMaterialFetch(selectFolderDirectory);
+    } else {
+      message.error(result.msg);
+    }
+  };
+  const delRemoteMaterialFetch = async (data) => {
+    const result = await delRemoteMaterial(data);
+    if (result && result.status === 200 && result.data) {
+      await queryFolderMaterialFetch(otherFolderDirectoryInit);
+    } else {
+      message.error(result.msg);
+    }
+  };
+  return {
+    setFolderDirectory,
+    setFolderDirectoryRows,
+    setSelectFolderDirectory,
+    setCheckFolderDirectory,
+    checkFolderDirectory,
+    currentFolderDirectory,
+    folderDirectoryRows,
+    folderDirectory,
+    selectFolderDirectory,
+    otherFolderDirectory,
+    setOtherFolderDirectory,
+    imageList,
+    setImageList,
+    selectedMaterial,
+    setSelectedMaterial,
+    queryFolderFetch,
+    delFolderFetch,
+    createFolderFetch,
+    editFolderFetch,
+    delMaterialFetch,
+    delRemoteMaterialFetch,
+    queryFolderMaterialFetch,
+  };
+}
+
+export default Material;

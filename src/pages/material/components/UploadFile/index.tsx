@@ -2,29 +2,38 @@ import { uploadFileURL } from '@/services/api/uploadFile';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message } from 'antd';
 import axios from 'axios';
+import { useModel } from 'umi';
 
 import './index.less';
 // https://github.com/react-component/upload#customrequest
-const UploadFile: React.FC = (props) => {
+const UploadFile: React.FC = () => {
   // console.log('UploadFile props:', props);
+  const { selectFolderDirectory, queryFolderMaterialFetch } = useModel('material');
   const uploadProps = {
+    accept: 'image/*',
     action: uploadFileURL(),
     multiple: false,
-    data: props.data,
+    data: selectFolderDirectory,
     headers: {},
     withCredentials: true,
     showUploadList: false,
-    onStart(file) {
+    directory: false,
+    maxCount: 1,
+    method: 'post',
+    onStart: async (file: { name: string }) => {
       console.log('onStart', file, file.name);
     },
-    onSuccess(res, file) {
-      if (props.callbackOk) {
-        props.callbackOk(file);
-      }
+    onSuccess: async (res: any, file: { name: any }) => {
+      message.success(`${file.name} 上传成功！`);
+      await queryFolderMaterialFetch(selectFolderDirectory);
       console.log('onSuccess', res, file.name);
     },
-    beforeUpload(file) {
-      if (props && props.data && props.data.is_leaf === 1) {
+    beforeUpload: async (file: { type: string; name: any }) => {
+      if (
+        selectFolderDirectory &&
+        selectFolderDirectory.is_leaf &&
+        selectFolderDirectory.is_leaf === 1
+      ) {
         const imgType = 'image/png,image/gif,image/jpg,image/jpeg';
         if (imgType.indexOf(file.type) < 0) {
           message.error(`${file.name} 不是jpg/jpeg/gif/png格式`);
@@ -34,16 +43,14 @@ const UploadFile: React.FC = (props) => {
         message.error(`当前文件夹不是叶子目录`);
       }
     },
-    onError(err) {
+    onError: async (err: any) => {
       console.log('onError', err);
-      if (props.handelUploadFailed) {
-        props.handelUploadFailed();
-      }
+      message.error('上传失败，请重试！');
     },
-    onProgress({ percent }, file) {
+    onProgress: async ({ percent }: any, file: { name: any }) => {
       console.log('onProgress', `${percent}%`, file.name);
     },
-    customRequest({
+    customRequest: async ({
       action,
       data,
       file,
@@ -53,7 +60,7 @@ const UploadFile: React.FC = (props) => {
       onProgress,
       onSuccess,
       withCredentials,
-    }) {
+    }) => {
       // EXAMPLE: post form-data with 'axios'
       // eslint-disable-next-line no-undef
       const formData = new FormData();
@@ -68,7 +75,7 @@ const UploadFile: React.FC = (props) => {
         .post(action, formData, {
           withCredentials,
           headers,
-          onUploadProgress: ({ total, loaded }) => {
+          onUploadProgress: ({ total = 1, loaded }) => {
             onProgress({ percent: Math.round((loaded / total) * 100).toFixed(2) }, file);
           },
         })
@@ -76,13 +83,6 @@ const UploadFile: React.FC = (props) => {
           onSuccess(response, file);
         })
         .catch(onError);
-      /*
-      return {
-        abort() {
-          console.log('upload progress is aborted.');
-        },
-      };
-      */
     },
   };
 

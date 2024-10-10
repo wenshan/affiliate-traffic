@@ -146,14 +146,14 @@ const TableList: React.FC = () => {
         },
       },
       render: (_, record) => {
-        let html = '';
+        let html = null;
         if (
           record &&
           record.signatureFile &&
           record.submitConfirmation &&
           record.submitConfirmation === 2
         ) {
-          if (record.is_checkSignature > 0) {
+          if (record.is_checkSignature && record.is_checkSignature > 0) {
             if (record.is_checkSignature === 1) {
               html = (
                 <div className="check-signature">
@@ -433,7 +433,7 @@ const TableList: React.FC = () => {
         },
       },
       render: (_, record) => {
-        let html = '';
+        let html = null;
         if (
           record &&
           record.signatureFile &&

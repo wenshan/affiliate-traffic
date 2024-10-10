@@ -274,6 +274,7 @@ const Banner: React.FC = () => {
         readonly={optionType === 2}
         autoFocusFirstInput
         modalProps={{
+          zIndex: 99,
           destroyOnClose: true,
           onCancel: () => setModalFormStatus(false),
         }}
@@ -376,6 +377,7 @@ const Banner: React.FC = () => {
             options={[
               { value: 'limeetpet', label: 'limeetpet' },
               { value: 'community', label: 'community' },
+              { value: 'qbs-tools', label: 'qbs-tools' },
             ]}
           />
         </ProForm.Group>
