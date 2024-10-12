@@ -72,7 +72,7 @@ export default (props: Props) => {
     onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
       setSelectedRows(selectedRows);
       setSelectedRowKeys(selectedRowKeys);
-      // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     },
     getCheckboxProps: (record: DataType) => ({
       checked: record.name === 'Disabled User', // Column configuration not to be checked
@@ -91,7 +91,7 @@ export default (props: Props) => {
       >
         <div className="content">
           <Table<DataType>
-            rowSelection={{ type: 'radio', ...rowSelection }}
+            rowSelection={{ type: 'checkbox', ...rowSelection }}
             columns={columns}
             dataSource={dataTypeList}
             pagination={false}

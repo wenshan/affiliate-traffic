@@ -64,9 +64,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
       },
     },
+    /*
     waterMarkProps: {
       content: initialState?.currentUser?.nickname,
     },
+    */
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;

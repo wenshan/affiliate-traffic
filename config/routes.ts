@@ -87,12 +87,12 @@ export default [
         component: './Product/ProductCustomType',
       },
       {
-        name: '创建主商品',
+        name: '主商品',
         path: '/product/ProductCreate',
         component: './Product/ProductCreate',
       },
       {
-        name: '创建SKU商品',
+        name: 'SKU商品',
         path: '/product/ProductCreateSku',
         hideInMenu: true,
         component: './Product/ProductCreateSku',

@@ -68,6 +68,7 @@ export default (props: Props) => {
     useState<currentProductMainRender>(defaultCurrentProductMain);
   const [isProductCategoryShow, setProductCategoryShow] = useState(false);
   const [isProductTypeShow, setProductTypeShow] = useState(false);
+  const [productTypeName, setProductTypeName] = useState('');
   const costsExchangeFetch = async () => {
     const result = await costsExchangeQuery();
     if (result && result.status === 200 && result.data) {
@@ -224,9 +225,14 @@ export default (props: Props) => {
   const productTypeCallBackOk = async ({ selectedRowKeys, selectedRows }) => {
     if (selectedRowKeys && selectedRows) {
       const newCurrentProductMainData = Object.assign({}, currentProductMainData, {
-        product_type_id: selectedRowKeys[0],
-        product_type: selectedRows[0],
+        product_type_id: selectedRowKeys.join(','),
+        product_type: selectedRows,
       });
+      const productTypeNameStr: string[] = [];
+      selectedRows.forEach((item: { title_zh: string }) => {
+        productTypeNameStr.push(item.title_zh);
+      });
+      setProductTypeName((productTypeNameStr && productTypeNameStr.join(',')) || '');
       setCurrentProductMainData(newCurrentProductMainData);
     }
     setProductTypeShow(false);
@@ -251,7 +257,6 @@ export default (props: Props) => {
     costsAdvertisingRatio,
     targetProfitRatio,
     summaryKeywords,
-    product_type,
     product_type_id,
   } = currentProductMainData;
   return (
@@ -312,7 +317,7 @@ export default (props: Props) => {
               <Input
                 placeholder="自定商品分类"
                 style={{ width: 350 }}
-                value={product_type && product_type.title_zh}
+                value={productTypeName && productTypeName}
                 disabled
               />
               <span className="operate">

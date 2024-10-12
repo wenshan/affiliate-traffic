@@ -18,9 +18,11 @@
 
   .form-box {
     .form-item {
+      position: relative;
+      z-index: 9;
+      display: block;
       clear: both;
       margin-bottom: 20px;
-      overflow: hidden;
       text-align: left;
       textarea {
         vertical-align: middle;
@@ -29,6 +31,7 @@
         display: inline-block;
         width: 155px;
         padding-right: 15px;
+        overflow: hidden;
         text-align: right;
         i {
           color: red;
@@ -95,10 +98,23 @@
         margin-left: 0;
       }
       .line-box-header {
-        float: left;
+        width: 155px;
+        overflow: hidden;
       }
       .line-box-container {
-        float: left;
+        position: relative;
+        z-index: 1;
+        width: auto;
+        .description {
+          .ql-formats {
+            z-index: 99;
+          }
+        }
+        .product_highlight {
+          .ql-formats {
+            z-index: 9;
+          }
+        }
       }
     }
   }

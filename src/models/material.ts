@@ -66,6 +66,7 @@ const otherFolderDirectoryInit = {
 };
 
 function Material() {
+  const [productSkuImageModalStatus, setProductSkuImageModalStatus] = useState(false);
   const [imageList, setImageList] = useState<ImageListObject>();
   const [checkFolderDirectory, setCheckFolderDirectory] = useState<DefaultFolderDirectoryType>();
   const [selectFolderDirectory, setSelectFolderDirectory] = useState<DefaultFolderDirectoryType>();
@@ -107,7 +108,7 @@ function Material() {
       message.error(result.msg);
     }
   };
-  const editFolderFetch = async (data) => {
+  const editFolderFetch = async (data: { [key: string]: any }) => {
     const result = await editFolder(data);
     if (result && result.status === 200 && result.data) {
       await queryFolderFetch();
@@ -115,7 +116,7 @@ function Material() {
       message.error(result.msg);
     }
   };
-  const delFolderFetch = async (data: { [key: string]: any } | undefined) => {
+  const delFolderFetch = async (data: { [key: string]: any }) => {
     if (data && data.key) {
       if (data.is_leaf === 1) {
         const result = await delFolder(data);
@@ -137,7 +138,7 @@ function Material() {
       message.error(result.msg);
     }
   };
-  const queryFolderMaterialFetch = async (data: { key: any; children?: any } | undefined) => {
+  const queryFolderMaterialFetch = async (data: { key: any; children?: any }) => {
     if (
       data &&
       data.key &&
@@ -210,6 +211,8 @@ function Material() {
     delMaterialFetch,
     delRemoteMaterialFetch,
     queryFolderMaterialFetch,
+    productSkuImageModalStatus,
+    setProductSkuImageModalStatus,
   };
 }
 

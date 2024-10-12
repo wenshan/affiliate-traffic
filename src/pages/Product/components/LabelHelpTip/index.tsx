@@ -43,12 +43,14 @@ export default (props: Props) => {
   if (!props.keyLabel) {
     return;
   }
-
   const currentHelpObj = props.keyLabel && labelHelpTip && labelHelpTip[props.keyLabel];
-  if (currentHelpObj && !currentHelpObj.title) {
-    return;
+  if (!currentHelpObj) {
+    return '--';
   }
   const { title, des, rule, exam, required } = currentHelpObj;
+  if (!title) {
+    return '--';
+  }
   return (
     <span className="label-help-tip">
       <span className="label">

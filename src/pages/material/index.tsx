@@ -16,6 +16,8 @@ import UploadFile from './components/UploadFile';
 
 import './index.less';
 
+type Event = { target: { value: any } };
+
 const operateFolderDirectoryInit = {
   label: '',
   key: '',
@@ -54,7 +56,6 @@ function MaterialPage() {
         addFolderDirectory = Object.assign({}, operateFolderDirectory, {
           father_key: checkFolderDirectory.key,
           key_path: `${checkFolderDirectory.father_key}/${checkFolderDirectory.key}`,
-          key: '',
           is_leaf: 1,
           active: false,
           is_default: false,
@@ -63,7 +64,6 @@ function MaterialPage() {
         addFolderDirectory = Object.assign({}, operateFolderDirectory, {
           father_key: checkFolderDirectory.key,
           key_path: `${checkFolderDirectory.key}`,
-          key: '',
           is_leaf: 1,
           active: false,
           is_default: false,
@@ -249,7 +249,7 @@ function MaterialPage() {
                             onChange={() => handleOnCheckSelectFolderMenu(event)}
                           ></Checkbox>
                           <span
-                            className="label"
+                            className="label ellipsis"
                             onClick={() => handleClickFolderMenuSecond(childrenItem)}
                           >
                             {Tool.replaceExceedEnd(childrenItem.label, 22)}
@@ -279,7 +279,7 @@ function MaterialPage() {
                                       onChange={() => handleOnCheckSelectFolderMenu(event)}
                                     ></Checkbox>
                                     <span
-                                      className="label"
+                                      className="label ellipsis"
                                       onClick={() => handleClickFolderMenuThird(children2Item)}
                                     >
                                       {Tool.replaceExceedEnd(children2Item.label, 22)}
@@ -315,7 +315,7 @@ function MaterialPage() {
                                                   onChange={() => handleOnCheckSelectFolderMenu()}
                                                 ></Checkbox>
                                                 <span
-                                                  className="label"
+                                                  className="label ellipsis"
                                                   onClick={() =>
                                                     handleClickFolderMenuFourth(children3Item)
                                                   }
@@ -356,7 +356,7 @@ function MaterialPage() {
                   checked={item.checked}
                   onChange={() => handleOnCheckSelectFolderMenu(event)}
                 ></Checkbox>
-                <span className="label" onClick={() => handleClickFolderMenu(item)}>
+                <span className="label ellipsis" onClick={() => handleClickFolderMenu(item)}>
                   {Tool.replaceExceedEnd(item.label, 22)}
                 </span>
               </div>
@@ -387,7 +387,10 @@ function MaterialPage() {
           <span className="space"></span>
           {otherFolderDirectory.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
           <Checkbox value={otherFolderDirectory.key} disabled={true}></Checkbox>
-          <span className="label" onClick={() => handleClickFolderOtherMenu({ active: true })}>
+          <span
+            className="label ellipsis"
+            onClick={() => handleClickFolderOtherMenu({ active: true })}
+          >
             {Tool.replaceExceedEnd(otherFolderDirectory.label, 22)}
           </span>
         </div>
@@ -423,14 +426,24 @@ function MaterialPage() {
               <Col span={19}>
                 <div className="container">
                   <div className="header">
-                    <Button onClick={() => handleClickDropdownDel()}>删除文件夹</Button>
-                    <Button onClick={() => handleClickDropdownEdit()}>编辑文件夹</Button>
+                    <Button
+                      onClick={() => handleClickDropdownDel()}
+                      disabled={!checkFolderDirectory}
+                    >
+                      删除文件夹
+                    </Button>
+                    <Button
+                      onClick={() => handleClickDropdownEdit()}
+                      disabled={!checkFolderDirectory}
+                    >
+                      编辑文件夹
+                    </Button>
                     <Button icon={<FolderAddOutlined />} onClick={() => handelCreateFolderAdd()}>
                       新建文件目录
                     </Button>
                     <UploadFile></UploadFile>
                   </div>
-                  <ImgList></ImgList>
+                  <ImgList limit={20}></ImgList>
                   {currentFolderDirectory && (
                     <Modal
                       title={optionAction ? '编辑文件目录' : '添加文件目录'}

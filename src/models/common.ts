@@ -2,7 +2,6 @@
 /* @ts-ignore */
 
 import { googleGetToken, googleGetUserinfo } from '@/services/api/login';
-import QueryString from 'query-string';
 export default {
   namespace: 'common',
   state: {
@@ -26,24 +25,6 @@ export default {
       user_project_group_id: 1,
     },
     defaultProject: {},
-  },
-
-  subscriptions: {
-    setup({ dispatch, history }) {
-      const search = window.document.location.hash;
-      const query = QueryString.parse(search);
-      console.log('query:', query);
-      if (query && query.access_token) {
-        dispatch({
-          type: 'updateUserinfo',
-          payload: query,
-        });
-        dispatch({
-          type: 'getUserinfoGoogleOauth',
-          payload: query,
-        });
-      }
-    },
   },
 
   effects: {

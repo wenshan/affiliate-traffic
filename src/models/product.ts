@@ -39,7 +39,7 @@ export default {
       pageSize: 50,
       total: 0,
     },
-    productSizeUnitUnitOption: [
+    productSizeUnitOption: [
       {
         value: 'mm',
         label: 'mm',

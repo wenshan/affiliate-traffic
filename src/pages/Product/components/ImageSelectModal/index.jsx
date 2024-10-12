@@ -9,7 +9,6 @@ import ImgList from '../../../Material/components/ImgList';
 import './index.less';
 
 function ImageSelectModal(props) {
-  console.log('ImageSelectModal props:', props);
   const {
     queryFolderFetch,
     selectFolderDirectory,
@@ -29,6 +28,8 @@ function ImageSelectModal(props) {
     setOtherFolderDirectory,
     selectedMaterial,
     setSelectedMaterial,
+    productSkuImageModalStatus,
+    setProductSkuImageModalStatus,
   } = useModel('material');
   const [limit] = useState(props.imageLimitNum || 20);
   const [selectedType] = useState(props.selectedType);
@@ -36,12 +37,12 @@ function ImageSelectModal(props) {
   const handleOk = () => {
     if (props.callbackOk) {
       props.callbackOk(selectedMaterial);
+      setProductSkuImageModalStatus(false);
+      setSelectedMaterial([]);
     }
   };
   const handleCancel = () => {
-    if (props.callbackCancel) {
-      props.callbackCancel();
-    }
+    setProductSkuImageModalStatus(false);
     setSelectedMaterial([]);
   };
   const handleClickFolderMenu = async (currentItem) => {
@@ -205,7 +206,7 @@ function ImageSelectModal(props) {
       <Modal
         className="wrap-select-modal"
         title="选择图片素材 "
-        open={props.open}
+        open={productSkuImageModalStatus}
         width={1000}
         onOk={handleOk}
         onCancel={handleCancel}

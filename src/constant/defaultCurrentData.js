@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* @ts-ignore */
 const defaultProductDetail = {
   product_id: '',
   item_group_id: '',
@@ -96,10 +98,151 @@ const defaultProductCustomType = {
   title_ko: '',
 };
 
+const monetaryUnitOption = [
+  { value: 'CNY', label: '人民币' },
+  { value: 'USD', label: '美元' },
+  { value: 'JPY', label: '日元' },
+  { value: 'KRW', label: '韩元' },
+];
+
+const languageOption = [
+  { value: 'zh-CN', label: '中文' },
+  { value: 'en-US', label: '英语' },
+  { value: 'ja-JP', label: '日语' },
+  { value: 'ko_KR', label: '韩语' },
+];
+const sizeTypeOption = [
+  { value: 'regular', label: '标准' },
+  { value: 'petite', label: '小号' },
+  { value: 'maternity', label: '孕妇 ' },
+  { value: 'big', label: '大' },
+  { value: 'tall', label: '高' },
+  { value: 'plus', label: '加大' },
+];
+
+const sizeSystemOption = [
+  { value: 'US', label: 'US' },
+  { value: 'UK', labe: 'UK' },
+  { value: 'EU', label: 'EU' },
+  { value: 'DE', label: 'DE' },
+  { value: 'FR', label: 'FR' },
+  { value: 'JP', label: 'JP' },
+  { value: 'CN', label: 'CN' },
+  { value: 'IT', label: 'IT' },
+  { value: 'BR', label: 'BR' },
+  { value: 'MEX', label: 'MEX' },
+  { value: 'AU', label: 'AU' },
+];
+const ageGroupOption = [
+  { value: 'newborn', label: '新生儿' },
+  { value: 'infant', label: '婴儿' },
+  { value: 'toddler', label: '幼儿' },
+  { value: 'kids', label: '儿童' },
+  { value: 'adult', label: '成人' },
+];
+const genderOption = [
+  { value: 'male', label: '男性' },
+  { value: 'female', label: '女性' },
+  { value: 'unisex', label: '男女通用' },
+];
+
+const productSizeUnitOption = [
+  {
+    value: 'mm',
+    label: 'mm',
+  },
+  {
+    value: 'cm',
+    label: 'cm',
+  },
+  {
+    value: 'm',
+    label: 'm',
+  },
+  {
+    value: 'in',
+    label: 'in',
+  },
+];
+
+const defaultSizeUnitCountry = {
+  US: {
+    value: 'in',
+    label: 'in',
+  },
+  JP: {
+    value: 'cm',
+    label: 'cm',
+  },
+  KR: {
+    value: 'cm',
+    label: 'cm',
+  },
+  CN: {
+    value: 'cm',
+    label: 'cm',
+  },
+};
+
+const productWeightUnitOption = [
+  {
+    value: 'g',
+    label: 'g',
+  },
+  {
+    value: 'kg',
+    label: 'kg',
+  },
+  {
+    value: 'lb',
+    label: 'lb',
+  },
+];
+const defaultWeightUnitCountry = {
+  US: {
+    value: 'g',
+    label: 'g',
+  },
+  JP: {
+    value: 'g',
+    label: 'g',
+  },
+  KR: {
+    value: 'g',
+    label: 'g',
+  },
+  CN: {
+    value: 'g',
+    label: 'g',
+  },
+};
+
+const costsExchangeInit = {
+  costFirstLegFreightRatio: 10,
+  costFbaRatio: 50,
+  costsAdvertisingRatio: 5,
+  targetProfitRatio: 30,
+  USD: 0.14,
+  JPY: 20.5,
+  KRW: 188,
+  CNY: 1,
+};
+
 export {
+  ageGroupOption,
+  costsExchangeInit,
   costsExchangeTypeCurrency,
   defaultCostsExchange,
   defaultCurrentProductMain,
   defaultProductCustomType,
   defaultProductDetail,
+  defaultSizeUnitCountry,
+  defaultWeightUnitCountry,
+  genderOption,
+  languageOption,
+  monetaryUnitOption,
+  productSizeUnitOption,
+  productWeightUnitOption,
+  sizeSystemOption,
+  sizeTypeOption,
 };

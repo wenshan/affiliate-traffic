@@ -1,128 +1,90 @@
 import { Button, Input, Modal, Table } from 'antd';
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
+import { useModel } from 'umi';
 
 import './index.less';
 
-class ProductAttribute extends Component {
-  constructor(props: Readonly<object>) {
-    super(props);
-    this.state = {
-      selectedRowsProductAttr: [],
-      optionAddStatus: 0,
-      currentProductAttribute: {
-        attribute_name: '',
-        attribute_value: '',
-      },
-      selectedRowKeys: [],
-      addOpen: false,
-      open: false,
-    };
-  }
+const currentProductAttributeInit = {
+  attribute_name: '',
+  attribute_value: '',
+};
 
-  // Modal
-  handleOk = () => {
-    const { selectedRowsProductAttr } = this.state;
-    if (this.props.callbackOk) {
-      this.props.callbackOk(selectedRowsProductAttr);
+function ProductAttribute(props: any) {
+  const {
+    productAttributeModalStatus,
+    setProductAttributeModalStatus,
+    currentProductAttribute,
+    setCurrentProductAttribute,
+    productAttributeList,
+    cerateAttrFetch,
+    delAttrFetch,
+    queryAttrFetch,
+  } = useModel('productAttributeModel');
+  const { productDetail } = useModel('productCreateSkuModel');
+  const [selectedRowsProductAttr, setSelectedRowsProductAttr] = useState([]);
+  const [optionAddStatus, setOptionAddStatus] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const handleOk = async () => {
+    if (props.callbackOk) {
+      props.callbackOk(selectedRowsProductAttr);
+      setProductAttributeModalStatus(false);
     }
   };
-
-  handleCancel = () => {
-    if (this.props.callbackCancel) {
-      this.props.callbackCancel();
-    }
+  const handleAddOk = async () => {
+    setAddOpen(false);
+    await cerateAttrFetch(currentProductAttribute);
   };
-
-  handleAddOk = () => {
-    const { currentProductAttribute } = this.state;
-    this.setState(
-      {
-        addOpen: false,
-      },
-      () => {
-        if (this.props.callbackAddOk) {
-          this.props.callbackAddOk(currentProductAttribute);
-        }
-      },
-    );
+  const handleCancel = async () => {
+    setProductAttributeModalStatus(false);
   };
-  handleAddCancel = () => {
-    const currentProductAttribute = {
-      attribute_name: '',
-      attribute_value: '',
-    };
-    this.setState({
-      addOpen: false,
-      currentProductAttribute,
-    });
+  const handleAddCancel = () => {
+    setAddOpen(false);
+    setCurrentProductAttribute(currentProductAttributeInit);
   };
-
-  nameInputHandle = (event: { target: { value: any } }) => {
+  const nameInputHandle = (event: { target: { value: any } }) => {
     const { value } = event.target;
-    const { currentProductAttribute } = this.state;
     const newCurrentProductAttribute = Object.assign({}, currentProductAttribute, {
       attribute_name: value,
     });
-    this.setState({
-      currentProductAttribute: newCurrentProductAttribute,
-    });
+    setCurrentProductAttribute(newCurrentProductAttribute);
   };
-
-  valueInputHandle = (event: { target: { value: any } }) => {
+  const valueInputHandle = (event: { target: { value: any } }) => {
     const { value } = event.target;
-    const { currentProductAttribute } = this.state;
     const newCurrentProductAttribute = Object.assign({}, currentProductAttribute, {
       attribute_value: value,
     });
-    this.setState({
-      currentProductAttribute: newCurrentProductAttribute,
-    });
+    setCurrentProductAttribute(newCurrentProductAttribute);
+  };
+  const handelTableAdd = () => {
+    setAddOpen(true);
+    setOptionAddStatus(false);
+    setCurrentProductAttribute(currentProductAttributeInit);
   };
 
-  handelTableAdd = () => {
-    const currentProductAttribute = {
-      attribute_name: '',
-      attribute_value: '',
-    };
-    this.setState({
-      addOpen: true,
-      optionAddStatus: 0,
-      currentProductAttribute,
-    });
+  const handelTableEdit = (record: any) => {
+    setAddOpen(true);
+    setOptionAddStatus(true);
+    setCurrentProductAttribute(record);
   };
-
-  handelTableEdit = (record: any) => {
-    this.setState({
-      addOpen: true,
-      optionAddStatus: 1,
-      currentProductAttribute: record,
-    });
-  };
-
-  handelTableDel = (record: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
+  const handelTableDel = (record: any) => {
     Modal.confirm({
       title: '确认删除',
       content: '删除当前的商品属性',
-      onOk() {
-        if (self.props.callbackDelOk) {
-          self.props.callbackDelOk(record);
-        }
+      onOk: async () => {
+        await delAttrFetch(record);
       },
       onCancel() {
         console.log('Cancel');
       },
     });
   };
-
-  onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
+  const onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
     console.log(selectedRowKeys, selectedRows);
-    const newSelectedRows = [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    selectedRows &&
-      selectedRows.length &&
-      selectedRows.map((item: { attribute_name: any; attribute_value: any }) => {
+    const newSelectedRows: any[] = [];
+    if (selectedRows && selectedRows.length) {
+      selectedRows.forEach((item: { attribute_name: any; attribute_value: any }) => {
         if (item.attribute_name && item.attribute_value) {
           newSelectedRows.push(
             Object.assign(
@@ -132,137 +94,132 @@ class ProductAttribute extends Component {
           );
         }
       });
-    this.setState({
-      selectedRowsProductAttr: newSelectedRows,
-      selectedRowKeys,
-    });
+      //@ts-ignore
+      setSelectedRowsProductAttr(newSelectedRows);
+      setSelectedRowKeys(selectedRowKeys);
+    }
+  };
+  const columns = [
+    {
+      title: '属性名称',
+      dataIndex: 'attribute_name',
+      key: 'attribute_name',
+    },
+    {
+      title: '属性值',
+      dataIndex: 'attribute_value',
+      key: 'attribute_value',
+    },
+    {
+      title: '操作',
+      dataIndex: 'operate',
+      render: (_: any, record: any) => {
+        return (
+          <div className="operate">
+            <span className="tx" onClick={handelTableAdd}>
+              添加
+            </span>
+            <span className="line">|</span>
+            <span
+              className="tx"
+              onClick={() => {
+                handelTableEdit(record);
+              }}
+            >
+              编辑
+            </span>
+            <span className="line">|</span>
+            <span
+              className="tx"
+              onClick={() => {
+                handelTableDel(record);
+              }}
+            >
+              删除
+            </span>
+          </div>
+        );
+      },
+    },
+  ];
+
+  useEffect(() => {
+    const selectedRowKeys: any[] = [];
+    if (productDetail && productDetail.id) {
+      const { language, product_main_id, product_detail } = productDetail;
+      if (language && product_main_id && product_detail) {
+        if (productDetail && productDetail.length) {
+          productDetail.forEach((item: { key: string }) => {
+            if (item.key) {
+              selectedRowKeys.push(item.key);
+            }
+          });
+        }
+        queryAttrFetch();
+        // @ts-ignore
+        setSelectedRowKeys(selectedRowKeys);
+      }
+    }
+  }, [productDetail]);
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onChangeSelectedRows,
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.dataSource.product_detail) {
-      const selectedRowKeys: any[] = [];
-      const { product_detail } = nextProps.dataSource;
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      product_detail &&
-        product_detail.length &&
-        product_detail.map((item: { key: any }) => {
-          selectedRowKeys.push(item.key);
-        });
-      this.setState({
-        selectedRowKeys,
-      });
-    }
-  }
-
-  render() {
-    const { attribute_name, attribute_value } = this.state.currentProductAttribute;
-    const { productAttributeOption } = this.props.dataSource;
-    const { selectedRowKeys } = this.state;
-    console.log('productAttributeOption:', productAttributeOption);
-    console.log('selectedRowKeys:', selectedRowKeys);
-    const columns = [
-      {
-        title: '属性名称',
-        dataIndex: 'attribute_name',
-        key: 'attribute_name',
-      },
-      {
-        title: '属性值',
-        dataIndex: 'attribute_value',
-        key: 'attribute_value',
-      },
-      {
-        title: '操作',
-        dataIndex: 'operate',
-        render: (_: any, record: any) => {
-          return (
-            <div className="operate">
-              <span className="tx" onClick={this.handelTableAdd}>
-                添加
-              </span>
-              <span className="line">|</span>
-              <span
-                className="tx"
-                onClick={() => {
-                  this.handelTableEdit(record);
-                }}
-              >
-                编辑
-              </span>
-              <span className="line">|</span>
-              <span
-                className="tx"
-                onClick={() => {
-                  this.handelTableDel(record);
-                }}
-              >
-                删除
-              </span>
-            </div>
-          );
-        },
-      },
-    ];
-
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onChangeSelectedRows,
-    };
-    return (
-      <div className="product-attribute">
-        <Modal
-          title="商品属性管理"
-          open={this.props.open}
-          width={900}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-        >
-          {productAttributeOption && productAttributeOption.length > 0 ? (
-            <Table
-              dataSource={productAttributeOption}
-              columns={columns}
-              pagination={false}
-              rowSelection={rowSelection}
-            />
-          ) : (
-            <div className="operate">
-              <span className="tx">
-                <Button onClick={this.handelTableAdd}>添加商品属性</Button>
-              </span>
-            </div>
-          )}
-        </Modal>
-        <Modal
-          title={this.state.optionAddStatus > 0 ? '编辑属性' : '添加属性'}
-          open={this.state.addOpen}
-          width={550}
-          onOk={this.handleAddOk}
-          onCancel={this.handleAddCancel}
-        >
-          <div className="content form-box">
-            <div className="form-item">
-              <span className="label">属性名称:</span>
-              <Input
-                placeholder="属性名称"
-                style={{ width: 250 }}
-                value={attribute_name}
-                onChange={this.nameInputHandle}
-              />
-            </div>
-            <div className="form-item">
-              <span className="label">属性值:</span>
-              <Input
-                placeholder="属性值"
-                style={{ width: 250 }}
-                value={attribute_value}
-                onChange={this.valueInputHandle}
-              />
-            </div>
+  return (
+    <div className="product-attribute">
+      <Modal
+        title="商品属性管理"
+        open={productAttributeModalStatus}
+        width={900}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        {productAttributeList && productAttributeList.length > 0 ? (
+          <Table
+            dataSource={productAttributeList}
+            columns={columns}
+            pagination={false}
+            rowSelection={rowSelection}
+          />
+        ) : (
+          <div className="operate">
+            <span className="tx">
+              <Button onClick={handelTableAdd}>添加商品属性</Button>
+            </span>
           </div>
-        </Modal>
-      </div>
-    );
-  }
+        )}
+      </Modal>
+      <Modal
+        title={optionAddStatus ? '编辑属性' : '添加属性'}
+        open={addOpen}
+        width={550}
+        onOk={handleAddOk}
+        onCancel={handleAddCancel}
+      >
+        <div className="content form-box">
+          <div className="form-item">
+            <span className="label">属性名称:</span>
+            <Input
+              placeholder="属性名称"
+              style={{ width: 250 }}
+              value={currentProductAttribute.attribute_name}
+              onChange={nameInputHandle}
+            />
+          </div>
+          <div className="form-item">
+            <span className="label">属性值:</span>
+            <Input
+              placeholder="属性值"
+              style={{ width: 250 }}
+              value={currentProductAttribute.attribute_value}
+              onChange={valueInputHandle}
+            />
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
 }
-
 export default ProductAttribute;

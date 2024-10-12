@@ -1,12 +1,20 @@
 import DefaultProject from '@/components/DefaultProject';
-import { costsExchangeTypeCurrency } from '@/constant/defaultCurrentData';
-import listToTreeSelf from '@/utils/listToTreeSelf';
+import {
+  ageGroupOption,
+  genderOption,
+  languageOption,
+  monetaryUnitOption,
+  productSizeUnitOption,
+  productWeightUnitOption,
+  sizeSystemOption,
+  sizeTypeOption,
+} from '@/constant/defaultCurrentData';
 import Tool from '@/utils/tool.js';
 import { PageContainer } from '@ant-design/pro-components';
+import type { RadioChangeEvent } from 'antd';
 import { Button, Col, Image, Input, InputNumber, Radio, Row, Select, Table } from 'antd';
-import QueryString from 'query-string';
-import { Component, JSX } from 'react';
-import { connect } from 'umi';
+import { JSX, useState } from 'react';
+import { useModel } from 'umi';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
@@ -14,378 +22,261 @@ import RichTextEditor from '../components/RichTextEditor';
 
 import './index.less';
 const { TextArea } = Input;
-@connect(({ product, common, material }) => ({
-  product,
-  common,
-  material,
-}))
-class ProductCreateSku extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isProductAttributeModal: false,
-      isProductImageModal: false,
-      currentImageProductType: 'image_link',
-      imageLimitNum: 20,
-      typeTextEditor: 'product_highlight',
-      isTextEditorState: false,
-      initValuerTextEditor: '',
-    };
-  }
+
+type Event = { target: { value: any } };
+
+function ProductCreateSku() {
+  const { queryFolderFetch } = useModel('material');
+  const {
+    createProductFetch,
+    editProductFetch,
+    costsExchange,
+    costsExchangeTypeCurrencyLabel,
+    costsExchangeTypeCurrencyValue,
+    productDetail,
+    setProductDetail,
+    queryParams,
+    currentPreSalePrice,
+  } = useModel('productCreateSkuModel');
+  const { setProductAttributeModalStatus } = useModel('productAttributeModel');
+  const { setProductSkuImageModalStatus } = useModel('material');
+  const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
+  const [imageLimitNum, setImageLimitNum] = useState(20);
+
   // 语言
-  languageRadioHandle = (event) => {
+  const languageRadioHandle = (event: RadioChangeEvent) => {
     const { value } = event.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        language: value,
-      },
-    });
+    const newProductDetail = Object.assign({}, productDetail, { language: value });
+    setProductDetail(newProductDetail);
   };
   // 货币单位
-  monetaryUnitSelectHandle = (value) => {
-    const { currentProductMain, costsExchange } = this.props.product;
-    const { preSalePrice } = currentProductMain;
-    const price = (costsExchange[value] * preSalePrice).toFixed(2);
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        monetary_unit: value,
-        price,
-      },
-    });
+  const monetaryUnitSelectHandle = (value: string) => {
+    const price = (costsExchange[value] * currentPreSalePrice).toFixed(2);
+    const newProductDetail = Object.assign({}, productDetail, { price, monetary_unit: value });
+    setProductDetail(newProductDetail);
   };
   // 名称
-  titleInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        title: value,
-      },
-    });
+  const titleInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { title: value });
+    setProductDetail(newProductDetail);
   };
   // 商品着陆页
-  linkInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        link: value,
-      },
-    });
+  const linkInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { link: value });
+    setProductDetail(newProductDetail);
   };
   // 手机端着陆页
-  mobileLinkInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        mobile_link: value,
-      },
-    });
-  };
-  // 商品价格
-  priceInputHandle = (e) => {
-    const { value } = e.target;
-    console.log('sale_price:', value);
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        price: value,
-      },
-    });
+  const mobileLinkInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { mobile_link: value });
+    setProductDetail(newProductDetail);
   };
   // 商品促销价格
-  salePriceInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        sale_price: value,
-      },
-    });
+  const salePriceInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { sale_price: value });
+    setProductDetail(newProductDetail);
   };
   // 商品折扣
-  discountInputHandle = (value: number) => {
-    const { productDetail } = this.props.product;
+  const discountInputHandle = (value: number) => {
     const { price, sale_price } = productDetail;
+    let newProductDetail;
     if (value > 0) {
       const rate = ((100 - value) / 100).toFixed(2);
-      const initSalePrice = (price * rate).toFixed(2);
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          discount: value,
-          sale_price: initSalePrice,
-        },
+      const initSalePrice = (price * Number(rate)).toFixed(2);
+      newProductDetail = Object.assign({}, productDetail, {
+        discount: value,
+        sale_price: initSalePrice,
       });
     } else {
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          discount: value,
-          sale_price,
-        },
-      });
+      newProductDetail = Object.assign({}, productDetail, { discount: value, sale_price });
     }
-  };
-  // lifestyle_image_link 生活风格图片链接
-  productLifestyleImageLinkInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        lifestyle_image_link: value,
-      },
-    });
-  };
-  // 商品描述
-  descriptionTextAreaHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        description: value,
-      },
-    });
+    setProductDetail(newProductDetail);
   };
   // 商品重量
-  productWeightInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        productWeight: value,
-      },
-    });
+  const productWeightInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { productWeight: value });
+    setProductDetail(newProductDetail);
   };
   // 尺寸 长宽高
-  productLengthInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        productLength: value,
-      },
-    });
+  const productLengthInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { productLength: value });
+    setProductDetail(newProductDetail);
   };
 
-  productWidthInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        productWidth: value,
-      },
-    });
+  const productWidthInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { productWidth: value });
+    setProductDetail(newProductDetail);
   };
 
-  productHeightInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        productHeight: value,
-      },
-    });
-  };
-  // 商品包装尺寸
-  shippingLengthInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        shipping_length: value,
-      },
-    });
-  };
-  shippingWidthInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        shipping_width: value,
-      },
-    });
-  };
-  shippingHeightInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        shipping_height: value,
-      },
-    });
-  };
-  // 商品发货国家
-  shipsFromCountryInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        ships_from_country: value,
-      },
-    });
+  const productHeightInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { productHeight: value });
+    setProductDetail(newProductDetail);
   };
 
-  productAttributeButtonHandle = () => {
-    this.setState({
-      isProductAttributeModal: true,
+  const productAttributeButtonHandle = () => {
+    setProductAttributeModalStatus(true);
+  };
+  const productAttributeCallbackOk = (selectedRowsProductAttr: any) => {
+    const newProductDetail = Object.assign({}, productDetail, {
+      product_detail: selectedRowsProductAttr,
     });
+    setProductDetail(newProductDetail);
+    setProductAttributeModalStatus(false);
   };
-  productAttributeCallbackCancel = () => {
-    this.setState({
-      isProductAttributeModal: false,
-    });
-  };
-  productAttributeCallbackOk = (selectedRowsProductAttr) => {
-    this.setState(
-      {
-        isProductAttributeModal: false,
-      },
-      () => {
-        this.props.dispatch({
-          type: 'product/updateProduct',
-          payload: {
-            product_detail: selectedRowsProductAttr,
-          },
-        });
-      },
-    );
-  };
-  // 新增
-  productAttributeAddCallbackOk = (item) => {
-    this.props.dispatch({
-      type: 'product/cerateAttr',
-      payload: {
-        ...item,
-      },
-    });
-  };
-  // 删除
-  productAttributeDelCallbackOk = (item) => {
-    this.props.dispatch({
-      type: 'product/delAttr',
-      payload: {
-        ...item,
-      },
-    });
-  };
-
-  productImageCallbackCancel = () => {
-    this.setState({
-      isProductImageModal: false,
-    });
-  };
-  productImageCallbackOk = (selectedMaterial: { url: any }[]) => {
-    const { currentImageProductType } = this.state;
-    const imageSrc: any[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions, array-callback-return
-    selectedMaterial &&
-      selectedMaterial.length &&
-      selectedMaterial.map((item: { url: any }) => {
+  const productImageCallbackOk = (selectedMaterial: { url: any }[]) => {
+    const imageSrc: string[] = [];
+    let newProductDetail;
+    if (selectedMaterial && selectedMaterial.length) {
+      selectedMaterial.map((item: { url: string }) => {
         imageSrc.push(item.url);
       });
-
+    }
     if (currentImageProductType === 'image_link') {
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          image_link: imageSrc[0],
-        },
-      });
+      newProductDetail = Object.assign({}, productDetail, { image_link: imageSrc[0] });
     }
     if (currentImageProductType === 'additional_image_link') {
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          additional_image_link: imageSrc,
-        },
-      });
+      newProductDetail = Object.assign({}, productDetail, { additional_image_link: imageSrc });
     }
     if (currentImageProductType === 'lifestyle_image_link') {
-      this.props.dispatch({
-        type: 'product/updateProduct',
-        payload: {
-          lifestyle_image_link: imageSrc,
-        },
-      });
+      newProductDetail = Object.assign({}, productDetail, { lifestyle_image_link: imageSrc });
     }
-    this.setState({
-      isProductImageModal: false,
-    });
+    console.log('newProductDetail:', newProductDetail);
+    setProductSkuImageModalStatus(false);
+    setProductDetail(newProductDetail);
   };
-
-  imageSelectModel = (type: string, imageLimitNum: number) => {
-    this.setState({
-      isProductImageModal: true,
-      currentImageProductType: type,
-      imageLimitNum,
-    });
-    this.props.dispatch({
-      type: 'material/queryFolder',
-    });
+  const imageSelectModel = async (type: string, imageLimitNum: number) => {
+    setProductSkuImageModalStatus(true);
+    setCurrentImageProductType(type);
+    setImageLimitNum(imageLimitNum);
+    await queryFolderFetch();
   };
-
-  handelFolderMenuSelect = (currentItem: any) => {
-    const { folderDirectoryRows } = this.props.material;
-    const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-    this.props.dispatch({
-      type: 'material/update',
-      payload: {
-        folderDirectory: rowsTree,
-        folderDirectoryRows: rowsList,
-        currentFolderDirectory: currentItem,
-      },
-    });
-    this.props.dispatch({
-      type: 'material/queryFolderMaterial',
-      payload: {
-        ...currentItem,
-      },
-    });
-  };
-
-  imageRenderView = (data: string[] | string) => {
+  const imageRenderView = (data: string[] | string) => {
     const html: JSX.Element[] = [];
     if (data && Tool.isArray(data) && data.length) {
       // @ts-ignore
       data.forEach((item: string) => {
         html.push(
-          <>
-            <div className="add-img-item" key={item}>
-              <Image width={100} src={item} />
-            </div>
-          </>,
+          <div className="add-img-item" key={item}>
+            <Image width={100} src={item} />
+          </div>,
         );
       });
     } else {
       html.push(
-        <>
-          <div className="add-img-item">
-            <Image width={100} src={data} />
-          </div>
-        </>,
+        <div className="add-img-item">
+          <Image width={100} src={data} />
+        </div>,
       );
     }
-
     return html;
   };
-  // 提交创建SKU
-  handelSubmitCreateSku = (product_sku_option_status: number) => {
-    if (product_sku_option_status > 0) {
-      this.props.dispatch({
-        type: 'product/editProduct',
-      });
-    } else {
-      this.props.dispatch({
-        type: 'product/createProduct',
-      });
-    }
+  const handelRadioAvailability = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { availability: value });
+    setProductDetail(newProductDetail);
+  };
+  // 商品组 ID [item_group_id]
+  const itemGroupIdInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { item_group_id: value });
+    setProductDetail(newProductDetail);
+  };
+  // 颜色 [color]
+  const colorInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { color: value });
+    setProductDetail(newProductDetail);
+  };
+  // 年龄段 [age_group]
+  const ageGroupSelectHandle = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { age_group: value });
+    setProductDetail(newProductDetail);
+  };
+  // 适用性别 [gender]
+  const genderSelectHandle = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { age_group: value });
+    setProductDetail(newProductDetail);
+  };
+  // 材质 [material]
+  const materialInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { material: value });
+    setProductDetail(newProductDetail);
+  };
+  // 图案 [pattern]
+  const patternInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { pattern: value });
+    setProductDetail(newProductDetail);
+  };
+  // 尺寸 [size]
+  const sizeInputHandle = (event: Event) => {
+    const { value } = event.target;
+    const newProductDetail = Object.assign({}, productDetail, { size: value });
+    setProductDetail(newProductDetail);
+  };
+  // 尺码类型 [size_type]
+  const sizeTypeSelectHandle = (value: string | number) => {
+    const newProductDetail = Object.assign({}, productDetail, { size_type: value });
+    setProductDetail(newProductDetail);
+  };
+  // 尺码体系 [size_system]
+  const sizeSystemSelectHandle = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { size_system: value });
+    setProductDetail(newProductDetail);
+  };
+  // 重量单位选择
+  const weightUnitSelectHandle = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { weightUnit: value });
+    setProductDetail(newProductDetail);
+  };
+  // 尺寸单位选择
+  const sizeUnitSelectHandle = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { sizeUnit: value });
+    setProductDetail(newProductDetail);
   };
 
-  columnsProductAttribute = () => {
+  // 富文本编辑器回调
+  const callbackTextEditorDescription = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { description: value });
+    setProductDetail(newProductDetail);
+  };
+  // 富文本编辑器回调
+  const callbackTextEditorProductHighlight = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { product_highlight: value });
+    setProductDetail(newProductDetail);
+  };
+  // 自定义产品分类处理
+  const productTypeNameStr = () => {
+    const { product_type, contentLanguage } = productDetail;
+    const nameStr: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    product_type &&
+      product_type.length &&
+      product_type.forEach((item: { [x: string]: any }) => {
+        if (item) {
+          nameStr.push(item[`title_${contentLanguage}`]);
+        }
+      });
+    return nameStr.join(',');
+    // contentLanguage && product_type && product_type[`title_${contentLanguage}`]
+  };
+  // 提交创建SKU
+  const handelSubmitCreateSku = async (product_sku_option_status: number) => {
+    if (product_sku_option_status > 0) {
+      await editProductFetch();
+    } else {
+      await createProductFetch();
+    }
+  };
+  const columnsProductAttribute = () => {
     return [
       {
         title: '属性名称',
@@ -397,693 +288,512 @@ class ProductCreateSku extends Component {
       },
     ];
   };
-  handelRadioAvailability = (event) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        availability: event.target.value,
-      },
-    });
-  };
-  // 商品组 ID [item_group_id]
-  itemGroupIdInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        item_group_id: value,
-      },
-    });
-  };
-  // 颜色 [color]
-  colorInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        color: value,
-      },
-    });
-  };
-  // 年龄段 [age_group]
-  ageGroupSelectHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        age_group: value,
-      },
-    });
-  };
-  // 适用性别 [gender]
-  genderSelectHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        age_group: value,
-      },
-    });
-  };
-  // 材质 [material]
-  materialInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        material: value,
-      },
-    });
-  };
-  // 图案 [pattern]
-  patternInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        pattern: value,
-      },
-    });
-  };
-  // 尺寸 [size]
-  sizeInputHandle = (e) => {
-    const { value } = e.target;
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        size: value,
-      },
-    });
-  };
-  // 尺码类型 [size_type]
-  sizeTypeSelectHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        size_type: value,
-      },
-    });
-  };
-  // 尺码体系 [size_system]
-  sizeSystemSelectHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        size_system: value,
-      },
-    });
-  };
-  // 重量单位选择
-  weightUnitSelectHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        weightUnit: value,
-      },
-    });
-  };
-  // 尺寸单位选择
-  sizeUnitSelectHandle = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        sizeUnit: value,
-      },
-    });
-  };
+  const {
+    language,
+    monetary_unit,
+    image_link,
+    additional_image_link,
+    lifestyle_image_link,
+    link,
+    product_type,
+    mobile_link,
+    description,
+    title,
+    price,
+    sale_price,
+    discount,
+    color,
+    material,
+    product_highlight,
+    availability,
+    productWeight,
+    product_detail,
+    item_group_id,
+    age_group,
+    gender,
+    pattern,
+    size,
+    size_type,
+    size_system,
+    weightUnit,
+    sizeUnit,
+    productHeight,
+    productLength,
+    productWidth,
+    title_main,
+    offer_id,
+    gtin,
+    brand,
+    google_product_category,
+    contentLanguage,
+    costPrice,
+    preSalePrice,
+    summaryKeywords,
+  } = productDetail;
+  const productTypeName = productTypeNameStr();
+  return (
+    <PageContainer>
+      <div className="page">
+        <div className="product-sku">
+          <DefaultProject></DefaultProject>
+          <div className="header">
+            <div className="sub-header">主数据</div>
+          </div>
 
-  // 富文本编辑器回调
-  callbackTextEditorDescription = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        description: value,
-      },
-    });
-  };
-  // 富文本编辑器回调
-  callbackTextEditorProductHighlight = (value) => {
-    this.props.dispatch({
-      type: 'product/updateProduct',
-      payload: {
-        product_highlight: value,
-      },
-    });
-  };
-  componentDidMount() {
-    this.props.dispatch({
-      type: 'product/initQueryParams',
-    });
-    this.props.dispatch({
-      type: 'product/queryAttr',
-    });
-    // 获取主商品详细
-    const search = window.document.location.search;
-    const query = QueryString.parse(search);
-    if (query && query.product_main_id) {
-      this.props.dispatch({
-        type: 'product/queryProductMainDetail',
-        payload: {
-          id: query.product_main_id,
-        },
-      });
-    }
-    if (query && query.product_id && query.language) {
-      this.props.dispatch({
-        type: 'product/queryProductDetail',
-        payload: {
-          id: query.product_id,
-          language: query.language,
-        },
-      });
-    }
-  }
-
-  render() {
-    const {
-      monetaryUnitOption,
-      languageOption,
-      productDetail,
-      productAttributeOption,
-      product_sku_option_status,
-      sizeTypeOption,
-      sizeSystemOption,
-      genderOption,
-      ageGroupOption,
-      productSizeUnitUnitOption,
-      productWeightUnitOption,
-      costsExchange,
-    } = this.props.product;
-    const {
-      language,
-      monetary_unit,
-      image_link,
-      additional_image_link,
-      lifestyle_image_link,
-      link,
-      product_type,
-      mobile_link,
-      description,
-      title,
-      price,
-      sale_price,
-      discount,
-      color,
-      material,
-      product_highlight,
-      availability,
-      productWeight,
-      product_detail,
-      item_group_id,
-      age_group,
-      gender,
-      pattern,
-      size,
-      size_type,
-      size_system,
-      weightUnit,
-      sizeUnit,
-      productHeight,
-      productLength,
-      productWidth,
-      title_main,
-      offer_id,
-      gtin,
-      brand,
-      google_product_category,
-      targetCountry,
-      contentLanguage,
-      costPrice,
-      preSalePrice,
-      summaryKeywords,
-    } = productDetail;
-
-    return (
-      <PageContainer>
-        <div className="page">
-          <div className="product-sku">
-            <DefaultProject></DefaultProject>
-            <div className="header">
-              <div className="sub-header">主数据</div>
+          <div className="content form-box">
+            <Row gutter={[16, 0]}>
+              <Col span={12}>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
+                  <Input
+                    placeholder="主商品标题"
+                    style={{ width: 350 }}
+                    value={title_main}
+                    disabled
+                  />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
+                  <Input placeholder="商品货号" style={{ width: 350 }} value={offer_id} disabled />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
+                  <Input
+                    placeholder="选择Google商品类目"
+                    style={{ width: 350 }}
+                    value={(google_product_category && google_product_category.title) || ''}
+                    disabled
+                  />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="product_type"></LabelHelpTip>
+                  <Input
+                    placeholder="自定商品分类"
+                    style={{ width: 350 }}
+                    value={contentLanguage && product_type && productTypeName}
+                    disabled
+                  />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
+                  <Input placeholder="商品GTIN码" style={{ width: 350 }} value={gtin} disabled />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="brand"></LabelHelpTip>
+                  <Input placeholder="商品品牌" style={{ width: 350 }} value={brand} disabled />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
+                  <Input
+                    placeholder="商品成本价"
+                    addonBefore="￥"
+                    style={{ width: 350 }}
+                    value={costPrice}
+                    disabled
+                  />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="preSalePrice"></LabelHelpTip>
+                  <Input
+                    placeholder="商品预估售价"
+                    addonBefore="￥"
+                    style={{ width: 350 }}
+                    value={preSalePrice}
+                    disabled
+                  />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel={costsExchangeTypeCurrencyLabel}></LabelHelpTip>
+                  <Input
+                    placeholder="汇率"
+                    addonBefore={costsExchangeTypeCurrencyLabel}
+                    style={{ width: 350 }}
+                    value={costsExchangeTypeCurrencyValue}
+                    disabled
+                  />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="summaryKeywords"></LabelHelpTip>
+                  <TextArea
+                    placeholder="关键词"
+                    rows={2}
+                    style={{ width: 350 }}
+                    value={summaryKeywords}
+                    disabled
+                  />
+                </div>
+              </Col>
+            </Row>
+          </div>
+          <div className="header">
+            <div className="sub-header">基本商品数据</div>
+          </div>
+          <div className="content form-box">
+            <div className="form-item">
+              <span className="label">
+                <i>*</i> 选择语言:
+              </span>
+              <Radio.Group
+                value={language}
+                onChange={languageRadioHandle}
+                options={languageOption}
+                disabled={queryParams.product_sku_option_status > 0}
+              ></Radio.Group>
             </div>
-
-            <div className="content form-box">
-              <Row gutter={[16, 0]}>
-                <Col span={12}>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
-                    <Input
-                      placeholder="主商品标题"
-                      style={{ width: 350 }}
-                      value={title_main}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
-                    <Input
-                      placeholder="商品货号"
-                      style={{ width: 350 }}
-                      value={offer_id}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
-                    <Input
-                      placeholder="选择Google商品类目"
-                      style={{ width: 350 }}
-                      value={(google_product_category && google_product_category.title) || ''}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="product_type"></LabelHelpTip>
-                    <Input
-                      placeholder="自定商品分类"
-                      style={{ width: 350 }}
-                      value={
-                        contentLanguage && product_type && product_type[`title_${contentLanguage}`]
-                      }
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
-                    <Input placeholder="商品GTIN码" style={{ width: 350 }} value={gtin} disabled />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="brand"></LabelHelpTip>
-                    <Input placeholder="商品品牌" style={{ width: 350 }} value={brand} disabled />
+            <div className="form-item">
+              <LabelHelpTip keyLabel="title"></LabelHelpTip>
+              <Input
+                placeholder="商品名称"
+                style={{ width: 550 }}
+                value={title}
+                onChange={titleInputHandle}
+              />
+            </div>
+            <div className="form-item">
+              <Row>
+                <Col flex="155px">
+                  <div className="line-box-header">
+                    <LabelHelpTip keyLabel="description"></LabelHelpTip>
                   </div>
                 </Col>
-                <Col span={12}>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
-                    <Input
-                      placeholder="商品成本价"
-                      addonBefore="￥"
-                      style={{ width: 350 }}
-                      value={costPrice}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="preSalePrice"></LabelHelpTip>
-                    <Input
-                      placeholder="商品预估售价"
-                      addonBefore="￥"
-                      style={{ width: 350 }}
-                      value={preSalePrice}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip
-                      keyLabel={costsExchangeTypeCurrency[targetCountry]}
-                    ></LabelHelpTip>
-                    <Input
-                      placeholder="汇率"
-                      addonBefore={costsExchangeTypeCurrency[targetCountry]}
-                      style={{ width: 350 }}
-                      value={costsExchange[costsExchangeTypeCurrency[targetCountry]]}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-item">
-                    <LabelHelpTip keyLabel="summaryKeywords"></LabelHelpTip>
-                    <TextArea
-                      placeholder="关键词"
-                      rows={2}
-                      style={{ width: 350 }}
-                      value={summaryKeywords}
-                      disabled
-                    />
+                <Col flex="auto">
+                  <div className="line-box-container">
+                    <div className="description">
+                      <RichTextEditor
+                        callbackValue={callbackTextEditorDescription}
+                        initValuerTextEditor={description}
+                      ></RichTextEditor>
+                    </div>
                   </div>
                 </Col>
               </Row>
             </div>
-            <div className="header">
-              <div className="sub-header">基本商品数据</div>
-            </div>
-            <div className="content form-box">
-              <div className="form-item">
-                <span className="label">
-                  <i>*</i> 选择语言:
-                </span>
-                <Radio.Group
-                  value={language}
-                  onChange={this.languageRadioHandle}
-                  options={languageOption}
-                  disabled={product_sku_option_status > 0}
-                ></Radio.Group>
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="title"></LabelHelpTip>
-                <Input
-                  placeholder="商品名称"
-                  style={{ width: 550 }}
-                  value={title}
-                  onChange={this.titleInputHandle}
-                />
-              </div>
-              <div className="form-item">
-                <div className="line-box-header">
-                  <LabelHelpTip keyLabel="description"></LabelHelpTip>
-                </div>
-                <div className="line-box-container">
-                  <RichTextEditor
-                    callbackValue={this.callbackTextEditorDescription}
-                    initValuerTextEditor={description}
-                  ></RichTextEditor>
-                </div>
-              </div>
-              <div className="form-item">
-                <div className="line-box-header">
-                  <LabelHelpTip keyLabel="product_highlight"></LabelHelpTip>
-                </div>
-                <div className="line-box-container">
-                  <RichTextEditor
-                    callbackValue={this.callbackTextEditorProductHighlight}
-                    initValuerTextEditor={product_highlight}
-                  ></RichTextEditor>
-                </div>
-              </div>
-              <div className="form-item">
-                <div className="line-box">
-                  <LabelHelpTip keyLabel="image_link"></LabelHelpTip>
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() => {
-                      this.imageSelectModel('image_link', 1);
-                    }}
-                  >
-                    添加主图
-                  </Button>
-                </div>
-                <div className="line-box">
-                  <div className="add-img-list">{this.imageRenderView(image_link)}</div>
-                </div>
-              </div>
-              <div className="form-item">
-                <div className="line-box">
-                  <LabelHelpTip keyLabel="additional_image_link"></LabelHelpTip>
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() => {
-                      this.imageSelectModel('additional_image_link', 5);
-                    }}
-                  >
-                    添加附属图片
-                  </Button>
-                </div>
-                <div className="line-box">
-                  <div className="add-img-list">{this.imageRenderView(additional_image_link)}</div>
-                </div>
-              </div>
-              <div className="content form-box">
-                <div className="form-item">
-                  <div className="line-box">
-                    <LabelHelpTip keyLabel="lifestyle_image_link"></LabelHelpTip>
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() => {
-                        this.imageSelectModel('lifestyle_image_link', 10);
-                      }}
-                    >
-                      添加生活图片
-                    </Button>
+            <div className="form-item">
+              <Row>
+                <Col flex="155px">
+                  <div className="line-box-header">
+                    <LabelHelpTip keyLabel="product_highlight"></LabelHelpTip>
                   </div>
-                  <div className="line-box">
-                    <div className="add-img-list">{this.imageRenderView(lifestyle_image_link)}</div>
+                </Col>
+                <Col flex="auto">
+                  <div className="line-box-container">
+                    <div className="product_highlight">
+                      <RichTextEditor
+                        callbackValue={callbackTextEditorProductHighlight}
+                        initValuerTextEditor={product_highlight}
+                      ></RichTextEditor>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="link"></LabelHelpTip>
-                <Input
-                  placeholder="商品着陆页"
-                  style={{ width: 550 }}
-                  value={link}
-                  onChange={this.linkInputHandle}
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="mobile_link"></LabelHelpTip>
-                <Input
-                  placeholder="商品着陆页"
-                  style={{ width: 550 }}
-                  value={mobile_link}
-                  onChange={this.mobileLinkInputHandle}
-                />
-              </div>
+                </Col>
+              </Row>
             </div>
-            <div className="header">
-              <div className="sub-header">价格和库存状况</div>
-            </div>
-            <div className="content form-box">
-              <div className="form-item">
-                <span className="label">
-                  <i>*</i> 选择货币单位:
-                </span>
-                <Select
-                  defaultValue={[costsExchangeTypeCurrency[targetCountry]]}
-                  value={monetary_unit}
-                  style={{ width: 130 }}
-                  onChange={this.monetaryUnitSelectHandle}
-                  options={monetaryUnitOption}
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="price"></LabelHelpTip>
-                <Input
-                  placeholder="价格"
-                  style={{ width: 130 }}
-                  value={price}
-                  suffix={monetary_unit}
-                  disabled
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="discount"></LabelHelpTip>
-                <InputNumber
-                  placeholder="折扣"
-                  style={{ width: 130 }}
-                  max={60}
-                  min={0}
-                  value={discount}
-                  onChange={this.discountInputHandle}
-                  suffix="%"
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
-                <Input
-                  placeholder="售卖价格"
-                  style={{ width: 130 }}
-                  value={sale_price}
-                  onChange={this.salePriceInputHandle}
-                  suffix={monetary_unit}
-                />
-              </div>
-              <div className="form-item">
-                <LabelHelpTip keyLabel="availability"></LabelHelpTip>
-                <Radio.Group value={availability} onChange={this.handelRadioAvailability}>
-                  <Radio value="in_stock"> 有货 </Radio>
-                  <Radio value="out_of_stock"> 缺货 </Radio>
-                </Radio.Group>
-              </div>
-            </div>
-            <div className="header">
-              <div className="sub-header">详细商品描述&创建商品组合</div>
-            </div>
-            <div className="content form-box">
-              {/** 商品组 ID [item_group_id] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="item_group_id"></LabelHelpTip>
-                <Input
-                  placeholder="商品组 ID"
-                  style={{ width: 120 }}
-                  value={item_group_id}
-                  onChange={this.itemGroupIdInputHandle}
-                />
-              </div>
-              {/* 颜色 [color] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="color"></LabelHelpTip>
-                <Input
-                  placeholder="商品颜色"
-                  style={{ width: 350 }}
-                  value={color}
-                  onChange={this.colorInputHandle}
-                />
-              </div>
-              {/* 年龄段 [age_group] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="age_group"></LabelHelpTip>
-                <Select
-                  value={age_group}
-                  style={{ width: 120 }}
-                  onChange={this.ageGroupSelectHandle}
-                  options={ageGroupOption}
-                />
-              </div>
-              {/* 适用性别 [gender] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="gender"></LabelHelpTip>
-                <Select
-                  value={gender}
-                  style={{ width: 120 }}
-                  onChange={this.genderSelectHandle}
-                  options={genderOption}
-                />
-              </div>
-              {/* 材质 [material] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="material"></LabelHelpTip>
-                <Input
-                  placeholder="商品材料"
-                  style={{ width: 350 }}
-                  value={material}
-                  onChange={this.materialInputHandle}
-                />
-              </div>
-              {/* 图案 [pattern] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="pattern"></LabelHelpTip>
-                <Input
-                  placeholder="商品图案"
-                  style={{ width: 350 }}
-                  value={pattern}
-                  onChange={this.patternInputHandle}
-                />
-              </div>
-              {/* 尺寸 [size] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="size"></LabelHelpTip>
-                <Input
-                  placeholder="商品尺寸"
-                  style={{ width: 150 }}
-                  value={size}
-                  onChange={this.sizeInputHandle}
-                />
-                <LabelHelpTip keyLabel="size_type"></LabelHelpTip>
-                <Select
-                  value={size_type}
-                  style={{ width: 80 }}
-                  onChange={this.sizeTypeSelectHandle}
-                  options={sizeTypeOption}
-                />
-                <LabelHelpTip keyLabel="size_system"></LabelHelpTip>
-                <Select
-                  value={size_system}
-                  style={{ width: 80 }}
-                  onChange={this.sizeSystemSelectHandle}
-                  options={sizeSystemOption}
-                />
-              </div>
-              {/**== 尺码类型 [size_type] */}
-              {/**== 尺码体系 [size_system] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="productSize"></LabelHelpTip>
-                <Input
-                  placeholder="长"
-                  style={{ width: 100 }}
-                  value={productLength}
-                  onChange={this.productLengthInputHandle}
-                />
-                <Input
-                  placeholder="宽"
-                  style={{ width: 100 }}
-                  value={productWidth}
-                  onChange={this.productWidthInputHandle}
-                />
-                <Input
-                  placeholder="高"
-                  style={{ width: 100 }}
-                  value={productHeight}
-                  onChange={this.productHeightInputHandle}
-                />
-                <LabelHelpTip keyLabel="sizeUnit"></LabelHelpTip>
-                <Select
-                  value={sizeUnit}
-                  style={{ width: 80 }}
-                  onChange={this.sizeUnitSelectHandle}
-                  options={productSizeUnitUnitOption}
-                />
-              </div>
-              {/**== 重量尺寸体系 [productWeight] */}
-              <div className="form-item">
-                <LabelHelpTip keyLabel="productWeight"></LabelHelpTip>
-                <Input
-                  placeholder="商品重量"
-                  style={{ width: 300 }}
-                  value={productWeight}
-                  onChange={this.productWeightInputHandle}
-                />
-                <LabelHelpTip keyLabel="weightUnit"></LabelHelpTip>
-                <Select
-                  value={weightUnit}
-                  style={{ width: 60 }}
-                  onChange={this.weightUnitSelectHandle}
-                  options={productWeightUnitOption}
-                />
-              </div>
-              <div className="form-item">
-                <div className="line-box">
-                  <LabelHelpTip keyLabel="product_detail"></LabelHelpTip>
-                  <Button type="primary" size="small" onClick={this.productAttributeButtonHandle}>
-                    属性管理
-                  </Button>
-                </div>
-                <div className="line-box">
-                  <div className="table-box">
-                    <Table
-                      dataSource={product_detail}
-                      columns={this.columnsProductAttribute()}
-                      pagination={false}
-                      style={{ width: 350 }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="content form-box"></div>
-            <div className="content form-box">
-              <div className="form-item">
-                <span className="label"></span>
+            <div className="form-item">
+              <div className="line-box">
+                <LabelHelpTip keyLabel="image_link"></LabelHelpTip>
                 <Button
                   type="primary"
-                  size="large"
+                  size="small"
                   onClick={() => {
-                    this.handelSubmitCreateSku(product_sku_option_status);
+                    imageSelectModel('image_link', 1);
                   }}
                 >
-                  {product_sku_option_status > 0 ? '确认编辑SKU商品' : '确认创建SKU商品'}
+                  添加主图
                 </Button>
+              </div>
+              <div className="line-box">
+                <div className="add-img-list">{imageRenderView(image_link)}</div>
+              </div>
+            </div>
+            <div className="form-item">
+              <div className="line-box">
+                <LabelHelpTip keyLabel="additional_image_link"></LabelHelpTip>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => {
+                    imageSelectModel('additional_image_link', 5);
+                  }}
+                >
+                  添加附属图片
+                </Button>
+              </div>
+              <div className="line-box">
+                <div className="add-img-list">{imageRenderView(additional_image_link)}</div>
+              </div>
+            </div>
+            <div className="content form-box">
+              <div className="form-item">
+                <div className="line-box">
+                  <LabelHelpTip keyLabel="lifestyle_image_link"></LabelHelpTip>
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      imageSelectModel('lifestyle_image_link', 10);
+                    }}
+                  >
+                    添加生活图片
+                  </Button>
+                </div>
+                <div className="line-box">
+                  <div className="add-img-list">{imageRenderView(lifestyle_image_link)}</div>
+                </div>
+              </div>
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="link"></LabelHelpTip>
+              <Input
+                placeholder="商品着陆页"
+                style={{ width: 550 }}
+                value={link}
+                onChange={linkInputHandle}
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="mobile_link"></LabelHelpTip>
+              <Input
+                placeholder="商品着陆页"
+                style={{ width: 550 }}
+                value={mobile_link}
+                onChange={mobileLinkInputHandle}
+              />
+            </div>
+          </div>
+          <div className="header">
+            <div className="sub-header">价格和库存状况</div>
+          </div>
+          <div className="content form-box">
+            <div className="form-item">
+              <span className="label">
+                <i>*</i> 选择货币单位:
+              </span>
+              <Select
+                value={monetary_unit}
+                style={{ width: 130 }}
+                onChange={monetaryUnitSelectHandle}
+                options={monetaryUnitOption}
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="price"></LabelHelpTip>
+              <Input
+                placeholder="价格"
+                style={{ width: 130 }}
+                value={price}
+                suffix={monetary_unit}
+                disabled
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="discount"></LabelHelpTip>
+              <InputNumber
+                placeholder="折扣"
+                style={{ width: 130 }}
+                max={60}
+                min={0}
+                value={discount}
+                onChange={() => discountInputHandle()}
+                suffix="%"
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
+              <Input
+                placeholder="售卖价格"
+                style={{ width: 130 }}
+                value={sale_price}
+                onChange={salePriceInputHandle}
+                suffix={monetary_unit}
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="availability"></LabelHelpTip>
+              <Radio.Group value={availability} onChange={() => handelRadioAvailability(event)}>
+                <Radio value="in_stock"> 有货 </Radio>
+                <Radio value="out_of_stock"> 缺货 </Radio>
+              </Radio.Group>
+            </div>
+          </div>
+          <div className="header">
+            <div className="sub-header">详细商品描述&创建商品组合</div>
+          </div>
+          <div className="content form-box">
+            {/** 商品组 ID [item_group_id] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="item_group_id"></LabelHelpTip>
+              <Input
+                placeholder="商品组 ID"
+                style={{ width: 120 }}
+                value={item_group_id}
+                onChange={itemGroupIdInputHandle}
+              />
+            </div>
+            {/* 颜色 [color] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="color"></LabelHelpTip>
+              <Input
+                placeholder="商品颜色"
+                style={{ width: 350 }}
+                value={color}
+                onChange={colorInputHandle}
+              />
+            </div>
+            {/* 年龄段 [age_group] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="age_group"></LabelHelpTip>
+              <Select
+                value={age_group}
+                style={{ width: 120 }}
+                onChange={ageGroupSelectHandle}
+                options={ageGroupOption}
+              />
+            </div>
+            {/* 适用性别 [gender] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="gender"></LabelHelpTip>
+              <Select
+                value={gender}
+                style={{ width: 120 }}
+                onChange={genderSelectHandle}
+                options={genderOption}
+              />
+            </div>
+            {/* 材质 [material] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="material"></LabelHelpTip>
+              <Input
+                placeholder="商品材料"
+                style={{ width: 350 }}
+                value={material}
+                onChange={materialInputHandle}
+              />
+            </div>
+            {/* 图案 [pattern] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="pattern"></LabelHelpTip>
+              <Input
+                placeholder="商品图案"
+                style={{ width: 350 }}
+                value={pattern}
+                onChange={patternInputHandle}
+              />
+            </div>
+            {/* 尺寸 [size] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="size"></LabelHelpTip>
+              <Input
+                placeholder="商品尺寸"
+                style={{ width: 150 }}
+                value={size}
+                onChange={sizeInputHandle}
+              />
+              <LabelHelpTip keyLabel="size_type"></LabelHelpTip>
+              <Select
+                value={size_type}
+                style={{ width: 80 }}
+                onChange={sizeTypeSelectHandle}
+                options={sizeTypeOption}
+              />
+              <LabelHelpTip keyLabel="size_system"></LabelHelpTip>
+              <Select
+                value={size_system}
+                style={{ width: 80 }}
+                onChange={sizeSystemSelectHandle}
+                options={sizeSystemOption}
+              />
+            </div>
+            {/**== 尺码类型 [size_type] */}
+            {/**== 尺码体系 [size_system] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="productSize"></LabelHelpTip>
+              <Input
+                placeholder="长"
+                style={{ width: 100 }}
+                value={productLength}
+                onChange={productLengthInputHandle}
+              />
+              <Input
+                placeholder="宽"
+                style={{ width: 100 }}
+                value={productWidth}
+                onChange={productWidthInputHandle}
+              />
+              <Input
+                placeholder="高"
+                style={{ width: 100 }}
+                value={productHeight}
+                onChange={productHeightInputHandle}
+              />
+              <LabelHelpTip keyLabel="sizeUnit"></LabelHelpTip>
+              <Select
+                value={sizeUnit}
+                style={{ width: 80 }}
+                onChange={sizeUnitSelectHandle}
+                options={productSizeUnitOption}
+              />
+            </div>
+            {/**== 重量尺寸体系 [productWeight] */}
+            <div className="form-item">
+              <LabelHelpTip keyLabel="productWeight"></LabelHelpTip>
+              <Input
+                placeholder="商品重量"
+                style={{ width: 300 }}
+                value={productWeight}
+                onChange={productWeightInputHandle}
+              />
+              <LabelHelpTip keyLabel="weightUnit"></LabelHelpTip>
+              <Select
+                value={weightUnit}
+                style={{ width: 60 }}
+                onChange={weightUnitSelectHandle}
+                options={productWeightUnitOption}
+              />
+            </div>
+            <div className="form-item">
+              <div className="line-box">
+                <LabelHelpTip keyLabel="product_detail"></LabelHelpTip>
+                <Button type="primary" size="small" onClick={productAttributeButtonHandle}>
+                  属性管理
+                </Button>
+              </div>
+              <div className="line-box">
+                <div className="table-box">
+                  <Table
+                    dataSource={product_detail}
+                    columns={columnsProductAttribute()}
+                    pagination={false}
+                    style={{ width: 350 }}
+                  />
+                </div>
               </div>
             </div>
           </div>
+          <div className="content form-box"></div>
+          <div className="content form-box">
+            <div className="form-item">
+              <span className="label"></span>
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => {
+                  handelSubmitCreateSku(queryParams.product_sku_option_status);
+                }}
+              >
+                {queryParams.product_sku_option_status > 0 ? '确认编辑SKU商品' : '确认创建SKU商品'}
+              </Button>
+            </div>
+          </div>
         </div>
-        <ProductAttribute
-          dataSource={{ productAttributeOption, product_detail }}
-          open={this.state.isProductAttributeModal}
-          callbackCancel={this.productAttributeCallbackCancel}
-          callbackOk={this.productAttributeCallbackOk}
-          callbackAddOk={this.productAttributeAddCallbackOk}
-          callbackDelOk={this.productAttributeDelCallbackOk}
-        ></ProductAttribute>
-        <ImageSelectModal
-          open={this.state.isProductImageModal}
-          callbackCancel={this.productImageCallbackCancel}
-          callbackOk={this.productImageCallbackOk}
-          selectedType={this.state.currentImageProductType}
-          imageLimitNum={this.state.imageLimitNum}
-        ></ImageSelectModal>
-      </PageContainer>
-    );
-  }
+      </div>
+      <ProductAttribute callbackOk={productAttributeCallbackOk}></ProductAttribute>
+      <ImageSelectModal
+        callbackOk={productImageCallbackOk}
+        selectedType={currentImageProductType}
+        imageLimitNum={imageLimitNum}
+      ></ImageSelectModal>
+    </PageContainer>
+  );
 }
-
 export default ProductCreateSku;
