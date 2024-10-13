@@ -8,11 +8,11 @@ import {
   WeiboCircleOutlined,
 } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
+import { history, useModel, useSearchParams } from '@umijs/max';
 import { Alert, message } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { history, useModel, useSearchParams } from 'umi';
 
 import './index.less';
 

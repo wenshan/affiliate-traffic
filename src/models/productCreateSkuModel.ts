@@ -8,7 +8,6 @@ import {
   defaultSizeUnitCountry,
   defaultWeightUnitCountry,
 } from '@/constant/defaultCurrentData';
-import { costsExchangeQuery } from '@/services/api/googleMerchant';
 import { createProduct, editProduct, queryProductDetail } from '@/services/api/product';
 import { queryProductMainDetail } from '@/services/api/productMain';
 import { Modal, message } from 'antd';
@@ -63,6 +62,7 @@ function productCreateSkuModel() {
     const query = Object.assign({}, queryParamsInit, QueryString.parse(search));
     if (query && query.product_main_id) {
       setQueryParams(query);
+      debugger;
       if (query.product_sku_option_status === '1') {
         // 编辑
         if (query.product_main_id && query.product_id) {
@@ -114,12 +114,14 @@ function productCreateSkuModel() {
           gtin: result.data.gtin,
           identifierExists: result.data.identifierExists || false,
           preSalePrice: result.data.preSalePrice,
-          costPrice: result.data.preSalePrice,
+          costPrice: result.data.costPrice,
           costFirstLegFreightRatio: result.data.costFirstLegFreightRatio,
           costsAdvertisingRatio: result.data.costsAdvertisingRatio,
           targetProfitRatio: result.data.targetProfitRatio,
           summaryKeywords: result.data.summaryKeywords,
         });
+        console.log('initProductDetail:', initProductDetail);
+        console.log('mainDetail:', result.data);
         setCurrentPreSalePrice(preSalePrice);
         setProductMainDetail(result.data);
         setProductDetail(initProductDetail);
@@ -144,13 +146,6 @@ function productCreateSkuModel() {
         setCurrentPreSalePrice(preSalePrice);
         setProductDetail(result.data);
       }
-    }
-  };
-  // 获取成本和汇率
-  const shoppingCostsExchangeQuery = async () => {
-    const result = await costsExchangeQuery();
-    if (result && result.status === 200 && result.data) {
-      setCostsExchange(result.data);
     }
   };
   // 商品编辑
@@ -296,6 +291,7 @@ function productCreateSkuModel() {
     costsExchangeTypeCurrencyLabel,
     costsExchangeTypeCurrencyValue,
     currentPreSalePrice,
+    queryProductMainDetailFetch,
   };
 }
 export default productCreateSkuModel;

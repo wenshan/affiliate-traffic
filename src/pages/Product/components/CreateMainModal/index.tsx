@@ -1,12 +1,7 @@
 import { defaultCurrentProductMain } from '@/constant/defaultCurrentData';
-import { costsExchangeQuery } from '@/services/api/googleMerchant';
-import {
-  createProductMain,
-  editProductMain,
-  queryProductMainDetail,
-} from '@/services/api/productMain';
+import { useModel } from '@umijs/max';
 import { Button, Col, Input, InputNumber, Modal, Row, Switch, message } from 'antd';
-import { useEffect, useState } from 'react';
+import React from 'react';
 import GoogleProductCategory from '../GoogleProductCategory';
 import LabelHelpTip from '../LabelHelpTip';
 import ProductCustomTypeModalSelect from '../ProductCustomTypeModalSelect';
@@ -27,73 +22,46 @@ type CostsExchange = {
   [key: string]: any;
 };
 */
+type Event = { target: { value: any } };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 type GoogleProductCategory = {
   key: string;
   title: string;
   [key: string]: any;
 };
-type currentProductMainRender = {
-  title_main: string;
-  imgSrc: string;
-  offer_id: string;
-  google_product_category: string | GoogleProductCategory;
-  google_product_category_id: string;
-  product_type: string;
-  product_type_id: string;
-  gtin: string;
-  brand: string;
-  projectId: string;
-  identifierExists: boolean;
-  costPrice: string;
-  preSalePrice: string;
-  costFirstLegFreightRatio: number;
-  costFbaRatio: number;
-  costsAdvertisingRatio: number;
-  targetProfitRatio: number;
-  summaryKeywords: string;
-  [key: string]: any;
-};
 
 type Props = {
-  id: string | number;
-  open: boolean;
-  openStatusCallback: any;
   optionAction: boolean;
   callbackOk: any;
 };
+type ProductType = {
+  id: number;
+  key: React.Key;
+  title_zh: string;
+  title_en: string;
+  title_ja: string;
+  title_ko: string;
+  projectId: string;
+  [key: string]: any;
+};
 
 export default (props: Props) => {
-  const [currentProductMainData, setCurrentProductMainData] =
-    useState<currentProductMainRender>(defaultCurrentProductMain);
-  const [isProductCategoryShow, setProductCategoryShow] = useState(false);
-  const [isProductTypeShow, setProductTypeShow] = useState(false);
-  const [productTypeName, setProductTypeName] = useState('');
-  const costsExchangeFetch = async () => {
-    const result = await costsExchangeQuery();
-    if (result && result.status === 200 && result.data) {
-      return result.data;
-    } else {
-      return null;
-    }
-  };
-  const currentProductMainFetch = async () => {
-    const id = props.id;
-    const result = await queryProductMainDetail({ id });
-    if (result && result.status === 200 && result.data) {
-      const resultCostsExchange = await costsExchangeFetch();
-      let formData = null;
-      if (resultCostsExchange) {
-        formData = Object.assign({}, result.data, resultCostsExchange);
-      } else {
-        formData = result.data;
-      }
-      setCurrentProductMainData(formData);
-    }
-  };
+  const {
+    productMainDetail,
+    setProductMainDetail,
+    createMainModalStatus,
+    setCreateMainModalStatus,
+    costsExchange,
+    productTypeName,
+    setProductTypeName,
+    createProductMainFetch,
+    editProductMainFetch,
+    setProductCategoryShow,
+    setProductTypeShow,
+  } = useModel('productMainModel');
   const handleCancel = async () => {
-    props.openStatusCallback(false);
-    setCurrentProductMainData(defaultCurrentProductMain);
+    setProductMainDetail(defaultCurrentProductMain);
+    setCreateMainModalStatus(false);
   };
   const handleOk = async () => {
     const {
@@ -107,7 +75,7 @@ export default (props: Props) => {
       costPrice,
       preSalePrice,
       product_type_id,
-    } = currentProductMainData;
+    } = productMainDetail;
     if (identifierExists) {
       if (!gtin) {
         message.error('请检测 identifierExists 和 gtin 的依赖关系！');
@@ -126,71 +94,62 @@ export default (props: Props) => {
     ) {
       if (props.optionAction) {
         // 编辑
-        const result = await editProductMain(currentProductMainData);
-        if (result && result.status === 200 && result.data) {
-          props.callbackOk(currentProductMainData);
-          message.success('编辑成功！');
-          props.openStatusCallback(false);
-        } else {
-          message.error(result.msg || '编辑失败！');
-        }
+        await editProductMainFetch();
       } else {
         // 新建
-        const result = await createProductMain(currentProductMainData);
-        if (result && result.status === 200 && result.data) {
-          props.callbackOk(currentProductMainData);
-          message.success('创建成功！');
-          props.openStatusCallback(false);
-        } else {
-          message.error(result.msg || '创建失败！');
-        }
+        await createProductMainFetch();
       }
+      setProductTypeName('');
     } else {
       message.error('缺少必要参数，请检测对应数据');
     }
   };
 
-  const setChangeInputValueHandler = async (key: string, event: any) => {
+  const setChangeInputValueHandler = async (key: string, event: Event) => {
     const { value } = event.target;
-    const temp: { [key: string]: any } = {};
+    const temp: { [key: string]: string | number } = {};
     temp[key] = value;
-    const newCurrentProductMainData = Object.assign({}, currentProductMainData, temp);
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, temp);
+    console.log('newCurrentProductMainData:', newCurrentProductMainData);
     if (key) {
-      setCurrentProductMainData(newCurrentProductMainData);
+      setProductMainDetail(newCurrentProductMainData);
     }
   };
   const setChangeSwitchValueHandler = async (key: string, value: any) => {
-    const temp: { [key: string]: any } = {};
+    const temp: { [key: string]: string | number } = {};
     temp[key] = value;
-    const newCurrentProductMainData = Object.assign({}, currentProductMainData, temp);
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, temp);
     if (key) {
-      setCurrentProductMainData(newCurrentProductMainData);
+      setProductMainDetail(newCurrentProductMainData);
     }
   };
-  const setChangeCostPriceValueHandler = async (key: string, event: any) => {
+  // 成本计算
+  const setChangeCostPriceValueHandler = async (key: string, event: Event) => {
     const { value } = event.target;
     const { costFirstLegFreightRatio, targetProfitRatio, costFbaRatio, costsAdvertisingRatio } =
-      currentProductMainData;
-    const temp: { [key: string]: any } = {};
+      costsExchange;
+    const temp: { [key: string]: string | number } = {};
     temp[key] = value;
+    // const costFirstLegFreightRatioValue = (Number(value) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2);
+    // const costFbaRatioValue = (Number(costPrice) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2);
+    // const costsAdvertisingRatioValue = (Number(value) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2);
+    // const targetProfitRatioValue = (Number(value) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2);
     const preSalePrice = (
       value *
       (1 +
         (costFirstLegFreightRatio + targetProfitRatio + costFbaRatio + costsAdvertisingRatio) / 100)
     ).toFixed(2);
-    const newCurrentProductMainData = Object.assign({}, currentProductMainData, temp, {
-      preSalePrice,
-    });
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, temp, { preSalePrice });
     if (key) {
-      setCurrentProductMainData(newCurrentProductMainData);
+      setProductMainDetail(newCurrentProductMainData);
     }
   };
   const setChangeInputNumberValueHandler = async (key: string, value: any) => {
-    const temp: { [key: string]: any } = {};
+    const temp: { [key: string]: string | number } = {};
     temp[key] = value;
-    const newCurrentProductMainData = Object.assign({}, currentProductMainData, temp);
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, temp);
     if (key) {
-      setCurrentProductMainData(newCurrentProductMainData);
+      setProductMainDetail(newCurrentProductMainData);
     }
   };
 
@@ -198,19 +157,17 @@ export default (props: Props) => {
     setProductCategoryShow(true);
   };
 
-  const productCategoryCallBackCancel = async () => {
-    setProductCategoryShow(false);
-  };
   const productCategoryCallBackOk = async (option: GoogleProductCategory) => {
     if (option) {
       const google_product_category = option;
       const google_product_category_id = option.key;
-      const newCurrentProductMainData = Object.assign({}, currentProductMainData, {
+      const newCurrentProductMainData = Object.assign({}, productMainDetail, {
         google_product_category,
         google_product_category_id,
       });
-      setCurrentProductMainData(newCurrentProductMainData);
+      setProductMainDetail(newCurrentProductMainData);
       setProductCategoryShow(false);
+      setProductTypeName('');
     } else {
       message.error('Google类目选择错误');
     }
@@ -219,28 +176,30 @@ export default (props: Props) => {
   const productTypeButtonHandle = async () => {
     setProductTypeShow(true);
   };
-  const productTypeCallBackCancel = async () => {
-    setProductTypeShow(false);
-  };
-  const productTypeCallBackOk = async ({ selectedRowKeys, selectedRows }) => {
+  const productTypeCallBackOk = async (
+    selectedRowKeys: React.Key[],
+    selectedRows: ProductType[],
+  ) => {
     if (selectedRowKeys && selectedRows) {
-      const newCurrentProductMainData = Object.assign({}, currentProductMainData, {
+      const newCurrentProductMainData = Object.assign({}, productMainDetail, {
         product_type_id: selectedRowKeys.join(','),
         product_type: selectedRows,
       });
-      const productTypeNameStr: string[] = [];
-      selectedRows.forEach((item: { title_zh: string }) => {
-        productTypeNameStr.push(item.title_zh);
+      const productTypeNameArr: string[] = [];
+      selectedRows.forEach((item: ProductType) => {
+        productTypeNameArr.push(item.title_zh);
       });
-      setProductTypeName((productTypeNameStr && productTypeNameStr.join(',')) || '');
-      setCurrentProductMainData(newCurrentProductMainData);
+      const productTypeNameStr: string = (productTypeNameArr && productTypeNameArr.join(',')) || '';
+      setProductTypeName(productTypeNameStr);
+      setProductMainDetail(newCurrentProductMainData);
     }
     setProductTypeShow(false);
   };
-
-  useEffect(() => {
-    currentProductMainFetch();
-  }, [props]);
+  // 同步成本计算
+  const restCostPriceCostsExchange = () => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, costsExchange);
+    setProductMainDetail(newCurrentProductMainData);
+  };
 
   const {
     title_main,
@@ -258,11 +217,11 @@ export default (props: Props) => {
     targetProfitRatio,
     summaryKeywords,
     product_type_id,
-  } = currentProductMainData;
+  } = productMainDetail;
   return (
     <Modal
-      title={'创建主商品信息'}
-      open={props.open}
+      title={`${props.optionAction ? '编辑主商品信息' : '创建主商品信息'}`}
+      open={createMainModalStatus}
       width={900}
       onOk={handleOk}
       onCancel={handleCancel}
@@ -303,7 +262,7 @@ export default (props: Props) => {
               <Input
                 placeholder="选择Google商品类目"
                 style={{ width: 350 }}
-                value={google_product_category && google_product_category.title}
+                value={(google_product_category && google_product_category.title) || ''}
                 disabled
               />
               <span className="operate">
@@ -359,18 +318,25 @@ export default (props: Props) => {
                 }}
               />
             </div>
-            <div className="form-item">
-              <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
-              <Input
-                name="costPrice"
-                style={{ width: 150 }}
-                addonBefore="￥"
-                value={costPrice}
-                onChange={(event) => {
-                  setChangeCostPriceValueHandler('costPrice', event);
-                }}
-              />
-            </div>
+            <Row gutter={[16, 0]}>
+              <Col span={12}>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
+                  <Input
+                    name="costPrice"
+                    style={{ width: 150 }}
+                    addonBefore="￥"
+                    value={costPrice}
+                    onChange={(event) => {
+                      setChangeCostPriceValueHandler('costPrice', event);
+                    }}
+                  />
+                </div>
+              </Col>
+              <Col span={12}>
+                <Button onClick={restCostPriceCostsExchange}>同步成本计算</Button>
+              </Col>
+            </Row>
 
             <Row gutter={[16, 0]}>
               <Col span={12}>
@@ -384,7 +350,7 @@ export default (props: Props) => {
                     onChange={(value) => {
                       setChangeInputNumberValueHandler('costFirstLegFreightRatio', value);
                     }}
-                  />{' '}
+                  />
                   <span>
                     {(Number(costPrice) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2)}
                   </span>
@@ -401,7 +367,7 @@ export default (props: Props) => {
                     onChange={(value) => {
                       setChangeInputNumberValueHandler('costFbaRatio', value);
                     }}
-                  />{' '}
+                  />
                   <span>{(Number(costPrice) * (Number(costFbaRatio) / 100)).toFixed(2)}</span>
                 </div>
               </Col>
@@ -416,7 +382,7 @@ export default (props: Props) => {
                     onChange={(value) => {
                       setChangeInputNumberValueHandler('costsAdvertisingRatio', value);
                     }}
-                  />{' '}
+                  />
                   <span>
                     {(Number(costPrice) * (Number(costsAdvertisingRatio) / 100)).toFixed(2)}
                   </span>
@@ -433,7 +399,7 @@ export default (props: Props) => {
                     onChange={(value) => {
                       setChangeInputNumberValueHandler('targetProfitRatio', value);
                     }}
-                  />{' '}
+                  />
                   <span>{(Number(costPrice) * (Number(targetProfitRatio) / 100)).toFixed(2)}</span>
                 </div>
               </Col>
@@ -462,14 +428,10 @@ export default (props: Props) => {
         </>
       </div>
       <GoogleProductCategory
-        open={isProductCategoryShow}
-        callbackCancel={productCategoryCallBackCancel}
         callbackOk={productCategoryCallBackOk}
-        selectedKeys={[Number(google_product_category_id)]}
+        selectedKeys={(google_product_category_id && [Number(google_product_category_id)]) || []}
       ></GoogleProductCategory>
       <ProductCustomTypeModalSelect
-        open={isProductTypeShow}
-        callbackCancel={productTypeCallBackCancel}
         callbackOk={productTypeCallBackOk}
         selectedKeys={product_type_id}
       ></ProductCustomTypeModalSelect>

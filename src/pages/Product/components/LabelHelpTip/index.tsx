@@ -13,7 +13,7 @@ export default (props: Props) => {
     const ruleRrr = (rule.length && rule.indexOf('。') > 0 && rule.split('。')) || [];
     if (ruleRrr && ruleRrr.length) {
       ruleRrr.map((item: any, idx: any) => {
-        ruleHtml.push(<dd key={idx}>{item}</dd>);
+        ruleHtml.push(<dd key={`${idx}_dd`}>{item}</dd>);
       });
     } else {
       ruleHtml.push('-');

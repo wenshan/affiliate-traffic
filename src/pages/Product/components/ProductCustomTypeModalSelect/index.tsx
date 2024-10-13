@@ -1,11 +1,12 @@
 import { queryTypeAll } from '@/services/api/productType';
+import { useModel } from '@umijs/max';
 import type { TableColumnsType, TableProps } from 'antd';
 import { Modal, Table, message } from 'antd';
 import { useEffect, useState } from 'react';
 
 import './index.less';
 
-type DataType = {
+type ProductType = {
   id: number;
   key: React.Key;
   title_zh: string;
@@ -17,24 +18,22 @@ type DataType = {
 };
 
 type Props = {
-  id: string | number;
-  open: boolean;
-  openStatusCallback: any;
-  callbackCancel: any;
-  optionAction: boolean;
+  selectedKeys: string;
   callbackOk: any;
 };
 
 export default (props: Props) => {
+  const { productTypeShow, setProductTypeShow } = useModel('productMainModel');
   const [dataTypeList, setDataTypeList] = useState();
   const [selectedRows, setSelectedRows] = useState<any>();
-  const [selectedRowKeys, setSelectedRowKeys] = useState();
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const handleSelectOk = async () => {
-    props.callbackOk({ selectedRowKeys, selectedRows });
+    props.callbackOk(selectedRowKeys, selectedRows);
+    setProductTypeShow(false);
   };
   const handleSelectCancel = async () => {
-    props.callbackCancel();
+    setProductTypeShow(false);
   };
   // 获取列表数据
   const queryTypeAllHandler = async () => {
@@ -47,10 +46,17 @@ export default (props: Props) => {
   };
 
   useEffect(() => {
+    if (props.selectedKeys) {
+      const selectedKeysArr = props.selectedKeys.split(',');
+      const selectedKeysNum = selectedKeysArr.map(Number);
+      setSelectedRowKeys(selectedKeysNum);
+    } else {
+      setSelectedRowKeys([]);
+    }
     queryTypeAllHandler();
-  }, []);
+  }, [props.selectedKeys]);
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<ProductType> = [
     {
       title: '中文',
       dataIndex: 'title_zh',
@@ -68,29 +74,30 @@ export default (props: Props) => {
       dataIndex: 'title_ko',
     },
   ];
-  const rowSelection: TableProps<DataType>['rowSelection'] = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+  const rowSelection: TableProps<ProductType>['rowSelection'] = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: ProductType[]) => {
       setSelectedRows(selectedRows);
       setSelectedRowKeys(selectedRowKeys);
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     },
-    getCheckboxProps: (record: DataType) => ({
+    getCheckboxProps: (record: ProductType) => ({
       checked: record.name === 'Disabled User', // Column configuration not to be checked
       name: record.name,
     }),
+    selectedRowKeys,
   };
 
   return (
     <div className="product-custom-type-modal-select">
       <Modal
         title="选择产品自定义分类"
-        open={props.open}
+        open={productTypeShow}
         width={800}
         onOk={handleSelectOk}
         onCancel={handleSelectCancel}
       >
         <div className="content">
-          <Table<DataType>
+          <Table<ProductType>
             rowSelection={{ type: 'checkbox', ...rowSelection }}
             columns={columns}
             dataSource={dataTypeList}

@@ -11,10 +11,10 @@ import {
 } from '@/constant/defaultCurrentData';
 import Tool from '@/utils/tool.js';
 import { PageContainer } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
 import type { RadioChangeEvent } from 'antd';
 import { Button, Col, Image, Input, InputNumber, Radio, Row, Select, Table } from 'antd';
 import { JSX, useState } from 'react';
-import { useModel } from 'umi';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
@@ -37,6 +37,7 @@ function ProductCreateSku() {
     setProductDetail,
     queryParams,
     currentPreSalePrice,
+    queryProductMainDetailFetch,
   } = useModel('productCreateSkuModel');
   const { setProductAttributeModalStatus } = useModel('productAttributeModel');
   const { setProductSkuImageModalStatus } = useModel('material');
@@ -51,6 +52,7 @@ function ProductCreateSku() {
   };
   // 货币单位
   const monetaryUnitSelectHandle = (value: string) => {
+    // @ts-ignore
     const price = (costsExchange[value] * currentPreSalePrice).toFixed(2);
     const newProductDetail = Object.assign({}, productDetail, { price, monetary_unit: value });
     setProductDetail(newProductDetail);
@@ -147,7 +149,6 @@ function ProductCreateSku() {
     if (currentImageProductType === 'lifestyle_image_link') {
       newProductDetail = Object.assign({}, productDetail, { lifestyle_image_link: imageSrc });
     }
-    console.log('newProductDetail:', newProductDetail);
     setProductSkuImageModalStatus(false);
     setProductDetail(newProductDetail);
   };
@@ -268,6 +269,13 @@ function ProductCreateSku() {
     return nameStr.join(',');
     // contentLanguage && product_type && product_type[`title_${contentLanguage}`]
   };
+
+  // 重置主数据
+  const resetProductMainDetail = async () => {
+    const { language } = productDetail;
+    const data = Object.assign({}, queryParams, { language });
+    await queryProductMainDetailFetch(data);
+  };
   // 提交创建SKU
   const handelSubmitCreateSku = async (product_sku_option_status: number) => {
     if (product_sku_option_status > 0) {
@@ -331,13 +339,20 @@ function ProductCreateSku() {
     summaryKeywords,
   } = productDetail;
   const productTypeName = productTypeNameStr();
+
+  console.log('productDetail:', productDetail);
   return (
     <PageContainer>
       <div className="page">
         <div className="product-sku">
           <DefaultProject></DefaultProject>
           <div className="header">
-            <div className="sub-header">主数据</div>
+            <div className="sub-header">
+              <span>主数据</span>{' '}
+              <Button className="reset-main-button" onClick={resetProductMainDetail}>
+                同步产品主数据
+              </Button>
+            </div>
           </div>
 
           <div className="content form-box">

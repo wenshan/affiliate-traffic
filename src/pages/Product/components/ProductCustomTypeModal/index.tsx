@@ -19,7 +19,6 @@ type Props = {
 };
 
 export default (props: Props) => {
-  console.log('props:', props);
   const [form] = Form.useForm<any>();
   const [isOpenShow, setOpenShow] = useState(props.open);
   const submitHandler = async (values: Item) => {

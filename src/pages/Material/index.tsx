@@ -8,9 +8,9 @@ import {
   PlusSquareOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
 import { Button, Checkbox, Col, Input, Modal, Row, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useModel } from 'umi';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
 
@@ -226,7 +226,7 @@ function MaterialPage() {
                 </span>
               </div>
               {item.children && item.children.length && (
-                <ul>
+                <ul key={`${item.key}_ul`}>
                   {item.children.map((childrenItem: any, idx: number) => {
                     return (
                       <li

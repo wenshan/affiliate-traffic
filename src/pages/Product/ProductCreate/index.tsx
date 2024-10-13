@@ -1,109 +1,111 @@
 import DefaultProject from '@/components/DefaultProject';
-import { defaultCurrentProductMain, defaultProductDetail } from '@/constant/defaultCurrentData';
+import { defaultCurrentProductMain } from '@/constant/defaultCurrentData';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Modal, Table } from 'antd';
-import { Component } from 'react';
-import { connect, history } from 'umi';
+import { history, useModel } from '@umijs/max';
+import { Button, Modal, Table, Tag } from 'antd';
+import { JSX, useEffect, useState } from 'react';
 import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';
 
-@connect(({ product, common, material }) => ({
-  product,
-  common,
-  material,
-}))
-class ProductCreate extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      id: null,
-      pageSize: 20,
-      current: 1,
-      currentOptionActionStatus: false, // 0 添加 1 编辑
-      isCreateMainModalShow: false,
-    };
-  }
-  createMainModalStatusHandle = () => {
-    this.setState({
-      currentOptionActionStatus: false,
-      isCreateMainModalShow: true,
-    });
+type GoogleProductCategory = {
+  key: string;
+  title: string;
+  [key: string]: any;
+};
 
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        currentProductMain: defaultCurrentProductMain,
-      },
-    });
+type ProductType = {
+  id: number;
+  key: React.Key;
+  title_zh: string;
+  title_en: string;
+  title_ja: string;
+  title_ko: string;
+  projectId: string;
+  [key: string]: any;
+};
+
+type ProductMainDetailType = {
+  title_main: string;
+  imgSrc: string;
+  offer_id: string;
+  google_product_category: string | GoogleProductCategory;
+  google_product_category_id: string;
+  product_type: Array<ProductType>;
+  product_type_id: string;
+  gtin: string;
+  brand: string;
+  projectId: string;
+  identifierExists: boolean;
+  costPrice: string;
+  preSalePrice: string;
+  costFirstLegFreightRatio: number;
+  costFbaRatio: number;
+  costsAdvertisingRatio: number;
+  targetProfitRatio: number;
+  summaryKeywords: string;
+  [key: string]: any;
+};
+
+function ProductCreate() {
+  const {
+    productMainDetail,
+    setProductMainDetail,
+    delProductMainFetch,
+    queryProductMainListFetch,
+    productMainList,
+    setCreateMainModalStatus,
+    paginationParams,
+    setProductTypeName,
+  } = useModel('productMainModel');
+  const [currentOptionActionStatus, setCurrentOptionActionStatus] = useState(false);
+
+  const createMainModalStatusHandle = () => {
+    setCurrentOptionActionStatus(false);
+    setCreateMainModalStatus(true);
+    setProductMainDetail(defaultCurrentProductMain);
   };
-  createMainModalCallbackOk = (currentProductMain: any) => {
-    this.props.dispatch({
-      type: 'product/update',
-      payload: currentProductMain,
-    });
-    this.props.dispatch({
-      type: 'product/queryProductMainAll',
-    });
-  };
-  openStatusCallbackCreateMainModal = (value) => {
-    this.setState({
-      isCreateMainModalShow: value,
-    });
+
+  const createMainModalCallbackOk = async (currentProductMain: any) => {
+    setProductMainDetail(currentProductMain);
+    setProductTypeName('');
+    await queryProductMainListFetch(paginationParams);
   };
 
   // table
-  handelTableCreateSku = (record) => {
-    const { currentProductMain } = this.props.product;
-    const newCurrentProductMain = Object.assign({}, currentProductMain, record);
-    const newProductDetail = Object.assign({}, defaultProductDetail, {
-      product_main_id: record.id,
-      title_main: record.title,
-      gtin: record.gtin,
-      offer_id: record.offer_id,
-      google_product_category: record.google_product_category,
-      google_product_category_id: record.google_product_category_id,
-    });
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        productDetail: newProductDetail,
-        currentProductMain: newCurrentProductMain,
-      },
-    });
+  const handelTableCreateSku = (record: ProductMainDetailType) => {
+    // const newCurrentProductMain = Object.assign({}, productMainDetail, record);
+    // setProductMainDetail(newCurrentProductMain);
     history.push(
       `/product/productCreateSku?product_main_id=${record.id}&product_sku_option_status=0`,
     );
   };
 
-  handelTableEdit = (record: any) => {
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        currentProductMain: Object.assign({}, record),
-      },
-    });
-    const { id } = record;
-    this.setState({
-      id,
-      isCreateMainModalShow: true,
-      currentOptionActionStatus: true,
-    });
+  const handelTableEdit = (record: ProductMainDetailType) => {
+    const newCurrentProductMain = Object.assign({}, productMainDetail, record);
+    const productTypeNameArr: string[] = [];
+    if (
+      newCurrentProductMain &&
+      newCurrentProductMain.product_type &&
+      newCurrentProductMain.product_type.length > 0
+    ) {
+      newCurrentProductMain.product_type.forEach((item: ProductType) => {
+        productTypeNameArr.push(item.title_zh);
+      });
+    }
+    const productTypeNameStr: string = (productTypeNameArr && productTypeNameArr.join(',')) || '';
+    setProductMainDetail(newCurrentProductMain);
+    setCurrentOptionActionStatus(true);
+    setCreateMainModalStatus(true);
+    setProductTypeName(productTypeNameStr);
   };
 
-  handelTableDel = (record: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
+  const handelTableDel = (record: ProductMainDetailType) => {
     Modal.confirm({
       title: '确认删除',
       content: '删除当前的主产品信息，所包含的多语言产品数据一并删除。',
-      onOk() {
-        self.props.dispatch({
-          type: 'product/delProductMain',
-          payload: {
-            ...record,
-          },
-        });
+      onOk: async () => {
+        await delProductMainFetch(record);
       },
       onCancel() {
         console.log('Cancel');
@@ -111,37 +113,12 @@ class ProductCreate extends Component {
     });
   };
 
-  handelTablePagination = (page, pageSize) => {
-    const { pagination } = this.props.product;
-    const updatePagination = Object.assign({}, pagination, { current: page });
-    this.props.dispatch({
-      type: 'product/update',
-      payload: {
-        pagination: updatePagination,
-      },
-    });
-    this.props.dispatch({
-      type: 'product/queryProductMainAll',
-      payload: {
-        pageSize,
-        current: page,
-      },
-    });
+  const handelTablePagination = async (page: number, pageSize: number) => {
+    const updatePagination = Object.assign({}, paginationParams, { current: page, pageSize });
+    await queryProductMainListFetch(updatePagination);
   };
 
-  componentDidMount() {
-    this.props.dispatch({
-      type: 'product/initQueryParams',
-    });
-    this.props.dispatch({
-      type: 'product/queryProductMainAll',
-    });
-    this.props.dispatch({
-      type: 'product/shoppingCostsExchangeQuery',
-    });
-  }
-
-  tableColumnsMain = () => {
+  const tableColumnsMain = () => {
     return [
       {
         title: '商品名称',
@@ -166,7 +143,15 @@ class ProductCreate extends Component {
         dataIndex: 'product_type',
         key: 'product_type',
         render: (text: any, record: any) => {
-          return record.product_type.title_zh || '-';
+          const txt: JSX.Element[] = [];
+          if (record.product_type && record.product_type.length) {
+            record.product_type.forEach((item: any) => {
+              if (item.title_zh) {
+                txt.push(<Tag>{item.title_zh}</Tag>);
+              }
+            });
+          }
+          return txt;
         },
       },
       {
@@ -196,7 +181,7 @@ class ProductCreate extends Component {
               <Button
                 size="small"
                 onClick={() => {
-                  this.handelTableCreateSku(record);
+                  handelTableCreateSku(record);
                 }}
               >
                 创建SKU商品
@@ -205,7 +190,7 @@ class ProductCreate extends Component {
               <Button
                 size="small"
                 onClick={() => {
-                  this.handelTableEdit(record);
+                  handelTableEdit(record);
                 }}
               >
                 编辑
@@ -214,7 +199,7 @@ class ProductCreate extends Component {
               <Button
                 size="small"
                 onClick={() => {
-                  this.handelTableDel(record);
+                  handelTableDel(record);
                 }}
               >
                 删除
@@ -226,48 +211,45 @@ class ProductCreate extends Component {
     ];
   };
 
-  render() {
-    const { productMainList, pagination } = this.props.product;
-    const { currentOptionActionStatus, id, isCreateMainModalShow } = this.state;
-    return (
-      <PageContainer>
-        <div className="page">
-          <div className="product-create">
-            <DefaultProject></DefaultProject>
-            <div className="header">
-              <div className="creat-button">
-                <Button type="primary" size="large" onClick={this.createMainModalStatusHandle}>
-                  创建主商品
-                </Button>
-              </div>
-            </div>
-            <div className="content">
-              <Table
-                dataSource={productMainList}
-                columns={this.tableColumnsMain()}
-                pagination={{
-                  position: ['bottomRight'],
-                  current: pagination.current,
-                  pageSize: pagination.pageSize,
-                  total: pagination.total,
-                  onChange: this.handelTablePagination,
-                }}
-              />
-            </div>
-            <div className="footer">
-              <CreateMainModal
-                id={id}
-                open={isCreateMainModalShow}
-                openStatusCallback={this.openStatusCallbackCreateMainModal}
-                callbackOk={this.createMainModalCallbackOk}
-                optionAction={currentOptionActionStatus}
-              ></CreateMainModal>
+  useEffect(() => {
+    queryProductMainListFetch(paginationParams);
+  }, []);
+
+  return (
+    <PageContainer>
+      <div className="page">
+        <div className="product-create">
+          <DefaultProject></DefaultProject>
+          <div className="header">
+            <div className="creat-button">
+              <Button type="primary" size="large" onClick={createMainModalStatusHandle}>
+                创建主商品
+              </Button>
             </div>
           </div>
+          <div className="content">
+            <Table
+              dataSource={productMainList}
+              columns={tableColumnsMain()}
+              pagination={{
+                position: ['bottomRight'],
+                current: paginationParams.current,
+                pageSize: paginationParams.pageSize,
+                total: paginationParams.total,
+                onChange: handelTablePagination,
+              }}
+            />
+          </div>
+          <div className="footer">
+            <CreateMainModal
+              callbackOk={createMainModalCallbackOk}
+              optionAction={currentOptionActionStatus}
+            ></CreateMainModal>
+          </div>
         </div>
-      </PageContainer>
-    );
-  }
+      </div>
+    </PageContainer>
+  );
 }
 
 export default ProductCreate;

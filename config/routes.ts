@@ -87,7 +87,7 @@ export default [
         component: './Product/ProductCustomType',
       },
       {
-        name: '主商品',
+        name: '主商品列表',
         path: '/product/ProductCreate',
         component: './Product/ProductCreate',
       },
@@ -98,7 +98,7 @@ export default [
         component: './Product/ProductCreateSku',
       },
       {
-        name: '商品列表',
+        name: 'SKU商品列表',
         path: '/product/ProductList',
         component: './Product/ProductList',
       },

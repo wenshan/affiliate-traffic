@@ -1,9 +1,9 @@
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { useModel } from '@umijs/max';
 import { Col, Modal, Row } from 'antd';
 import { useEffect, useState } from 'react';
-import { useModel } from 'umi';
 import ImgList from '../../../Material/components/ImgList';
 
 import './index.less';
