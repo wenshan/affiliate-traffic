@@ -15,6 +15,7 @@ export default [
     path: '/user',
     layout: false,
     routes: [
+      { path: '/user', redirect: '/user/login' },
       {
         name: 'login',
         path: '/user/login',
@@ -33,8 +34,8 @@ export default [
     path: '/project',
     icon: 'profile',
     layout: true,
-    component: './ProjectGroup',
     routes: [
+      { path: '/project', redirect: '/project/index' },
       {
         name: '项目列表',
         path: '/project/index',
@@ -47,8 +48,8 @@ export default [
     path: '/material',
     icon: 'profile',
     layout: true,
-    component: './Material',
     routes: [
+      { path: '/material', redirect: '/material/index' },
       {
         name: '素材列表',
         path: '/material/index',
@@ -61,8 +62,8 @@ export default [
     path: '/banner',
     icon: 'table',
     layout: true,
-    component: './Banner',
     routes: [
+      { path: '/banner', redirect: '/banner/index' },
       {
         name: 'Banner广告',
         path: '/banner/index',
@@ -76,6 +77,7 @@ export default [
     layout: true,
     icon: 'profile',
     routes: [
+      { path: '/product', redirect: '/product/CostsExchange' },
       {
         name: '成本&汇率',
         path: '/product/CostsExchange',
@@ -96,6 +98,7 @@ export default [
         path: '/product/ProductCreateSku',
         hideInMenu: true,
         component: './Product/ProductCreateSku',
+        parentKeys: ['/product'],
       },
       {
         name: 'SKU商品列表',
@@ -115,8 +118,8 @@ export default [
     icon: 'profile',
     access: 'canAdmin',
     layout: true,
-    component: './Community/Dashboard',
     routes: [
+      { path: '/community', redirect: '/community/Dashboard' },
       {
         name: '数据面板',
         path: '/community/Dashboard',
@@ -153,8 +156,8 @@ export default [
     path: '/account',
     icon: 'crown',
     layout: true,
-    component: './Account/PersonInfo',
     routes: [
+      { path: '/account', redirect: '/account/PersonInfo' },
       {
         name: '基础信息',
         path: '/account/PersonInfo',

@@ -7,7 +7,7 @@ const Tool = {
    * @return {boolean}
    */
 
-  isEmptyObject(obj) {
+  isEmptyObject(obj: any) {
     let key;
     for (key in obj) {
       if (obj[key]) {
@@ -22,11 +22,11 @@ const Tool = {
    * @param {string} s
    * @return {string}
    */
-  trim(s) {
+  trim(s: any) {
     return s.replace(/(^\s*)|(\s*$)/g, '');
   },
   // 数组判断
-  isArray(value) {
+  isArray(value: any) {
     return value && Object.prototype.toString.call(value) === '[object Array]';
   },
   /**
@@ -37,7 +37,7 @@ const Tool = {
    * @return {string} 替换后的字符串
    * 中文 code 范围： U+4E00 - U+9FFFF
    */
-  replaceExceedEnd(str, maxWidth = 12, replace = '...') {
+  replaceExceedEnd(str: any, maxWidth = 12, replace = '...') {
     let width = 0;
     let index;
 
@@ -73,6 +73,7 @@ const Tool = {
       s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
     }
     s[14] = '4'; // bits 12-15 of the time_hi_and_version field to 0010
+    // @ts-ignore
     s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
     s[8] = s[13] = s[18] = s[23] = '-';
 
@@ -89,7 +90,7 @@ const Tool = {
    *
    */
 
-  objectToString(object, separator = '&') {
+  objectToString(object: any, separator = '&') {
     if (!object) {
       return false;
     }
@@ -101,7 +102,7 @@ const Tool = {
     return str;
   },
 
-  checkPhone(phone) {
+  checkPhone(phone: any) {
     if (!/^1[34578]\d{9}$/.test(phone)) {
       return false;
     }
@@ -111,7 +112,7 @@ const Tool = {
   /*
    * 格式价格
    */
-  formatPrice(price, type = 2) {
+  formatPrice(price: any, type = 2) {
     if (typeof price !== 'number' || Number.isNaN(price)) {
       return '￥0.00';
     }

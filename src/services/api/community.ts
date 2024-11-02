@@ -1,19 +1,16 @@
 // @ts-ignore
 /* eslint-disable */
-// import { request } from '@umijs/max';
-import request from '@/utils/request';
+import { request } from '@umijs/max';
+// import request from '@/utils/request';
 
 /** 社区获取列表 */
-export async function getUserTableList(
-  params: {
-    // query
-    /** 当前的页码 */
-    current?: number;
-    /** 页面的容量 */
-    pageSize?: number;
-  },
-  options?: { [key: string]: any },
-) {
+export async function getUserTableList(params: {
+  // query
+  /** 当前的页码 */
+  current?: number;
+  /** 页面的容量 */
+  pageSize?: number;
+}) {
   return request<API.RuleList>('/api/community/getUserTableList', {
     method: 'POST',
     data: params,
@@ -32,7 +29,7 @@ export async function downloadXlsx() {
 }
 
 /** 社区 电子签名审核 */
-export async function verifySignature(options: { [key: string]: any }) {
+export async function verifySignature(options: ParamsType) {
   return request('/api/community/verifySignature', {
     method: 'POST',
     data: options,
@@ -40,7 +37,7 @@ export async function verifySignature(options: { [key: string]: any }) {
 }
 
 /** 社区 build 数据 */
-export async function reportFormsBuildTable(options: { [key: string]: any }) {
+export async function reportFormsBuildTable(options: ParamsType) {
   return request('/api/community/reportFormsBuildTable', {
     method: 'POST',
     data: options,
@@ -51,7 +48,7 @@ export async function reportFormsBuildTable(options: { [key: string]: any }) {
 }
 
 /** 社区 最近七天数据 */
-export async function lastDayIntention(options: { [key: string]: any }) {
+export async function lastDayIntention(options: ParamsType) {
   return request('/api/community/lastDayIntention', {
     method: 'POST',
     data: options,

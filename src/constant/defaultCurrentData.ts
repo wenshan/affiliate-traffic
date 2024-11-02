@@ -1,6 +1,7 @@
 /* eslint-disable */
 /* @ts-ignore */
 const defaultProductDetail = {
+  id: '',
   product_id: '',
   item_group_id: '',
   age_group: 'adult',
@@ -25,9 +26,7 @@ const defaultProductDetail = {
   lifestyle_image_link: [],
   google_product_category: '',
   google_product_category_id: '',
-  product_type: '',
-  product_type_id: '',
-  product_type: { key: '', title: '' },
+  product_type: [],
   product_type_id: '',
   color: '',
   material: '',
@@ -51,6 +50,12 @@ const defaultProductDetail = {
   contentLanguage: 'zh',
   targetCountry: 'CN',
   projectId: '',
+  costPrice: 0,
+  costFirstLegFreightRatio: 0,
+  costFbaRatio: 0,
+  preSalePrice: 0,
+  targetProfitRatio: 0,
+  summaryKeywords: '',
 };
 const defaultCurrentProductMain = {
   id: '',

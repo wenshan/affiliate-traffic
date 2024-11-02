@@ -22,7 +22,7 @@ declare namespace API {
 
   type deleteUserParams = {
     /** The name that needs to be deleted */
-    name: string;
+    username: string;
   };
 
   type findPetsByStatusParams = {
@@ -47,12 +47,12 @@ declare namespace API {
 
   type getUserByNameParams = {
     /** The name that needs to be fetched. Use user1 for testing.  */
-    name: string;
+    username: string;
   };
 
   type loginUserParams = {
     /** The user name for login */
-    name: string;
+    username: string;
     /** The password for login in clear text */
     password: string;
   };
@@ -89,7 +89,7 @@ declare namespace API {
 
   type updateUserParams = {
     /** name that need to be updated */
-    name: string;
+    username: string;
   };
 
   type uploadFileParams = {
@@ -99,7 +99,7 @@ declare namespace API {
 
   type User = {
     id?: number;
-    name?: string;
+    username?: string;
     firstName?: string;
     lastName?: string;
     email?: string;

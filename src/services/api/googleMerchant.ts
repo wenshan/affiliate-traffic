@@ -1,9 +1,9 @@
 // @ts-ignore
 /* eslint-disable */
-import request from '@/utils/request';
+import { request } from '@umijs/max';
 /** google  shopping */
 
-export async function getProductListAll(params: any) {
+export async function getProductListAll(params: ParamsType) {
   return request('/api/shopping/product/getProductListAll', {
     method: 'POST',
     data: params,
@@ -13,7 +13,7 @@ export async function getProductListAll(params: any) {
   });
 }
 
-export const deleteGoogleMerchant = async (params: any) => {
+export const deleteGoogleMerchant = async (params: ParamsType) => {
   return request('/api/shopping/product/deleteGoogleMerchant', {
     method: 'POST',
     data: params,
@@ -21,22 +21,22 @@ export const deleteGoogleMerchant = async (params: any) => {
 };
 
 // shopping-content 账号信息
-export const googleMerchantAccountAuthinfo = async (params?: { [key: string]: any }) => {
-  return request<{ data: any }>('/api/shopping/authinfo', {
+export const googleMerchantAccountAuthinfo = async (params?: ParamsType) => {
+  return request<ResponseDataType>('/api/shopping/authinfo', {
     method: 'POST',
     data: {},
   });
 };
 // shopping-content 插入子账号
-export const googleMerchantAccountInsert = async (params?: { [key: string]: any }) => {
-  return request<{ data: any }>('/api/shopping/accountInsert', {
+export const googleMerchantAccountInsert = async (params?: ParamsType) => {
+  return request<ResponseDataType>('/api/shopping/accountInsert', {
     method: 'POST',
     data: params,
   });
 };
 
-export const googleMerchantAccountGet = async (params?: { [key: string]: any }) => {
-  return request<{ data: any }>('/api/shopping/accountGet', {
+export const googleMerchantAccountGet = async (params?: ParamsType) => {
+  return request<ResponseDataType>('/api/shopping/accountGet', {
     method: 'POST',
     data: params,
   });
@@ -49,21 +49,21 @@ export const queryProjectList = async () => {
   });
 };
 
-export const updateProject = async (params: any) => {
+export const updateProject = async (params: ParamsType) => {
   return request('/api/shopping/updateProject', {
     method: 'POST',
     data: params,
   });
 };
 
-export const setDefaultState = async (params: any) => {
+export const setDefaultState = async (params: ParamsType) => {
   return request('/api/shopping/setDefaultState', {
     method: 'POST',
     data: params,
   });
 };
 // /api/shopping/setDefault
-export const setDefault = async (params: any) => {
+export const setDefault = async (params: ParamsType) => {
   return request('/api/shopping/setDefault', {
     method: 'POST',
     data: params,

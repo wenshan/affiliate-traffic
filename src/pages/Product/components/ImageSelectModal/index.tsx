@@ -1,38 +1,30 @@
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import { useModel } from '@umijs/max';
 import { Col, Modal, Row } from 'antd';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect } from 'react';
+import { useModel } from 'umi';
 import ImgList from '../../../Material/components/ImgList';
 
 import './index.less';
 
-function ImageSelectModal(props) {
+function ImageSelectModal(props: any) {
   const {
     queryFolderFetch,
-    selectFolderDirectory,
-    createFolderFetch,
-    editFolderFetch,
-    currentFolderDirectory,
-    delFolderFetch,
     folderDirectoryRows,
     setFolderDirectory,
     setFolderDirectoryRows,
     setSelectFolderDirectory,
     queryFolderMaterialFetch,
     folderDirectory,
-    setCheckFolderDirectory,
-    checkFolderDirectory,
-    otherFolderDirectory,
-    setOtherFolderDirectory,
     selectedMaterial,
     setSelectedMaterial,
     productSkuImageModalStatus,
     setProductSkuImageModalStatus,
   } = useModel('material');
-  const [limit] = useState(props.imageLimitNum || 20);
-  const [selectedType] = useState(props.selectedType);
+
+  // const [limit] = useState(props.imageLimitNum || 20);
+  // const [selectedType] = useState(props.selectedType);
 
   const handleOk = () => {
     if (props.callbackOk) {
@@ -45,7 +37,7 @@ function ImageSelectModal(props) {
     setProductSkuImageModalStatus(false);
     setSelectedMaterial([]);
   };
-  const handleClickFolderMenu = async (currentItem) => {
+  const handleClickFolderMenu = async (currentItem: any) => {
     if (currentItem && currentItem.key) {
       const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
       setFolderDirectory(rowsTree);
@@ -55,7 +47,7 @@ function ImageSelectModal(props) {
     }
   };
   const folderMenuHtml = () => {
-    const html = [];
+    const html: JSX.Element[] = [];
     if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
       folderDirectory.map((item, index) => {
         if (item.children) {

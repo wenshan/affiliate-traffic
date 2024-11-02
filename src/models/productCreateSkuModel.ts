@@ -12,7 +12,7 @@ import { createProduct, editProduct, queryProductDetail } from '@/services/api/p
 import { queryProductMainDetail } from '@/services/api/productMain';
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { history } from 'umi';
 
 type QueryParamsType = {
@@ -62,7 +62,6 @@ function productCreateSkuModel() {
     const query = Object.assign({}, queryParamsInit, QueryString.parse(search));
     if (query && query.product_main_id) {
       setQueryParams(query);
-      debugger;
       if (query.product_sku_option_status === '1') {
         // 编辑
         if (query.product_main_id && query.product_id) {
@@ -186,7 +185,7 @@ function productCreateSkuModel() {
       product_main_id
     ) {
       const result = await editProduct(productDetail);
-      if (result && result.status === 200) {
+      if (result && result.status && result.status === 200) {
         Modal.confirm({
           title: '编辑成功',
           content: '编辑商品SKU成功,返回到列表页面',
@@ -275,16 +274,13 @@ function productCreateSkuModel() {
     }
   };
 
-  useEffect(() => {
-    initQueryParams();
-  }, []);
-
   return {
     createProductFetch,
     editProductFetch,
     productDetail,
     setProductDetail,
     queryParams,
+    initQueryParams,
     productMainDetail,
     setProductMainDetail,
     costsExchange,

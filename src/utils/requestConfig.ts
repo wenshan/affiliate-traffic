@@ -1,14 +1,15 @@
-﻿// import type { RequestOptions } from '@@/plugin-request/request';
+// @ts-ignore
+/* eslint-disable */
 import { message } from 'antd';
 import type { RequestConfig } from 'umi';
 
 const limeet = 'https://api.limeetpet.com';
-// const dreamstep = 'https://www.dreamstep.top';
+const dreamstep = 'https://www.dreamstep.top';
 const devUrl = 'http://127.0.0.1:7001';
 
 const isDev = process.env.NODE_ENV === 'development';
-const API_DEV = `${devUrl}`;
-const API_PRO = `${limeet}`;
+const API_DEV = `${devUrl}/`;
+const API_PRO = `${limeet}/`;
 
 // 与后端约定的响应数据格式
 interface ResponseStructure {
@@ -18,14 +19,9 @@ interface ResponseStructure {
   msg: string;
 }
 
-/**
- * @name 错误处理
- * pro 自带的错误处理， 可以在这里做自己的改动
- * @doc https://umijs.org/docs/max/request#配置
- */
-export const errorConfig: RequestConfig = {
+const request: RequestConfig = {
   baseURL: isDev ? API_DEV : API_PRO,
-  timeout: 60000,
+  timeout: 1000 * 60,
   headers: {
     'Access-Control-Allow-Credentials': true,
     'Access-Control-Allow-Origin': `${isDev ? API_DEV : limeet}`,
@@ -39,8 +35,8 @@ export const errorConfig: RequestConfig = {
   // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
     // 错误抛出
-    errorThrower: (res: unknown) => {
-      const { success, data, status, msg } = res as unknown as ResponseStructure;
+    errorThrower: (res: ResponseStructure) => {
+      const { success, data, status, msg } = res;
       if (!success) {
         const error: any = new Error(msg);
         error.name = 'BizError';
@@ -55,7 +51,7 @@ export const errorConfig: RequestConfig = {
       if (error.name === 'BizError') {
         const errorInfo: ResponseStructure | undefined = error.info;
         if (errorInfo) {
-          const { msg } = errorInfo;
+          const { status, msg } = errorInfo;
           message.error(msg);
         }
       } else if (error.response) {
@@ -73,4 +69,40 @@ export const errorConfig: RequestConfig = {
       }
     },
   },
+  requestInterceptors: [
+    (url, options) => {
+      if (options) {
+        if (options.config.isConsole) {
+          console.log(
+            `${new Date().toLocaleString()}【 M=${url} 】P=`,
+            options.params || options.data,
+          );
+        }
+        if (options.config.headers) {
+          options.headers = Object.assign({}, options.headers, options.config.headers);
+        }
+      }
+      return { url, options };
+    },
+  ],
+  responseInterceptors: [
+    (response) => {
+      // 不再需要异步处理读取返回体内容，可直接在data中读出，部分字段可在 config 中找到
+      const { data = {} as any, config } = response;
+      if (data.status >= 200 && data.status < 300) {
+        if (config.isConsole) {
+          console.log(
+            `${new Date().toLocaleString()}【 M=${config.url} 】【接口响应：】`,
+            response.data,
+          );
+        }
+        if (config.config.isToast && data.msg) {
+          message.warning(String(data.msg), 3);
+        }
+      }
+      return response;
+    },
+  ],
 };
+
+export default request;

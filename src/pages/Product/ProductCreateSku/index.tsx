@@ -9,12 +9,13 @@ import {
   sizeSystemOption,
   sizeTypeOption,
 } from '@/constant/defaultCurrentData';
-import Tool from '@/utils/tool.js';
+import languageObj from '@/constant/language';
+import Tool from '@/utils/tool';
 import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
 import type { RadioChangeEvent } from 'antd';
 import { Button, Col, Image, Input, InputNumber, Radio, Row, Select, Table } from 'antd';
-import { JSX, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
+import { useModel } from 'umi';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
@@ -36,6 +37,7 @@ function ProductCreateSku() {
     productDetail,
     setProductDetail,
     queryParams,
+    initQueryParams,
     currentPreSalePrice,
     queryProductMainDetailFetch,
   } = useModel('productCreateSkuModel');
@@ -45,10 +47,24 @@ function ProductCreateSku() {
   const [imageLimitNum, setImageLimitNum] = useState(20);
 
   // 语言
+  // TODO: 创建时初始化货币单位
   const languageRadioHandle = (event: RadioChangeEvent) => {
     const { value } = event.target;
-    const newProductDetail = Object.assign({}, productDetail, { language: value });
-    setProductDetail(newProductDetail);
+    if (value) {
+      // @ts-ignore
+      const languageInfor = languageObj[value];
+      const { preSalePrice } = productDetail;
+      const price = (preSalePrice * languageInfor.exchangeRate).toFixed(2);
+      const sale_price = price;
+      const newProductDetail = Object.assign({}, productDetail, {
+        language: value,
+        monetary_unit: languageInfor.exchangeKey,
+        preSalePrice,
+        sale_price,
+        price,
+      });
+      setProductDetail(newProductDetail);
+    }
   };
   // 货币单位
   const monetaryUnitSelectHandle = (value: string) => {
@@ -82,12 +98,12 @@ function ProductCreateSku() {
     setProductDetail(newProductDetail);
   };
   // 商品折扣
-  const discountInputHandle = (value: number) => {
+  const discountInputHandle = (value: null | string) => {
     const { price, sale_price } = productDetail;
     let newProductDetail;
-    if (value > 0) {
-      const rate = ((100 - value) / 100).toFixed(2);
-      const initSalePrice = (price * Number(rate)).toFixed(2);
+    if (value && Number(value) > 0) {
+      const rate = ((100 - Number(value)) / 100).toFixed(2);
+      const initSalePrice = (Number(price) * Number(rate)).toFixed(2);
       newProductDetail = Object.assign({}, productDetail, {
         discount: value,
         sale_price: initSalePrice,
@@ -150,6 +166,7 @@ function ProductCreateSku() {
       newProductDetail = Object.assign({}, productDetail, { lifestyle_image_link: imageSrc });
     }
     setProductSkuImageModalStatus(false);
+    // @ts-ignore
     setProductDetail(newProductDetail);
   };
   const imageSelectModel = async (type: string, imageLimitNum: number) => {
@@ -171,7 +188,7 @@ function ProductCreateSku() {
       });
     } else {
       html.push(
-        <div className="add-img-item">
+        <div className="add-img-item" key={data}>
           <Image width={100} src={data} />
         </div>,
       );
@@ -258,14 +275,13 @@ function ProductCreateSku() {
   const productTypeNameStr = () => {
     const { product_type, contentLanguage } = productDetail;
     const nameStr: any[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    product_type &&
-      product_type.length &&
+    if (product_type && product_type.length && product_type.length > 0) {
       product_type.forEach((item: { [x: string]: any }) => {
         if (item) {
           nameStr.push(item[`title_${contentLanguage}`]);
         }
       });
+    }
     return nameStr.join(',');
     // contentLanguage && product_type && product_type[`title_${contentLanguage}`]
   };
@@ -340,7 +356,10 @@ function ProductCreateSku() {
   } = productDetail;
   const productTypeName = productTypeNameStr();
 
-  console.log('productDetail:', productDetail);
+  useEffect(() => {
+    initQueryParams();
+  }, []);
+
   return (
     <PageContainer>
       <div className="page">
@@ -348,7 +367,7 @@ function ProductCreateSku() {
           <DefaultProject></DefaultProject>
           <div className="header">
             <div className="sub-header">
-              <span>主数据</span>{' '}
+              <span>主数据</span>
               <Button className="reset-main-button" onClick={resetProductMainDetail}>
                 同步产品主数据
               </Button>
@@ -362,20 +381,20 @@ function ProductCreateSku() {
                   <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
                   <Input
                     placeholder="主商品标题"
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={title_main}
                     disabled
                   />
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
-                  <Input placeholder="商品货号" style={{ width: 350 }} value={offer_id} disabled />
+                  <Input placeholder="商品货号" style={{ width: 300 }} value={offer_id} disabled />
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
                   <Input
                     placeholder="选择Google商品类目"
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={(google_product_category && google_product_category.title) || ''}
                     disabled
                   />
@@ -384,18 +403,18 @@ function ProductCreateSku() {
                   <LabelHelpTip keyLabel="product_type"></LabelHelpTip>
                   <Input
                     placeholder="自定商品分类"
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={contentLanguage && product_type && productTypeName}
                     disabled
                   />
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
-                  <Input placeholder="商品GTIN码" style={{ width: 350 }} value={gtin} disabled />
+                  <Input placeholder="商品GTIN码" style={{ width: 300 }} value={gtin} disabled />
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="brand"></LabelHelpTip>
-                  <Input placeholder="商品品牌" style={{ width: 350 }} value={brand} disabled />
+                  <Input placeholder="商品品牌" style={{ width: 300 }} value={brand} disabled />
                 </div>
               </Col>
               <Col span={12}>
@@ -404,7 +423,7 @@ function ProductCreateSku() {
                   <Input
                     placeholder="商品成本价"
                     addonBefore="￥"
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={costPrice}
                     disabled
                   />
@@ -414,7 +433,7 @@ function ProductCreateSku() {
                   <Input
                     placeholder="商品预估售价"
                     addonBefore="￥"
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={preSalePrice}
                     disabled
                   />
@@ -424,7 +443,7 @@ function ProductCreateSku() {
                   <Input
                     placeholder="汇率"
                     addonBefore={costsExchangeTypeCurrencyLabel}
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={costsExchangeTypeCurrencyValue}
                     disabled
                   />
@@ -434,7 +453,7 @@ function ProductCreateSku() {
                   <TextArea
                     placeholder="关键词"
                     rows={2}
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                     value={summaryKeywords}
                     disabled
                   />
@@ -454,7 +473,7 @@ function ProductCreateSku() {
                 value={language}
                 onChange={languageRadioHandle}
                 options={languageOption}
-                disabled={queryParams.product_sku_option_status > 0}
+                disabled={Number(queryParams.product_sku_option_status) > 0}
               ></Radio.Group>
             </div>
             <div className="form-item">
@@ -606,10 +625,10 @@ function ProductCreateSku() {
               <InputNumber
                 placeholder="折扣"
                 style={{ width: 130 }}
-                max={60}
-                min={0}
+                max={'60'}
+                min={'0'}
                 value={discount}
-                onChange={() => discountInputHandle()}
+                onChange={(value) => discountInputHandle(value)}
                 suffix="%"
               />
             </div>
@@ -650,7 +669,7 @@ function ProductCreateSku() {
               <LabelHelpTip keyLabel="color"></LabelHelpTip>
               <Input
                 placeholder="商品颜色"
-                style={{ width: 350 }}
+                style={{ width: 300 }}
                 value={color}
                 onChange={colorInputHandle}
               />
@@ -680,7 +699,7 @@ function ProductCreateSku() {
               <LabelHelpTip keyLabel="material"></LabelHelpTip>
               <Input
                 placeholder="商品材料"
-                style={{ width: 350 }}
+                style={{ width: 300 }}
                 value={material}
                 onChange={materialInputHandle}
               />
@@ -690,7 +709,7 @@ function ProductCreateSku() {
               <LabelHelpTip keyLabel="pattern"></LabelHelpTip>
               <Input
                 placeholder="商品图案"
-                style={{ width: 350 }}
+                style={{ width: 300 }}
                 value={pattern}
                 onChange={patternInputHandle}
               />
@@ -779,7 +798,7 @@ function ProductCreateSku() {
                     dataSource={product_detail}
                     columns={columnsProductAttribute()}
                     pagination={false}
-                    style={{ width: 350 }}
+                    style={{ width: 300 }}
                   />
                 </div>
               </div>

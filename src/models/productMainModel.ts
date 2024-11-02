@@ -11,7 +11,7 @@ import {
   queryProductMainDetail,
 } from '@/services/api/productMain';
 import { message } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const productAttributeOptionInit = [
   {
@@ -202,10 +202,11 @@ function ProductMainModel() {
       message.warning({ content: '缺少参数' });
     }
   };
-
+  /*
   useEffect(() => {
     shoppingCostsExchangeQuery();
   }, []);
+  */
 
   return {
     productMainList,
@@ -231,6 +232,7 @@ function ProductMainModel() {
     setSelectedRowsProductType,
     selectedRowsProductCategory,
     setSelectedRowsProductCategory,
+    shoppingCostsExchangeQuery,
   };
 }
 

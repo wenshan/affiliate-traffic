@@ -1,7 +1,6 @@
 declare namespace API {
   type CurrentUser = {
     name?: string;
-    nickname: ?string;
     avatar?: string;
     userid?: string;
     email?: string;
@@ -44,22 +43,12 @@ declare namespace API {
     name?: string;
     password?: string;
     autoLogin?: boolean;
-    email?: string;
-    nickname: ?string;
-  };
-
-  type RegisterParams = {
-    name?: string;
-    password?: string;
-    autoLogin?: boolean;
-    email?: string;
-    nickname: ?string;
+    type?: string;
   };
 
   type LoginResult = {
-    status?: number;
-    success?: boolean;
-    msg?: string;
+    status?: string;
+    type?: string;
     currentAuthority?: string;
   };
 
@@ -98,31 +87,18 @@ declare namespace API {
   };
 
   type RuleListItem = {
-    id?: number;
     key?: number;
-    userid?: number;
-    roomid?: string;
-    areas?: string;
-    region?: string;
-    build?: number;
-    unit?: number;
-    room?: number;
-    is_certification?: number;
+    disabled?: boolean;
+    href?: string;
+    avatar?: string;
     name?: string;
-    owner?: number;
-    contractId?: string;
-    contractPath?: string;
-    signatureFile?: string;
-    is_checkSignature?: number;
-    is_submitConfirmation?: number;
-    submitConfirmation?: number;
-    is_submitContractUnwilling?: number;
-    mobile?: number;
-    is_checkMobile?: number;
-    propertyType?: number;
-    feedback?: string;
+    owner?: string;
+    desc?: string;
+    callNo?: number;
+    status?: number;
     updatedAt?: string;
     createdAt?: string;
+    progress?: number;
   };
 
   type ruleParams = {
@@ -132,18 +108,3 @@ declare namespace API {
     pageSize?: number;
   };
 }
-type ParamsType = {
-  [key: string]: any;
-};
-type DataType = {
-  [key: string]: any;
-};
-type ResponseDataType = {
-  data: any;
-  msg?: string;
-  status: number;
-  success?: boolean;
-};
-type OptionsType = {
-  [key: string]: any;
-};

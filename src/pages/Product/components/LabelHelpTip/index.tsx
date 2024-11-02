@@ -8,7 +8,7 @@ type Props = {
   keyLabel: string;
 };
 export default (props: Props) => {
-  const proHtml = async ({ des, rule, exam }) => {
+  const proHtml = ({ des, rule, exam }) => {
     const ruleHtml = [];
     const ruleRrr = (rule.length && rule.indexOf('。') > 0 && rule.split('。')) || [];
     if (ruleRrr && ruleRrr.length) {

@@ -1,7 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from '@umijs/max';
-// import request from '@/utils/request';
 
 /** 获取规则列表 GET /api/rule */
 export async function rule(

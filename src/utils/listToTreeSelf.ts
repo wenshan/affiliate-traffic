@@ -1,17 +1,18 @@
-export default (list, currentItem = {}) => {
+export default (list: any, currentItem = { key: '', father_key: '' }) => {
   // https://juejin.cn/post/7043324432537878536
   // https://www.xiabingbao.com/post/comments/comments-list-to-tree-r7zsnb.html
   const newList = JSON.parse(JSON.stringify(list)); // 避免影响外层的数组
   const map = new Map();
-  const result = [];
-  const rowsList = [];
+  const result: any[] = [];
+  const rowsList: any[] = [];
   const father_key = [];
 
-  newList.forEach((item) => {
+  newList.forEach((item: { key: any }) => {
     const temp = Object.assign({}, item, { active: 0 });
     map.set(item.key, temp);
   });
 
+  // @ts-ignore
   if (currentItem && currentItem.key) {
     father_key.push(currentItem.key);
     if (currentItem.father_key) {
@@ -41,7 +42,7 @@ export default (list, currentItem = {}) => {
     });
   }
 
-  map.forEach((value, key) => {
+  map.forEach((value) => {
     rowsList.push(Object.assign({}, value));
     if (value.father_key) {
       let parentItem = map.get(value.father_key);

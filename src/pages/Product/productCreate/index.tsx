@@ -1,9 +1,9 @@
 import DefaultProject from '@/components/DefaultProject';
 import { defaultCurrentProductMain } from '@/constant/defaultCurrentData';
 import { PageContainer } from '@ant-design/pro-components';
-import { history, useModel } from '@umijs/max';
 import { Button, Modal, Table, Tag } from 'antd';
 import { JSX, useEffect, useState } from 'react';
+import { history, useModel } from 'umi';
 import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';
@@ -57,12 +57,14 @@ function ProductCreate() {
     setCreateMainModalStatus,
     paginationParams,
     setProductTypeName,
+    shoppingCostsExchangeQuery,
   } = useModel('productMainModel');
   const [currentOptionActionStatus, setCurrentOptionActionStatus] = useState(false);
 
   const createMainModalStatusHandle = () => {
     setCurrentOptionActionStatus(false);
     setCreateMainModalStatus(true);
+    // @ts-ignore
     setProductMainDetail(defaultCurrentProductMain);
   };
 
@@ -212,6 +214,7 @@ function ProductCreate() {
   };
 
   useEffect(() => {
+    shoppingCostsExchangeQuery();
     queryProductMainListFetch(paginationParams);
   }, []);
 
