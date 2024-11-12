@@ -112,6 +112,7 @@ export default () => {
         const html = [];
         html.push(
           <a
+            key={`${record.projectId}_edit`}
             onClick={() => {
               accountUpdate(record);
             }}
@@ -119,12 +120,17 @@ export default () => {
             编辑
           </a>,
         );
-        html.push(<span> | </span>);
+        html.push(<span key={`${record.projectId}_span`}> | </span>);
         html.push(
           record.defaultState ? (
             '默认项目'
           ) : (
-            <a onClick={() => setDefaultStateFetch2(record.accountId)}>设置默认为项目</a>
+            <a
+              key={`${record.projectId}_default`}
+              onClick={() => setDefaultStateFetch2(record.accountId)}
+            >
+              设置默认为项目
+            </a>
           ),
         );
         return html;
@@ -146,7 +152,11 @@ export default () => {
       title: '操作',
       key: 'operate',
       render: (_, record: any) => {
-        return <a onClick={() => userTableListDel(record.email)}>删除</a>;
+        return (
+          <a key={record.email} onClick={() => userTableListDel(record.email)}>
+            删除
+          </a>
+        );
       },
     },
   ];
@@ -242,8 +252,18 @@ export default () => {
                 googleMerchantAccountGetFetchSearch(value);
               }}
             >
-              <ProFormText name="merchantId" label="Merchant ID" placeholder="input Merchant ID" />
-              <ProFormText name="accountId" label="AccountId ID" placeholder="input AccountId ID" />
+              <ProFormText
+                key="merchantId"
+                name="merchantId"
+                label="Merchant ID"
+                placeholder="input Merchant ID"
+              />
+              <ProFormText
+                key="accountId"
+                name="accountId"
+                label="AccountId ID"
+                placeholder="input AccountId ID"
+              />
             </ProForm>
           </div>
           <div className="text"></div>
@@ -266,6 +286,8 @@ export default () => {
           </Button>
         </div>
         <Table
+          key="xjxm"
+          rowKey={(record) => record.accountId}
           dataSource={projectList && projectList.rows}
           columns={columnsAccount}
           pagination={false}
@@ -339,7 +361,13 @@ export default () => {
               </a>
             </div>
             <div className="table-box">
-              <Table dataSource={userTableList} columns={columnsUser} pagination={false} />
+              <Table
+                key="yhlb"
+                rowKey={(record) => record.email}
+                dataSource={userTableList}
+                columns={columnsUser}
+                pagination={false}
+              />
             </div>
           </div>
         </ProForm.Group>
@@ -367,9 +395,15 @@ export default () => {
         />
         {userInfoCurrent && (
           <Descriptions title="用户信息">
-            <Descriptions.Item label="Nickname">{userInfoCurrent.nickname}</Descriptions.Item>
-            <Descriptions.Item label="Email">{userInfoCurrent.email}</Descriptions.Item>
-            <Descriptions.Item label="项目ID">{userInfoCurrent.projectId}</Descriptions.Item>
+            <Descriptions.Item key="Nickname" label="Nickname">
+              {userInfoCurrent.nickname}
+            </Descriptions.Item>
+            <Descriptions.Item key="Email" label="Email">
+              {userInfoCurrent.email}
+            </Descriptions.Item>
+            <Descriptions.Item key="xmid" label="项目ID">
+              {userInfoCurrent.projectId}
+            </Descriptions.Item>
           </Descriptions>
         )}
       </Modal>

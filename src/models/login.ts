@@ -29,11 +29,10 @@ export default {
     javascript_origins: ['https://admin.limeetpet.com'],
   },
   subscriptions: {
-    setup({ dispatch, history }) {
+    setup({ dispatch }) {
       const search = window.document.location.search;
       const query = QueryString.parse(search);
-      console.log('query:', query);
-      if (query && query.code && query.state && false) {
+      if (dispatch && query && query.code && query.state && false) {
         console.log('123123');
         dispatch({
           type: 'update',
@@ -48,7 +47,7 @@ export default {
   },
 
   effects: {
-    *googleGetToken({ payload }, { call, put, select }) {
+    *googleGetToken({ payload }, { call, select }) {
       const { code, state } = yield select((state) => state.login);
       const currentCode = (payload && payload.code) || code;
       const currentState = (payload && payload.state) || state;
@@ -61,7 +60,7 @@ export default {
         }
       }
     },
-    *initState({ payload }, { call, put, select }) {
+    *initState({ payload }, { put }) {
       yield put({ type: 'update', payload });
     },
   },

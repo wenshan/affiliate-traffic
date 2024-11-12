@@ -302,9 +302,9 @@ export default {
   },
   productSize: {
     title: '商品尺寸',
-    des: '根据区域选择尺寸单位',
-    rule: '',
-    exam: '',
+    des: '根据区域选择尺寸单位， 长x宽x高',
+    rule: '长x宽x高',
+    exam: '长x宽x高',
     link: '',
   },
   title_main: {
@@ -413,6 +413,14 @@ export default {
   CNY: {
     title: '人民币汇率',
     des: '当前人民币汇率',
+    rule: '1',
+    required: false,
+    exam: '1:1',
+    link: '',
+  },
+  YoutubeVideo: {
+    title: 'Youtube视频',
+    des: 'Youtube视频播放',
     rule: '1',
     required: false,
     exam: '1:1',

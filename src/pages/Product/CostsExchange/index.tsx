@@ -2,6 +2,7 @@ import DefaultProject from '@/components/DefaultProject';
 import { costsExchangeQuery, costsExchangeSave } from '@/services/api/googleMerchant';
 import { PageContainer, ProForm, ProFormDigit } from '@ant-design/pro-components';
 import { Form, message } from 'antd';
+import { useModel } from 'umi';
 
 import './index.less';
 
@@ -24,9 +25,13 @@ const defaultCostsExchange = {
   exchange_US: 0.14,
   exchange_JP: 20.5,
   exchange_KR: 188,
+  exchange_cm2in: 0.3937008,
+  exchange_kg2lb: 2.2046226,
+  exchange_g2lb: 0.0022046,
 };
 
 export default () => {
+  const { setCostsExchange } = useModel('productCreateSkuModel');
   const [form] = Form.useForm<CostsExchange>();
   return (
     <PageContainer>
@@ -51,6 +56,7 @@ export default () => {
           request={async () => {
             const result = await costsExchangeQuery();
             if (result && result.status === 200 && result.data) {
+              setCostsExchange(result.data);
               return result.data;
             } else {
               return defaultCostsExchange;

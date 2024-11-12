@@ -40,11 +40,11 @@ class FolderDirectory extends Component {
   folderInputHandle = (event) => {
     const { value } = event.target;
     const { optionAction } = this.state;
-    const { currentFolderDirectory } = this.props.material;
+    const { selectFolderDirectory } = this.props.material;
     let addFolderDirectory;
     if (optionAction > 0) {
       // 编辑
-      addFolderDirectory = Object.assign({}, currentFolderDirectory, {
+      addFolderDirectory = Object.assign({}, selectFolderDirectory, {
         label: value,
         is_default: false,
         active: false,

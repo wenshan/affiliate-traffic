@@ -60,15 +60,23 @@ class ProductList extends Component {
         key: 'price',
         fixed: 'left',
         width: 100,
-        render: (_, record) => {
+        render: (_, record: any) => {
           const html: any = [];
           if (record && record.price && record.monetary_unit) {
-            html.push(`price: ${record.price} ${record.monetary_unit}`);
+            html.push(
+              <span
+                key={`${record.price}_price`}
+              >{`price: ${record.price} ${record.monetary_unit}`}</span>,
+            );
           } else {
             html.push(<span>-</span>);
           }
           if (record && record.sale_price && record.sale_price && record.monetary_unit) {
-            html.push(`salePrice: ${record.sale_price} ${record.monetary_unit}`);
+            html.push(
+              <span
+                key={`${record.sale_price}_salePrice`}
+              >{`salePrice: ${record.sale_price} ${record.monetary_unit}`}</span>,
+            );
           } else {
             html.push(<span>-</span>);
           }
@@ -80,7 +88,7 @@ class ProductList extends Component {
         dataIndex: 'description',
         key: 'description',
         width: 220,
-        render: (_, record) => {
+        render: (_, record: any) => {
           if (record && record.description) {
             return (
               <div
@@ -108,14 +116,26 @@ class ProductList extends Component {
           const html: any = [];
           if (record.link) {
             html.push(
-              <a href={record.link} title={record.link} target="_blank" rel="noreferrer">
+              <a
+                key={`${record.link}_link`}
+                href={record.link}
+                title={record.link}
+                target="_blank"
+                rel="noreferrer"
+              >
                 link
               </a>,
             );
           }
           if (record.mobile_link) {
             html.push(
-              <a href={record.link} title={record.mobile_link} target="_blank" rel="noreferrer">
+              <a
+                key={`${record.mobile_link}_mobileLink`}
+                href={record.mobile_link}
+                title={record.mobile_link}
+                target="_blank"
+                rel="noreferrer"
+              >
                 mobileLink
               </a>,
             );
@@ -144,7 +164,7 @@ class ProductList extends Component {
         dataIndex: 'google_product_category',
         key: 'google_product_category',
         width: 110,
-        render: (_, record) => {
+        render: (_, record: any) => {
           if (record.google_product_category && record.google_product_category.title) {
             return record.google_product_category.title;
           } else {
@@ -164,7 +184,7 @@ class ProductList extends Component {
             Tool.isArray(record.additional_image_link) &&
             record.additional_image_link.length &&
             record.additional_image_link.map((item: string, idx: Key) => {
-              html.push(<img key={idx} src={item} width={50}></img>);
+              html.push(<img key={`${idx}_${item}`} src={item} width={50}></img>);
             });
           return html;
         },
@@ -181,7 +201,7 @@ class ProductList extends Component {
             Tool.isArray(record.lifestyle_image_link) &&
             record.lifestyle_image_link.length > 0 &&
             record.lifestyle_image_link.map((item: string, idx: Key) => {
-              html.push(<img key={idx} src={item} width={30}></img>);
+              html.push(<img key={`${idx}_${item}`} src={item} width={30}></img>);
             });
           return html;
         },
@@ -271,7 +291,7 @@ class ProductList extends Component {
             record.product_detail.length &&
             record.product_detail.map((item: any, idx: number) => {
               html.push(
-                <p className="product-attr" key={idx}>
+                <p className="product-attr" key={`${idx}_${item.attribute_name}`}>
                   <span className="label">{item.attribute_name}</span> :{' '}
                   <span>{item.attribute_value}</span>
                 </p>,
@@ -286,7 +306,7 @@ class ProductList extends Component {
         key: 'product_highlight',
         ellipsis: true,
         width: 200,
-        render: (_, record) => (
+        render: (_, record: any) => (
           <span
             className="table-text clearfix"
             dangerouslySetInnerHTML={{ __html: record.product_highlight }}
@@ -298,7 +318,7 @@ class ProductList extends Component {
         dataIndex: 'availability',
         key: 'availability',
         width: 60,
-        render: (text, record) => {
+        render: (text, record: any) => {
           if (record.availability === 'in_stock') {
             return '有';
           } else {
@@ -317,7 +337,7 @@ class ProductList extends Component {
         key: 'operate',
         fixed: 'right',
         width: 160,
-        render: (text, record) => {
+        render: (text, record: any) => {
           return (
             <div className="operate">
               <a
@@ -568,6 +588,7 @@ class ProductList extends Component {
             </div>
             <div className="content">
               <Table
+                rowKey={(record) => record.attribute_name}
                 dataSource={productList}
                 columns={this.tableColumns()}
                 scroll={{ x: 1300 }}

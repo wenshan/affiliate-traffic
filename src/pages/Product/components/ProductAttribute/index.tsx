@@ -178,6 +178,7 @@ function ProductAttribute(props: any) {
       >
         {productAttributeList && productAttributeList.length > 0 ? (
           <Table
+            rowKey={(record) => record.attribute_name}
             dataSource={productAttributeList}
             columns={columns}
             pagination={false}

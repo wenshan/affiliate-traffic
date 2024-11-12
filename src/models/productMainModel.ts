@@ -58,18 +58,18 @@ type PaginationParamsType = {
 };
 type ProductMainDetailType = {
   title_main: string;
-  imgSrc: string;
+  imgSrc?: string;
   offer_id: string;
   google_product_category: string | GoogleProductCategory;
   google_product_category_id: string;
-  product_type: Array<ProductType>;
-  product_type_id: string;
+  product_type?: Array<ProductType>;
+  product_type_id?: string;
   gtin: string;
   brand: string;
-  projectId: string;
+  projectId?: string;
   identifierExists: boolean;
-  costPrice: string;
-  preSalePrice: string;
+  costPrice: string | number;
+  preSalePrice: string | number;
   costFirstLegFreightRatio: number;
   costFbaRatio: number;
   costsAdvertisingRatio: number;
@@ -77,6 +77,7 @@ type ProductMainDetailType = {
   summaryKeywords: string;
   [key: string]: any;
 };
+// imgSrc, product_type, product_type_id, projectId
 
 type ProductTypeType = {
   title_zh: string;
@@ -169,6 +170,7 @@ function ProductMainModel() {
     if (result && result.status === 200 && result.data) {
       await queryProductMainListFetch(paginationParams);
       setCreateMainModalStatus(false);
+      setProductMainDetail(defaultCurrentProductMain);
     } else {
       message.error({ content: result.msg });
     }
@@ -195,6 +197,7 @@ function ProductMainModel() {
       if (result && result.status === 200 && result.data) {
         await queryProductMainListFetch(paginationParams);
         setCreateMainModalStatus(false);
+        setProductMainDetail(defaultCurrentProductMain);
       } else {
         message.error({ content: result.msg });
       }
@@ -202,11 +205,6 @@ function ProductMainModel() {
       message.warning({ content: '缺少参数' });
     }
   };
-  /*
-  useEffect(() => {
-    shoppingCostsExchangeQuery();
-  }, []);
-  */
 
   return {
     productMainList,

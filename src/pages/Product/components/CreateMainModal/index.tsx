@@ -1,5 +1,10 @@
-import { defaultCurrentProductMain } from '@/constant/defaultCurrentData';
-import { Button, Col, Input, InputNumber, Modal, Row, Switch, message } from 'antd';
+import InputText from '@/components/InputText';
+import {
+  defaultCurrentProductMain,
+  productSizeUnitOptionMain,
+  productWeightUnitOptionMain,
+} from '@/constant/defaultCurrentData';
+import { Button, Col, Input, InputNumber, Modal, Row, Select, Switch, message } from 'antd';
 import React from 'react';
 import { useModel } from 'umi';
 import GoogleProductCategory from '../GoogleProductCategory';
@@ -22,7 +27,6 @@ type CostsExchange = {
   [key: string]: any;
 };
 */
-type Event = { target: { value: any } };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 type GoogleProductCategory = {
   key: string;
@@ -105,12 +109,10 @@ export default (props: Props) => {
     }
   };
 
-  const setChangeInputValueHandler = async (key: string, event: Event) => {
-    const { value } = event.target;
+  const setChangeInputValueHandler = async (key: string, value: string) => {
     const temp: { [key: string]: string | number } = {};
     temp[key] = value;
     const newCurrentProductMainData = Object.assign({}, productMainDetail, temp);
-    console.log('newCurrentProductMainData:', newCurrentProductMainData);
     if (key) {
       setProductMainDetail(newCurrentProductMainData);
     }
@@ -124,8 +126,7 @@ export default (props: Props) => {
     }
   };
   // 成本计算
-  const setChangeCostPriceValueHandler = async (key: string, event: Event) => {
-    const { value } = event.target;
+  const setChangeCostPriceValueHandler = async (key: string, value: string) => {
     const { costFirstLegFreightRatio, targetProfitRatio, costFbaRatio, costsAdvertisingRatio } =
       costsExchange;
     const temp: { [key: string]: string | number } = {};
@@ -135,7 +136,7 @@ export default (props: Props) => {
     // const costsAdvertisingRatioValue = (Number(value) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2);
     // const targetProfitRatioValue = (Number(value) * (Number(costFirstLegFreightRatio) / 100)).toFixed(2);
     const preSalePrice = (
-      value *
+      Number(value) *
       (1 +
         (costFirstLegFreightRatio + targetProfitRatio + costFbaRatio + costsAdvertisingRatio) / 100)
     ).toFixed(2);
@@ -155,6 +156,48 @@ export default (props: Props) => {
 
   const googleProductCategoryButtonHandle = async () => {
     setProductCategoryShow(true);
+  };
+
+  // 尺寸&重量
+  // 重量单位选择
+  const weightUnitSelectHandle = (value: string) => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, {
+      baseWeightUnit: value,
+    });
+    setProductMainDetail(newCurrentProductMainData);
+  };
+  // 尺寸单位选择
+  const sizeUnitSelectHandle = (value: string) => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, { baseSizeUnit: value });
+    setProductMainDetail(newCurrentProductMainData);
+  };
+  // 商品重量
+  const productWeightInputHandle = (value: string) => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, {
+      baseProductWeight: value,
+    });
+    setProductMainDetail(newCurrentProductMainData);
+  };
+  // 尺寸 长宽高
+  const productLengthInputHandle = (value: string) => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, {
+      baseProductLength: value,
+    });
+    setProductMainDetail(newCurrentProductMainData);
+  };
+
+  const productWidthInputHandle = (value: string) => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, {
+      baseProductWidth: value,
+    });
+    setProductMainDetail(newCurrentProductMainData);
+  };
+
+  const productHeightInputHandle = (value: string) => {
+    const newCurrentProductMainData = Object.assign({}, productMainDetail, {
+      baseProductHeight: value,
+    });
+    setProductMainDetail(newCurrentProductMainData);
   };
 
   const productCategoryCallBackOk = async (option: GoogleProductCategory) => {
@@ -217,6 +260,12 @@ export default (props: Props) => {
     targetProfitRatio,
     summaryKeywords,
     product_type_id,
+    baseProductHeight,
+    baseProductLength,
+    baseProductWidth,
+    baseProductWeight,
+    baseSizeUnit,
+    baseWeightUnit,
   } = productMainDetail;
   return (
     <Modal
@@ -237,7 +286,7 @@ export default (props: Props) => {
               <span className="label">
                 <i>*</i> 主商品名称:
               </span>
-              <Input
+              <InputText
                 placeholder="主商品名称"
                 style={{ width: 350 }}
                 value={title_main}
@@ -248,7 +297,7 @@ export default (props: Props) => {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品货号"
                 style={{ width: 350 }}
                 value={offer_id}
@@ -259,7 +308,7 @@ export default (props: Props) => {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="选择Google商品类目"
                 style={{ width: 350 }}
                 value={(google_product_category && google_product_category.title) || ''}
@@ -273,7 +322,7 @@ export default (props: Props) => {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="product_type"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="自定商品分类"
                 style={{ width: 350 }}
                 value={productTypeName && productTypeName}
@@ -287,7 +336,7 @@ export default (props: Props) => {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品GTIN码"
                 style={{ width: 350 }}
                 value={gtin}
@@ -298,7 +347,7 @@ export default (props: Props) => {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="brand"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="品牌名称"
                 style={{ width: 350 }}
                 value={brand}
@@ -322,7 +371,7 @@ export default (props: Props) => {
               <Col span={12}>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
-                  <Input
+                  <InputText
                     name="costPrice"
                     style={{ width: 150 }}
                     addonBefore="￥"
@@ -406,11 +455,55 @@ export default (props: Props) => {
             </Row>
             <div className="form-item">
               <LabelHelpTip keyLabel="preSalePrice"></LabelHelpTip>
-              <Input
+              <InputText
                 name="preSalePrice"
                 style={{ width: 150 }}
                 addonBefore="￥"
                 value={preSalePrice}
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="productSize"></LabelHelpTip>
+              <InputText
+                placeholder="长"
+                style={{ width: 100 }}
+                value={baseProductLength}
+                onChange={productLengthInputHandle}
+              />
+              <InputText
+                placeholder="宽"
+                style={{ width: 100 }}
+                value={baseProductWidth}
+                onChange={productWidthInputHandle}
+              />
+              <InputText
+                placeholder="高"
+                style={{ width: 100 }}
+                value={baseProductHeight}
+                onChange={productHeightInputHandle}
+              />
+              <LabelHelpTip keyLabel="sizeUnit"></LabelHelpTip>
+              <Select
+                value={baseSizeUnit}
+                style={{ width: 80 }}
+                onChange={sizeUnitSelectHandle}
+                options={productSizeUnitOptionMain}
+              />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="productWeight"></LabelHelpTip>
+              <InputText
+                placeholder="商品重量"
+                style={{ width: 300 }}
+                value={baseProductWeight}
+                onChange={productWeightInputHandle}
+              />
+              <LabelHelpTip keyLabel="weightUnit"></LabelHelpTip>
+              <Select
+                value={baseWeightUnit}
+                style={{ width: 60 }}
+                onChange={weightUnitSelectHandle}
+                options={productWeightUnitOptionMain}
               />
             </div>
             <div className="form-item">

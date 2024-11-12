@@ -25,7 +25,7 @@ const UploadFile: React.FC = () => {
     },
     onSuccess: async (res: any, file: { name: any }) => {
       message.success(`${file.name} 上传成功！`);
-      await queryFolderMaterialFetch(selectFolderDirectory);
+      await queryFolderMaterialFetch(selectFolderDirectory, 'upload');
       console.log('onSuccess', res, file.name);
     },
     beforeUpload: async (file: { type: string; name: any }) => {

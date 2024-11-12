@@ -98,6 +98,7 @@ export default (props: Props) => {
       >
         <div className="content">
           <Table<ProductType>
+            rowKey={(record) => record.title_en}
             rowSelection={{ type: 'checkbox', ...rowSelection }}
             columns={columns}
             dataSource={dataTypeList}

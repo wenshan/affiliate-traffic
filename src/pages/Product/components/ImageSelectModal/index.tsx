@@ -1,4 +1,3 @@
-import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { Col, Modal, Row } from 'antd';
@@ -11,16 +10,14 @@ import './index.less';
 function ImageSelectModal(props: any) {
   const {
     queryFolderFetch,
-    folderDirectoryRows,
-    setFolderDirectory,
-    setFolderDirectoryRows,
-    setSelectFolderDirectory,
     queryFolderMaterialFetch,
     folderDirectory,
     selectedMaterial,
     setSelectedMaterial,
     productSkuImageModalStatus,
     setProductSkuImageModalStatus,
+    updateOperateSelectFolderDirectory,
+    setCurrentOperateMaterial,
   } = useModel('material');
 
   // const [limit] = useState(props.imageLimitNum || 20);
@@ -28,6 +25,7 @@ function ImageSelectModal(props: any) {
 
   const handleOk = () => {
     if (props.callbackOk) {
+      console.log('selectedMaterial:', selectedMaterial);
       props.callbackOk(selectedMaterial);
       setProductSkuImageModalStatus(false);
       setSelectedMaterial([]);
@@ -39,11 +37,10 @@ function ImageSelectModal(props: any) {
   };
   const handleClickFolderMenu = async (currentItem: any) => {
     if (currentItem && currentItem.key) {
-      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      setSelectFolderDirectory(currentItem);
-      await queryFolderMaterialFetch(currentItem);
+      updateOperateSelectFolderDirectory(currentItem);
+      if (currentItem.is_leaf === 1) {
+        await queryFolderMaterialFetch(currentItem);
+      }
     }
   };
   const folderMenuHtml = () => {
@@ -63,7 +60,7 @@ function ImageSelectModal(props: any) {
                 {item.is_leaf === 1 ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
                 {Tool.replaceExceedEnd(item.label, 20)}
               </div>
-              {item.children && item.children.length && (
+              {item.children && item.children.length > 0 && (
                 <ul>
                   {item.children.map((childrenItem, idx) => {
                     return (
@@ -86,7 +83,7 @@ function ImageSelectModal(props: any) {
                           ) : null}
                           {Tool.replaceExceedEnd(childrenItem.label, 20)}
                         </div>
-                        {childrenItem.children && childrenItem.children.length && (
+                        {childrenItem.children && childrenItem.children.length > 0 && (
                           <ul key={`${childrenItem.key}_${idx}_ul`}>
                             {childrenItem.children.map((children2Item, idx2) => {
                               return (
@@ -109,7 +106,7 @@ function ImageSelectModal(props: any) {
                                     ) : null}
                                     {Tool.replaceExceedEnd(children2Item.label, 20)}
                                   </div>
-                                  {children2Item.children && children2Item.children.length && (
+                                  {children2Item.children && children2Item.children.length > 0 && (
                                     <ul key={`${children2Item.key}_${idx2}_ul`}>
                                       {children2Item.children.map((children3Item, idx3) => {
                                         return (
@@ -190,6 +187,7 @@ function ImageSelectModal(props: any) {
   };
 
   useEffect(() => {
+    setCurrentOperateMaterial({ keys: '' });
     queryFolderFetch();
   }, []);
 
@@ -199,7 +197,7 @@ function ImageSelectModal(props: any) {
         className="wrap-select-modal"
         title="选择图片素材 "
         open={productSkuImageModalStatus}
-        width={1000}
+        width={1100}
         onOk={handleOk}
         onCancel={handleCancel}
       >

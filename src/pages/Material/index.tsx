@@ -1,4 +1,5 @@
 import DefaultProject from '@/components/DefaultProject';
+import InputText from '@/components/InputText';
 import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import {
@@ -8,7 +9,7 @@ import {
   PlusSquareOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Checkbox, Col, Input, Modal, Row, message } from 'antd';
+import { Button, Checkbox, Col, Modal, Row, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import ImgList from './components/ImgList';
@@ -16,11 +17,8 @@ import UploadFile from './components/UploadFile';
 
 import './index.less';
 
-type Event = { target: { value: any } };
-
 const operateFolderDirectoryInit = {
   label: '',
-  key: '',
 };
 
 function MaterialPage() {
@@ -29,7 +27,6 @@ function MaterialPage() {
     selectFolderDirectory,
     createFolderFetch,
     editFolderFetch,
-    currentFolderDirectory,
     delFolderFetch,
     folderDirectoryRows,
     setFolderDirectory,
@@ -37,10 +34,11 @@ function MaterialPage() {
     setSelectFolderDirectory,
     queryFolderMaterialFetch,
     folderDirectory,
-    setCheckFolderDirectory,
     checkFolderDirectory,
     otherFolderDirectory,
     setOtherFolderDirectory,
+    updateOperateCheckFolderDirectory,
+    updateOperateSelectFolderDirectory,
   } = useModel('material');
   const [optionAction, setOptionAction] = useState(false);
   const [folderOpenStatus, setFolderOpenStatus] = useState(false);
@@ -51,8 +49,8 @@ function MaterialPage() {
   };
   const handelFolderOk = async () => {
     let addFolderDirectory = Object.assign({}, operateFolderDirectory);
-    if (checkFolderDirectory && checkFolderDirectory.key) {
-      if (checkFolderDirectory.father_key) {
+    if (checkFolderDirectory && checkFolderDirectory.key && checkFolderDirectory.checked) {
+      if (checkFolderDirectory.key) {
         addFolderDirectory = Object.assign({}, operateFolderDirectory, {
           father_key: checkFolderDirectory.key,
           key_path: `${checkFolderDirectory.father_key}/${checkFolderDirectory.key}`,
@@ -62,7 +60,7 @@ function MaterialPage() {
         });
       } else {
         addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-          father_key: checkFolderDirectory.key,
+          father_key: '',
           key_path: `${checkFolderDirectory.key}`,
           is_leaf: 1,
           active: false,
@@ -100,19 +98,18 @@ function MaterialPage() {
       message.info('选择当前文件夹');
     }
   };
-  const folderInputHandle = async (event: Event) => {
-    const { value } = event.target;
+  const folderInputHandle = async (value: string) => {
     if (optionAction) {
       // 编辑
-      const operateFolderDirectory = Object.assign({}, currentFolderDirectory, {
-        title: value,
+      const inputOperateFolderDirectory = Object.assign({}, checkFolderDirectory, {
         label: value,
+        title: value,
       });
-      setOperateFolderDirectory(operateFolderDirectory);
+      setOperateFolderDirectory(inputOperateFolderDirectory);
     } else {
       // 新增
-      const operateFolderDirectory = Object.assign({}, { title: value, label: value });
-      setOperateFolderDirectory(operateFolderDirectory);
+      const inputOperateFolderDirectory = Object.assign({}, { label: value, title: value });
+      setOperateFolderDirectory(inputOperateFolderDirectory);
     }
   };
   const handleClickDropdownDel = async () => {
@@ -131,77 +128,56 @@ function MaterialPage() {
       message.info('选择当前文件夹');
     }
   };
-  const handleOnCheckSelectFolderMenu = async (event: Event | undefined) => {
-    const key = event?.target?.value;
-    const newRows: any[] = [];
-    let currentItem = {};
+  const handleOnCheckSelectFolderMenu = async (event: any, key: string) => {
+    const { checked } = event.target;
+    let currentItem = {
+      key: '',
+    };
     if (key && folderDirectoryRows) {
       folderDirectoryRows.map((item: { key: any; checked: any }) => {
         if (item.key === key) {
-          let tempItem;
-          if (item && item.checked) {
-            tempItem = Object.assign({}, item, { checked: false });
-          } else {
-            tempItem = Object.assign({}, item, { checked: true });
-          }
-          newRows.push(tempItem);
-          currentItem = tempItem;
-        } else {
-          newRows.push(Object.assign({}, item, { checked: false }));
+          currentItem = Object.assign({}, item, { checked });
         }
       });
-      const { rowsTree, rowsList } = listToTreeSelf(newRows, selectFolderDirectory);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      if (currentItem && currentItem.checked) {
-        setCheckFolderDirectory(currentItem);
-      } else {
-        setCheckFolderDirectory({});
+      if (currentItem.key) {
+        updateOperateCheckFolderDirectory(currentItem);
       }
     }
   };
   const handleClickFolderMenu = async (currentItem: any) => {
+    console.log('currentItem1:', currentItem);
     if (currentItem && currentItem.key) {
-      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      setSelectFolderDirectory(currentItem);
-      const newOtherFolderDirectory = Object.assign({}, otherFolderDirectory, { active: false });
-      setOtherFolderDirectory(newOtherFolderDirectory);
-      await queryFolderMaterialFetch(currentItem);
+      updateOperateSelectFolderDirectory(currentItem);
+      if (currentItem && currentItem.is_leaf === 1) {
+        await queryFolderMaterialFetch(currentItem);
+      }
     }
   };
   const handleClickFolderMenuSecond = async (currentItem: any) => {
+    console.log('currentItem2:', currentItem);
     if (currentItem && currentItem.key) {
-      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      setSelectFolderDirectory(currentItem);
-      const newOtherFolderDirectory = Object.assign({}, otherFolderDirectory, { active: false });
-      setOtherFolderDirectory(newOtherFolderDirectory);
-      await queryFolderMaterialFetch(currentItem);
+      updateOperateSelectFolderDirectory(currentItem);
+      if (currentItem && currentItem.is_leaf === 1) {
+        await queryFolderMaterialFetch(currentItem);
+      }
     }
   };
   const handleClickFolderMenuThird = async (currentItem: any) => {
+    console.log('currentItem3:', currentItem);
     if (currentItem && currentItem.key) {
-      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      setSelectFolderDirectory(currentItem);
-      const newOtherFolderDirectory = Object.assign({}, otherFolderDirectory, { active: false });
-      setOtherFolderDirectory(newOtherFolderDirectory);
-      await queryFolderMaterialFetch(currentItem);
+      updateOperateSelectFolderDirectory(currentItem);
+      if (currentItem && currentItem.is_leaf === 1) {
+        await queryFolderMaterialFetch(currentItem);
+      }
     }
   };
   const handleClickFolderMenuFourth = async (currentItem: any) => {
+    console.log('currentItem4:', currentItem);
     if (currentItem && currentItem.key) {
-      const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows, currentItem);
-      setFolderDirectory(rowsTree);
-      setFolderDirectoryRows(rowsList);
-      setSelectFolderDirectory(currentItem);
-      const newOtherFolderDirectory = Object.assign({}, otherFolderDirectory, { active: false });
-      setOtherFolderDirectory(newOtherFolderDirectory);
-      await queryFolderMaterialFetch(currentItem);
+      updateOperateSelectFolderDirectory(currentItem);
+      if (currentItem && currentItem.is_leaf === 1) {
+        await queryFolderMaterialFetch(currentItem);
+      }
     }
   };
   const folderMenuHtml = () => {
@@ -216,13 +192,12 @@ function MaterialPage() {
                 <span className="space"></span>
                 {item.is_leaf === 1 ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
                 <Checkbox
-                  value={item.key}
                   disabled={!!item.is_default}
                   checked={item.checked}
-                  onChange={() => handleOnCheckSelectFolderMenu(event)}
+                  onChange={(event) => handleOnCheckSelectFolderMenu(event, item.key)}
                 ></Checkbox>
                 <span onClick={() => handleClickFolderMenu(item)}>
-                  {Tool.replaceExceedEnd(item.label, 22)}
+                  {Tool.replaceExceedEnd(item.label, 20)}
                 </span>
               </div>
               {item.children && item.children.length && (
@@ -243,19 +218,20 @@ function MaterialPage() {
                             )
                           ) : null}
                           <Checkbox
-                            value={childrenItem.key}
                             disabled={!!childrenItem.is_default}
                             checked={childrenItem.checked}
-                            onChange={() => handleOnCheckSelectFolderMenu(event)}
+                            onChange={(event) =>
+                              handleOnCheckSelectFolderMenu(event, childrenItem.key)
+                            }
                           ></Checkbox>
                           <span
                             className="label ellipsis"
                             onClick={() => handleClickFolderMenuSecond(childrenItem)}
                           >
-                            {Tool.replaceExceedEnd(childrenItem.label, 22)}
+                            {Tool.replaceExceedEnd(childrenItem.label, 20)}
                           </span>
                         </div>
-                        {childrenItem.children && childrenItem.children.length && (
+                        {childrenItem.children && childrenItem.children.length > 0 && (
                           <ul key={`${childrenItem.key}_${idx}_ul`}>
                             {childrenItem.children.map((children2Item: any, idx2: number) => {
                               return (
@@ -273,19 +249,20 @@ function MaterialPage() {
                                       )
                                     ) : null}
                                     <Checkbox
-                                      value={children2Item.key}
                                       disabled={!!children2Item.is_default}
                                       checked={children2Item.checked}
-                                      onChange={() => handleOnCheckSelectFolderMenu(event)}
+                                      onChange={(event) =>
+                                        handleOnCheckSelectFolderMenu(event, children2Item.key)
+                                      }
                                     ></Checkbox>
                                     <span
                                       className="label ellipsis"
                                       onClick={() => handleClickFolderMenuThird(children2Item)}
                                     >
-                                      {Tool.replaceExceedEnd(children2Item.label, 22)}
+                                      {Tool.replaceExceedEnd(children2Item.label, 20)}
                                     </span>
                                   </div>
-                                  {children2Item.children && children2Item.children.length && (
+                                  {children2Item.children && children2Item.children.length > 0 && (
                                     <ul key={`${children2Item.key}_${idx2}_ul`}>
                                       {children2Item.children.map(
                                         (children3Item: any, idx3: number) => {
@@ -309,10 +286,14 @@ function MaterialPage() {
                                                   )
                                                 ) : null}
                                                 <Checkbox
-                                                  value={children3Item.key}
                                                   disabled={!!children3Item.is_default}
                                                   checked={children3Item.checked}
-                                                  onChange={() => handleOnCheckSelectFolderMenu()}
+                                                  onChange={(event) =>
+                                                    handleOnCheckSelectFolderMenu(
+                                                      event,
+                                                      children3Item.key,
+                                                    )
+                                                  }
                                                 ></Checkbox>
                                                 <span
                                                   className="label ellipsis"
@@ -320,7 +301,7 @@ function MaterialPage() {
                                                     handleClickFolderMenuFourth(children3Item)
                                                   }
                                                 >
-                                                  {Tool.replaceExceedEnd(children3Item.label, 22)}
+                                                  {Tool.replaceExceedEnd(children3Item.label, 20)}
                                                 </span>
                                               </div>
                                             </li>
@@ -351,13 +332,12 @@ function MaterialPage() {
                 <span className="space"></span>
                 {item.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
                 <Checkbox
-                  value={item.key}
                   disabled={!!item.is_default}
                   checked={item.checked}
-                  onChange={() => handleOnCheckSelectFolderMenu(event)}
+                  onChange={(event) => handleOnCheckSelectFolderMenu(event, item.key)}
                 ></Checkbox>
                 <span className="label ellipsis" onClick={() => handleClickFolderMenu(item)}>
-                  {Tool.replaceExceedEnd(item.label, 22)}
+                  {Tool.replaceExceedEnd(item.label, 20)}
                 </span>
               </div>
             </li>,
@@ -367,14 +347,16 @@ function MaterialPage() {
     }
     return html;
   };
-  const handleClickFolderOtherMenu = async ({ active }) => {
+  const handleClickFolderOtherMenu = async ({ active }: any) => {
     const newOtherFolderDirectory = Object.assign({}, otherFolderDirectory, { active });
     setOtherFolderDirectory(newOtherFolderDirectory);
     const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows);
     setFolderDirectory(rowsTree);
     setFolderDirectoryRows(rowsList);
     setSelectFolderDirectory({});
-    await queryFolderMaterialFetch(newOtherFolderDirectory);
+    if (selectFolderDirectory && selectFolderDirectory.is_leaf === 1) {
+      await queryFolderMaterialFetch(newOtherFolderDirectory);
+    }
   };
   const otherFolderMenuHtml = () => {
     const html = [];
@@ -386,12 +368,12 @@ function MaterialPage() {
         <div title={otherFolderDirectory.label} className="item" key={otherFolderDirectory.key}>
           <span className="space"></span>
           {otherFolderDirectory.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
-          <Checkbox value={otherFolderDirectory.key} disabled={true}></Checkbox>
+          <Checkbox disabled={true}></Checkbox>
           <span
             className="label ellipsis"
             onClick={() => handleClickFolderOtherMenu({ active: true })}
           >
-            {Tool.replaceExceedEnd(otherFolderDirectory.label, 22)}
+            {Tool.replaceExceedEnd(otherFolderDirectory.label, 20)}
           </span>
         </div>
       </li>,
@@ -428,13 +410,13 @@ function MaterialPage() {
                   <div className="header">
                     <Button
                       onClick={() => handleClickDropdownDel()}
-                      disabled={!checkFolderDirectory}
+                      disabled={checkFolderDirectory && !!!checkFolderDirectory.checked}
                     >
                       删除文件夹
                     </Button>
                     <Button
                       onClick={() => handleClickDropdownEdit()}
-                      disabled={!checkFolderDirectory}
+                      disabled={checkFolderDirectory && !!!checkFolderDirectory.checked}
                     >
                       编辑文件夹
                     </Button>
@@ -444,7 +426,7 @@ function MaterialPage() {
                     <UploadFile></UploadFile>
                   </div>
                   <ImgList limit={20}></ImgList>
-                  {currentFolderDirectory && (
+                  {selectFolderDirectory && (
                     <Modal
                       title={optionAction ? '编辑文件目录' : '添加文件目录'}
                       open={folderOpenStatus}
@@ -455,11 +437,11 @@ function MaterialPage() {
                       <div className="content">
                         <div className="form-item">
                           <span className="label">文件夹名称: </span>
-                          <Input
+                          <InputText
                             placeholder="文件夹名称"
                             style={{ width: 250 }}
                             value={operateFolderDirectory && operateFolderDirectory.label}
-                            onChange={() => folderInputHandle(event)}
+                            onChange={folderInputHandle}
                           />
                         </div>
                       </div>

@@ -41,7 +41,7 @@ export const errorConfig: RequestConfig = {
     // 错误抛出
     errorThrower: (res: unknown) => {
       const { success, data, status, msg } = res as unknown as ResponseStructure;
-      if (!success) {
+      if (!success && !data && !msg) {
         const error: any = new Error(msg);
         error.name = 'BizError';
         error.info = { status, msg, data };

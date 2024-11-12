@@ -5,9 +5,8 @@ import {
   costsExchangeTypeCurrency,
   defaultCurrentProductMain,
   defaultProductDetail,
-  defaultSizeUnitCountry,
-  defaultWeightUnitCountry,
 } from '@/constant/defaultCurrentData';
+import { costsExchangeQuery } from '@/services/api/googleMerchant';
 import { createProduct, editProduct, queryProductDetail } from '@/services/api/product';
 import { queryProductMainDetail } from '@/services/api/productMain';
 import { Modal, message } from 'antd';
@@ -32,6 +31,9 @@ type CostsExchangeType = {
   JPY: number;
   KRW: number;
   CNY: number;
+  exchange_cm2in: number | string;
+  exchange_kg2lb: number | string;
+  exchange_g2lb: number | string;
 };
 
 type QueryParamsInitType = {
@@ -49,6 +51,7 @@ const queryParamsInit = {
 
 function productCreateSkuModel() {
   const [queryParams, setQueryParams] = useState<QueryParamsInitType>(queryParamsInit);
+  const [currentLanguage, setCurrentLanguage] = useState('zh-CN');
   const [productDetail, setProductDetail] = useState(defaultProductDetail);
   const [costsExchange, setCostsExchange] = useState<CostsExchangeType>(costsExchangeInit);
   const [productMainDetail, setProductMainDetail] = useState(defaultCurrentProductMain);
@@ -62,29 +65,49 @@ function productCreateSkuModel() {
     const query = Object.assign({}, queryParamsInit, QueryString.parse(search));
     if (query && query.product_main_id) {
       setQueryParams(query);
+      if (query.language) {
+        setCurrentLanguage(query.language);
+      }
+      await costsExchangeQueryFetch();
       if (query.product_sku_option_status === '1') {
         // 编辑
-        if (query.product_main_id && query.product_id) {
+        if (query.product_main_id && query.product_id && query.language) {
           await queryProductDetailFetch(query);
         }
       } else {
         // 创建
-        if (query.product_main_id) {
+        if (query.product_main_id && query.language) {
           await queryProductMainDetailFetch(query);
         }
       }
+    }
+  };
+  // 更新项目汇率等配置
+  const costsExchangeQueryFetch = async () => {
+    const result = await costsExchangeQuery();
+    if (result && result.status === 200 && result.data) {
+      setCostsExchange(result.data);
     }
   };
 
   // 获取主商品信息
   const queryProductMainDetailFetch = async (data: QueryParamsInitType) => {
     const { product_main_id } = data;
-    if (product_main_id && productDetail && productDetail.language) {
+    if (product_main_id && productDetail && productDetail.language && currentLanguage) {
       const result = await queryProductMainDetail({ id: product_main_id });
       if (result && result.status && result.status === 200 && result.data) {
         // 初始化计算 当前 语种下的 价格
-        const { preSalePrice } = result.data;
-        const targetCountry = productDetail.language.split('-')[1];
+        const {
+          preSalePrice,
+          baseProductHeight,
+          baseProductLength,
+          baseProductWidth,
+          baseProductWeight,
+          baseSizeUnit,
+          baseWeightUnit,
+        } = result.data;
+        const { exchange_cm2in, exchange_kg2lb, exchange_g2lb } = costsExchange;
+        const targetCountry = currentLanguage.split('-')[1];
         // 当前的货币单位 当前汇率 货币汇率计算
         // 国家=》货币单位
         const targetCountryUnit =
@@ -94,14 +117,53 @@ function productCreateSkuModel() {
         const price = (preSalePrice * targetCountryValue).toFixed(2);
         const sale_price = price;
         const monetary_unit = targetCountryUnit;
-        const sizeUnit = defaultSizeUnitCountry[targetCountry].value;
-        const weightUnit = defaultWeightUnitCountry[targetCountry].value;
+        let sizeUnit = baseSizeUnit;
+        let weightUnit = baseWeightUnit;
+        let productLength = baseProductLength;
+        let productWidth = baseProductWidth;
+        let productHeight = baseProductHeight;
+        let productWeight = baseProductWeight;
+
+        // 适配 商品尺寸 和 重量
+        // 适配 商品尺寸
+
+        if (baseProductHeight && baseProductLength && baseProductWidth && baseSizeUnit) {
+          if (targetCountry === 'US') {
+            productLength = (Number(baseProductLength) * Number(exchange_cm2in)).toFixed(2);
+            productHeight = (Number(baseProductHeight) * Number(exchange_cm2in)).toFixed(2);
+            productWidth = (Number(baseProductWidth) * Number(exchange_cm2in)).toFixed(2);
+            sizeUnit = 'in';
+          }
+        }
+        if (baseWeightUnit && baseWeightUnit) {
+          if (targetCountry === 'US') {
+            if (baseWeightUnit === 'g') {
+              productWeight = (Number(baseProductWeight) * Number(exchange_g2lb)).toFixed(2);
+            }
+            if (baseWeightUnit === 'kg') {
+              productWeight = (Number(baseProductWeight) * Number(exchange_kg2lb)).toFixed(2);
+            }
+            weightUnit = 'lb';
+          }
+        }
+
+        // 适配 商品重量
         const initProductDetail = Object.assign({}, productDetail, {
           price,
           sale_price,
           monetary_unit,
           sizeUnit,
           weightUnit,
+          productLength,
+          productWidth,
+          productHeight,
+          productWeight,
+          baseProductHeight,
+          baseProductLength,
+          baseProductWidth,
+          baseProductWeight,
+          baseSizeUnit,
+          baseWeightUnit,
           product_main_id: result.data.id,
           title_main: result.data.title_main,
           product_type: result.data.product_type,
@@ -119,8 +181,6 @@ function productCreateSkuModel() {
           targetProfitRatio: result.data.targetProfitRatio,
           summaryKeywords: result.data.summaryKeywords,
         });
-        console.log('initProductDetail:', initProductDetail);
-        console.log('mainDetail:', result.data);
         setCurrentPreSalePrice(preSalePrice);
         setProductMainDetail(result.data);
         setProductDetail(initProductDetail);
@@ -132,8 +192,9 @@ function productCreateSkuModel() {
   // 获取当前商品信息
   const queryProductDetailFetch = async (data: QueryParamsInitType) => {
     const { product_id, language } = data;
+    const realLanguage = currentLanguage || language;
     if (product_id && language) {
-      const result = await queryProductDetail({ id: product_id, language });
+      const result = await queryProductDetail({ id: product_id, language: realLanguage });
       if (result && result.status && result.status === 200 && result.data) {
         const { targetCountry, preSalePrice } = result.data;
         const targetCountryUnit =
@@ -191,6 +252,7 @@ function productCreateSkuModel() {
           content: '编辑商品SKU成功,返回到列表页面',
           onOk() {
             history.push('/product/productList');
+            setProductDetail(defaultProductDetail);
           },
           onCancel() {
             message.success({ content: result.msg });
@@ -200,7 +262,7 @@ function productCreateSkuModel() {
         message.warning({ content: result.msg });
       }
     } else {
-      message.warning({ content: '=请检查必填字段！' });
+      message.warning({ content: '请检查必填字段！' });
     }
   };
   // 商品创建
@@ -261,6 +323,7 @@ function productCreateSkuModel() {
           content: '创建商品SKU,返回到列表页面',
           onOk() {
             history.push('/product/productList');
+            setProductDetail(defaultProductDetail);
           },
           onCancel() {
             message.success({ content: result.msg });
@@ -288,6 +351,8 @@ function productCreateSkuModel() {
     costsExchangeTypeCurrencyValue,
     currentPreSalePrice,
     queryProductMainDetailFetch,
+    setCostsExchange,
+    currentLanguage,
   };
 }
 export default productCreateSkuModel;

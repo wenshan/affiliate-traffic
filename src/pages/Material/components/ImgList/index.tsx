@@ -4,21 +4,15 @@ import {
   RotateRightOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
-import { useModel } from '@umijs/max';
-import { Image, Modal, message } from 'antd';
-import React, { useEffect } from 'react';
+import { Image, Modal } from 'antd';
+import React from 'react';
+import { useModel } from 'umi';
 
 import './index.less';
 
-function ImgList(props: { limit: any }) {
-  const {
-    imageList,
-    setImageList,
-    delRemoteMaterialFetch,
-    delMaterialFetch,
-    selectedMaterial,
-    setSelectedMaterial,
-  } = useModel('material');
+function ImgList() {
+  const { imageList, delRemoteMaterialFetch, delMaterialFetch, updateOperateMaterial } =
+    useModel('material');
   // const [ limit] = useState(props.limit || 20);
   const onDownload = async (item: { url: string | URL | Request }) => {
     fetch(item.url)
@@ -60,30 +54,36 @@ function ImgList(props: { limit: any }) {
     }
   };
   const handelSelectCurrent = async (currentItem: any) => {
-    const checkedData: any[] = [];
-    const { limit } = props;
+    console.log('currentItem1:', currentItem);
 
-    if (imageList && imageList.length > 0) {
+    if (currentItem && currentItem.keys && imageList && imageList.length > 0) {
+      /*
       imageList.map((item: any) => {
         if (item.keys === currentItem.keys) {
           if (currentItem.current) {
+            checkedData.push(Object.assign({}, item, { current: false }));
+            newImageList.push(Object.assign({}, item, { current: false }));
           } else {
             checkedData.push(Object.assign({}, item, { current: true }));
+            newImageList.push(Object.assign({}, item, { current: true }));
           }
         } else {
           if (item && item.current) {
             checkedData.push(item);
           }
+          newImageList.push(Object.assign({}, item));
         }
       });
+      */
+      updateOperateMaterial(currentItem);
 
+      console.log('currentItem2:', currentItem);
+      /*
       if (checkedData && checkedData.length > limit) {
         message.success(`当前场景下素材一次操作限制${limit}张素材`);
         return false;
       }
-      // @ts-ignore
-      setSelectedMaterial(checkedData);
-      // handelCheckCallback(checkedData);
+        */
     }
   };
   const htmlLi = () => {
@@ -122,32 +122,7 @@ function ImgList(props: { limit: any }) {
 
     return html;
   };
-  const initSelectedMaterial = async () => {
-    const newImageList: any[] = [];
-    if (imageList && imageList.length > 0) {
-      if (selectedMaterial && selectedMaterial.length > 0) {
-        const mapMaterial = new Map();
-        selectedMaterial.forEach((item: { keys: any }) => {
-          mapMaterial.set(item.keys, item);
-        });
-        imageList.forEach((item: any[]) => {
-          if (item && item.keys && mapMaterial.get(item.keys)) {
-            newImageList.push(Object.assign({}, item, { current: true }));
-          } else {
-            newImageList.push(item);
-          }
-        });
-      } else {
-        imageList.forEach((item: any[]) => {
-          newImageList.push(Object.assign({}, item, { current: false }));
-        });
-      }
-      setImageList(newImageList);
-    }
-  };
-  useEffect(() => {
-    initSelectedMaterial();
-  }, [selectedMaterial]);
+
   return (
     <div className="imglist">
       <div className="content">

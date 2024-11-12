@@ -493,6 +493,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             <Table
+              rowKey={(record) => record.id}
               columns={columnsTable()}
               dataSource={tableData}
               loading={isLoading}

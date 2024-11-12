@@ -368,6 +368,7 @@ class ProductListCompos extends Component {
     if (record && record.skus && record.skus.length) {
       return (
         <Table
+          rowKey={(record) => record.id}
           dataSource={record.skus}
           columns={this.tableColumnsSku()}
           size="small"
@@ -439,6 +440,7 @@ class ProductListCompos extends Component {
                 <div className="main">
                   <div className="table-content">
                     <Table
+                      rowKey={(record) => record.id}
                       dataSource={productMainList}
                       columns={this.tableColumnsMain()}
                       expandable={{

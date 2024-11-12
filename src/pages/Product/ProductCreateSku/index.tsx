@@ -1,4 +1,5 @@
 import DefaultProject from '@/components/DefaultProject';
+import InputText from '@/components/InputText';
 import {
   ageGroupOption,
   genderOption,
@@ -11,15 +12,17 @@ import {
 } from '@/constant/defaultCurrentData';
 import languageObj from '@/constant/language';
 import Tool from '@/utils/tool';
+import { CloseOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import type { RadioChangeEvent } from 'antd';
-import { Button, Col, Image, Input, InputNumber, Radio, Row, Select, Table } from 'antd';
+import { Button, Col, Input, InputNumber, Radio, Row, Select, Table, message } from 'antd';
 import { JSX, useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import ImageSelectModal from '../components/ImageSelectModal';
 import LabelHelpTip from '../components/LabelHelpTip';
 import ProductAttribute from '../components/ProductAttribute';
 import RichTextEditor from '../components/RichTextEditor';
+import YouTubeVideoPlayModal from '../components/YouTubeVideoPlayModal';
 
 import './index.less';
 const { TextArea } = Input;
@@ -40,11 +43,13 @@ function ProductCreateSku() {
     initQueryParams,
     currentPreSalePrice,
     queryProductMainDetailFetch,
+    currentLanguage,
   } = useModel('productCreateSkuModel');
   const { setProductAttributeModalStatus } = useModel('productAttributeModel');
   const { setProductSkuImageModalStatus } = useModel('material');
   const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
   const [imageLimitNum, setImageLimitNum] = useState(20);
+  const [isYoutubeVideoOpen, setYoutubeVideoOpen] = useState(false);
 
   // 语言
   // TODO: 创建时初始化货币单位
@@ -69,31 +74,49 @@ function ProductCreateSku() {
   // 货币单位
   const monetaryUnitSelectHandle = (value: string) => {
     // @ts-ignore
+    const { discount } = productDetail;
     const price = (costsExchange[value] * currentPreSalePrice).toFixed(2);
-    const newProductDetail = Object.assign({}, productDetail, { price, monetary_unit: value });
+    let sale_price = price;
+    if (discount > 0) {
+      const rate = ((100 - Number(discount)) / 100).toFixed(2);
+      sale_price = (Number(price) * Number(rate)).toFixed(2);
+    }
+    const newProductDetail = Object.assign({}, productDetail, {
+      price,
+      monetary_unit: value,
+      sale_price,
+    });
     setProductDetail(newProductDetail);
   };
   // 名称
-  const titleInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const titleInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { title: value });
     setProductDetail(newProductDetail);
   };
   // 商品着陆页
-  const linkInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const linkInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { link: value });
     setProductDetail(newProductDetail);
   };
   // 手机端着陆页
-  const mobileLinkInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const mobileLinkInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { mobile_link: value });
     setProductDetail(newProductDetail);
   };
+  // youTubeId
+  const youTubeIdInputHandle = (value: string) => {
+    const newProductDetail = Object.assign({}, productDetail, { youTubeId: value });
+    setProductDetail(newProductDetail);
+  };
+  // YoutubeCallbackPlayer
+  const youtubeCallbackPlayer = () => {
+    setYoutubeVideoOpen(true);
+  };
+  const youTubeCallbackStatus = () => {
+    setYoutubeVideoOpen(false);
+  };
   // 商品促销价格
-  const salePriceInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const salePriceInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { sale_price: value });
     setProductDetail(newProductDetail);
   };
@@ -114,26 +137,22 @@ function ProductCreateSku() {
     setProductDetail(newProductDetail);
   };
   // 商品重量
-  const productWeightInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const productWeightInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { productWeight: value });
     setProductDetail(newProductDetail);
   };
   // 尺寸 长宽高
-  const productLengthInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const productLengthInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { productLength: value });
     setProductDetail(newProductDetail);
   };
 
-  const productWidthInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const productWidthInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { productWidth: value });
     setProductDetail(newProductDetail);
   };
 
-  const productHeightInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const productHeightInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { productHeight: value });
     setProductDetail(newProductDetail);
   };
@@ -149,21 +168,25 @@ function ProductCreateSku() {
     setProductAttributeModalStatus(false);
   };
   const productImageCallbackOk = (selectedMaterial: { url: any }[]) => {
-    const imageSrc: string[] = [];
+    const { additional_image_link, lifestyle_image_link } = productDetail;
     let newProductDetail;
     if (selectedMaterial && selectedMaterial.length) {
-      selectedMaterial.map((item: { url: string }) => {
-        imageSrc.push(item.url);
-      });
-    }
-    if (currentImageProductType === 'image_link') {
-      newProductDetail = Object.assign({}, productDetail, { image_link: imageSrc[0] });
-    }
-    if (currentImageProductType === 'additional_image_link') {
-      newProductDetail = Object.assign({}, productDetail, { additional_image_link: imageSrc });
-    }
-    if (currentImageProductType === 'lifestyle_image_link') {
-      newProductDetail = Object.assign({}, productDetail, { lifestyle_image_link: imageSrc });
+      if (currentImageProductType === 'image_link') {
+        const src_mage_link = selectedMaterial[0]?.url;
+        newProductDetail = Object.assign({}, productDetail, { image_link: src_mage_link });
+      }
+      if (currentImageProductType === 'additional_image_link') {
+        selectedMaterial.map((item: { url: string }) => {
+          additional_image_link.push(item.url);
+        });
+        newProductDetail = Object.assign({}, productDetail, { additional_image_link });
+      }
+      if (currentImageProductType === 'lifestyle_image_link') {
+        selectedMaterial.map((item: { url: string }) => {
+          lifestyle_image_link.push(item.url);
+        });
+        newProductDetail = Object.assign({}, productDetail, { lifestyle_image_link });
+      }
     }
     setProductSkuImageModalStatus(false);
     // @ts-ignore
@@ -175,23 +198,72 @@ function ProductCreateSku() {
     setImageLimitNum(imageLimitNum);
     await queryFolderFetch();
   };
-  const imageRenderView = (data: string[] | string) => {
+
+  const imgListRemove = (type: string, src: string) => {
+    if (type && src) {
+      const { image_link, additional_image_link, lifestyle_image_link } = productDetail;
+      if (type === 'image_link' && image_link) {
+        const newProductDetail = Object.assign({}, productDetail, { image_link: [] });
+        setProductDetail(newProductDetail);
+      }
+
+      if (type === 'additional_image_link' && additional_image_link) {
+        const newAdditional_image_link: string[] = [];
+        additional_image_link.forEach((item: string) => {
+          if (src !== item) {
+            newAdditional_image_link.push(item);
+          }
+        });
+        const newProductDetail = Object.assign({}, productDetail, {
+          additional_image_link: newAdditional_image_link,
+        });
+        setProductDetail(newProductDetail);
+      }
+      if (type === 'lifestyle_image_link' && lifestyle_image_link) {
+        const newLifestyle_image_link: string[] = [];
+        lifestyle_image_link.forEach((item: string) => {
+          if (src !== item) {
+            newLifestyle_image_link.push(item);
+          }
+        });
+        console.log('newLifestyle_image_link:', newLifestyle_image_link);
+        const newProductDetail = Object.assign({}, productDetail, {
+          lifestyle_image_link: newLifestyle_image_link,
+        });
+        setProductDetail(newProductDetail);
+      }
+    }
+  };
+
+  const imageRenderView = (type: string, data: string[] | string) => {
     const html: JSX.Element[] = [];
-    if (data && Tool.isArray(data) && data.length) {
-      // @ts-ignore
-      data.forEach((item: string) => {
+    if (type && data) {
+      if (Tool.isArray(data)) {
+        if (data[0]) {
+          // @ts-ignore
+          data.forEach((item: string, idx) => {
+            if (item) {
+              html.push(
+                <div className="add-img-item" key={`${item}-${idx}`}>
+                  <img src={item} />
+                  <span className="img-remove" onClick={() => imgListRemove(type, item)}>
+                    <CloseOutlined style={{ fontSize: '24px' }} />
+                  </span>
+                </div>,
+              );
+            }
+          });
+        }
+      } else {
         html.push(
-          <div className="add-img-item" key={item}>
-            <Image width={100} src={item} />
+          <div className="add-img-item" key={data}>
+            <img src={data} />
+            <span className="img-remove 111" onClick={() => imgListRemove(type, data)}>
+              <CloseOutlined style={{ fontSize: '24px' }} />
+            </span>
           </div>,
         );
-      });
-    } else {
-      html.push(
-        <div className="add-img-item" key={data}>
-          <Image width={100} src={data} />
-        </div>,
-      );
+      }
     }
     return html;
   };
@@ -201,14 +273,12 @@ function ProductCreateSku() {
     setProductDetail(newProductDetail);
   };
   // 商品组 ID [item_group_id]
-  const itemGroupIdInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const itemGroupIdInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { item_group_id: value });
     setProductDetail(newProductDetail);
   };
   // 颜色 [color]
-  const colorInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const colorInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { color: value });
     setProductDetail(newProductDetail);
   };
@@ -223,20 +293,17 @@ function ProductCreateSku() {
     setProductDetail(newProductDetail);
   };
   // 材质 [material]
-  const materialInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const materialInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { material: value });
     setProductDetail(newProductDetail);
   };
   // 图案 [pattern]
-  const patternInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const patternInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { pattern: value });
     setProductDetail(newProductDetail);
   };
   // 尺寸 [size]
-  const sizeInputHandle = (event: Event) => {
-    const { value } = event.target;
+  const sizeInputHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { size: value });
     setProductDetail(newProductDetail);
   };
@@ -288,16 +355,20 @@ function ProductCreateSku() {
 
   // 重置主数据
   const resetProductMainDetail = async () => {
-    const { language } = productDetail;
-    const data = Object.assign({}, queryParams, { language });
+    const data = Object.assign({}, queryParams, { language: currentLanguage });
     await queryProductMainDetailFetch(data);
   };
   // 提交创建SKU
   const handelSubmitCreateSku = async (product_sku_option_status: number) => {
-    if (product_sku_option_status > 0) {
-      await editProductFetch();
+    const { image_link, additional_image_link, lifestyle_image_link } = productDetail;
+    if (image_link && additional_image_link.length <= 6 && lifestyle_image_link.length <= 10) {
+      if (product_sku_option_status > 0) {
+        await editProductFetch();
+      } else {
+        await createProductFetch();
+      }
     } else {
-      await createProductFetch();
+      message.warning({ content: '请检测图片数据' });
     }
   };
   const columnsProductAttribute = () => {
@@ -313,7 +384,6 @@ function ProductCreateSku() {
     ];
   };
   const {
-    language,
     monetary_unit,
     image_link,
     additional_image_link,
@@ -353,6 +423,13 @@ function ProductCreateSku() {
     costPrice,
     preSalePrice,
     summaryKeywords,
+    youTubeId,
+    baseProductHeight,
+    baseProductLength,
+    baseProductWidth,
+    baseProductWeight,
+    baseSizeUnit,
+    baseWeightUnit,
   } = productDetail;
   const productTypeName = productTypeNameStr();
 
@@ -379,7 +456,7 @@ function ProductCreateSku() {
               <Col span={12}>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="title_main"></LabelHelpTip>
-                  <Input
+                  <InputText
                     placeholder="主商品标题"
                     style={{ width: 300 }}
                     value={title_main}
@@ -388,11 +465,16 @@ function ProductCreateSku() {
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="offer_id"></LabelHelpTip>
-                  <Input placeholder="商品货号" style={{ width: 300 }} value={offer_id} disabled />
+                  <InputText
+                    placeholder="商品货号"
+                    style={{ width: 300 }}
+                    value={offer_id}
+                    disabled
+                  />
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="google_product_category"></LabelHelpTip>
-                  <Input
+                  <InputText
                     placeholder="选择Google商品类目"
                     style={{ width: 300 }}
                     value={(google_product_category && google_product_category.title) || ''}
@@ -401,7 +483,7 @@ function ProductCreateSku() {
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="product_type"></LabelHelpTip>
-                  <Input
+                  <InputText
                     placeholder="自定商品分类"
                     style={{ width: 300 }}
                     value={contentLanguage && product_type && productTypeName}
@@ -410,17 +492,22 @@ function ProductCreateSku() {
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="gtin"></LabelHelpTip>
-                  <Input placeholder="商品GTIN码" style={{ width: 300 }} value={gtin} disabled />
+                  <InputText
+                    placeholder="商品GTIN码"
+                    style={{ width: 300 }}
+                    value={gtin}
+                    disabled
+                  />
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="brand"></LabelHelpTip>
-                  <Input placeholder="商品品牌" style={{ width: 300 }} value={brand} disabled />
+                  <InputText placeholder="商品品牌" style={{ width: 300 }} value={brand} disabled />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="costPrice"></LabelHelpTip>
-                  <Input
+                  <InputText
                     placeholder="商品成本价"
                     addonBefore="￥"
                     style={{ width: 300 }}
@@ -430,7 +517,7 @@ function ProductCreateSku() {
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="preSalePrice"></LabelHelpTip>
-                  <Input
+                  <InputText
                     placeholder="商品预估售价"
                     addonBefore="￥"
                     style={{ width: 300 }}
@@ -440,13 +527,45 @@ function ProductCreateSku() {
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel={costsExchangeTypeCurrencyLabel}></LabelHelpTip>
-                  <Input
+                  <InputText
                     placeholder="汇率"
                     addonBefore={costsExchangeTypeCurrencyLabel}
                     style={{ width: 300 }}
                     value={costsExchangeTypeCurrencyValue}
                     disabled
                   />
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="productSize"></LabelHelpTip>
+                  <InputText
+                    placeholder="长"
+                    style={{ width: 80 }}
+                    value={baseProductLength}
+                    disabled
+                  />
+                  <InputText
+                    placeholder="宽"
+                    style={{ width: 80 }}
+                    value={baseProductWidth}
+                    disabled
+                  />
+                  <InputText
+                    placeholder="高"
+                    style={{ width: 80 }}
+                    value={baseProductHeight}
+                    disabled
+                  />
+                  <span>{baseSizeUnit}</span>
+                </div>
+                <div className="form-item">
+                  <LabelHelpTip keyLabel="productWeight"></LabelHelpTip>
+                  <InputText
+                    placeholder="商品重量"
+                    style={{ width: 280 }}
+                    value={baseProductWeight}
+                    disabled
+                  />
+                  <span>{baseWeightUnit}</span>
                 </div>
                 <div className="form-item">
                   <LabelHelpTip keyLabel="summaryKeywords"></LabelHelpTip>
@@ -470,7 +589,7 @@ function ProductCreateSku() {
                 <i>*</i> 选择语言:
               </span>
               <Radio.Group
-                value={language}
+                value={currentLanguage}
                 onChange={languageRadioHandle}
                 options={languageOption}
                 disabled={Number(queryParams.product_sku_option_status) > 0}
@@ -478,11 +597,13 @@ function ProductCreateSku() {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="title"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品名称"
                 style={{ width: 550 }}
                 value={title}
-                onChange={titleInputHandle}
+                onChange={(value) => {
+                  titleInputHandle(value);
+                }}
               />
             </div>
             <div className="form-item">
@@ -535,9 +656,10 @@ function ProductCreateSku() {
                 >
                   添加主图
                 </Button>
+                <span className="des">（限1张白底图片）</span>
               </div>
               <div className="line-box">
-                <div className="add-img-list">{imageRenderView(image_link)}</div>
+                <div className="add-img-list">{imageRenderView('image_link', image_link)}</div>
               </div>
             </div>
             <div className="form-item">
@@ -547,14 +669,17 @@ function ProductCreateSku() {
                   type="primary"
                   size="small"
                   onClick={() => {
-                    imageSelectModel('additional_image_link', 5);
+                    imageSelectModel('additional_image_link', 6);
                   }}
                 >
                   添加附属图片
                 </Button>
+                <span className="des">（限最多5张产品展示图）</span>
               </div>
               <div className="line-box">
-                <div className="add-img-list">{imageRenderView(additional_image_link)}</div>
+                <div className="add-img-list">
+                  {imageRenderView('additional_image_link', additional_image_link)}
+                </div>
               </div>
             </div>
             <div className="content form-box">
@@ -570,15 +695,18 @@ function ProductCreateSku() {
                   >
                     添加生活图片
                   </Button>
+                  <span className="des">（限最多10张产品生活图）</span>
                 </div>
                 <div className="line-box">
-                  <div className="add-img-list">{imageRenderView(lifestyle_image_link)}</div>
+                  <div className="add-img-list">
+                    {imageRenderView('lifestyle_image_link', lifestyle_image_link)}
+                  </div>
                 </div>
               </div>
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="link"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品着陆页"
                 style={{ width: 550 }}
                 value={link}
@@ -587,12 +715,24 @@ function ProductCreateSku() {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="mobile_link"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品着陆页"
                 style={{ width: 550 }}
                 value={mobile_link}
                 onChange={mobileLinkInputHandle}
               />
+            </div>
+            <div className="form-item">
+              <LabelHelpTip keyLabel="YoutubeVideo"></LabelHelpTip>
+              <InputText
+                placeholder="Youtube id"
+                style={{ width: 450 }}
+                value={youTubeId}
+                onChange={youTubeIdInputHandle}
+              />
+              <Button disabled={!youTubeId} onClick={youtubeCallbackPlayer}>
+                播放
+              </Button>
             </div>
           </div>
           <div className="header">
@@ -612,7 +752,7 @@ function ProductCreateSku() {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="price"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="价格"
                 style={{ width: 130 }}
                 value={price}
@@ -628,13 +768,13 @@ function ProductCreateSku() {
                 max={'60'}
                 min={'0'}
                 value={discount}
-                onChange={(value) => discountInputHandle(value)}
+                onChange={discountInputHandle}
                 suffix="%"
               />
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="售卖价格"
                 style={{ width: 130 }}
                 value={sale_price}
@@ -644,7 +784,7 @@ function ProductCreateSku() {
             </div>
             <div className="form-item">
               <LabelHelpTip keyLabel="availability"></LabelHelpTip>
-              <Radio.Group value={availability} onChange={() => handelRadioAvailability(event)}>
+              <Radio.Group value={availability} onChange={handelRadioAvailability}>
                 <Radio value="in_stock"> 有货 </Radio>
                 <Radio value="out_of_stock"> 缺货 </Radio>
               </Radio.Group>
@@ -657,7 +797,7 @@ function ProductCreateSku() {
             {/** 商品组 ID [item_group_id] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="item_group_id"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品组 ID"
                 style={{ width: 120 }}
                 value={item_group_id}
@@ -667,7 +807,7 @@ function ProductCreateSku() {
             {/* 颜色 [color] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="color"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品颜色"
                 style={{ width: 300 }}
                 value={color}
@@ -697,7 +837,7 @@ function ProductCreateSku() {
             {/* 材质 [material] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="material"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品材料"
                 style={{ width: 300 }}
                 value={material}
@@ -707,7 +847,7 @@ function ProductCreateSku() {
             {/* 图案 [pattern] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="pattern"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品图案"
                 style={{ width: 300 }}
                 value={pattern}
@@ -717,7 +857,7 @@ function ProductCreateSku() {
             {/* 尺寸 [size] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="size"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品尺寸"
                 style={{ width: 150 }}
                 value={size}
@@ -742,19 +882,19 @@ function ProductCreateSku() {
             {/**== 尺码体系 [size_system] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="productSize"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="长"
                 style={{ width: 100 }}
                 value={productLength}
                 onChange={productLengthInputHandle}
               />
-              <Input
+              <InputText
                 placeholder="宽"
                 style={{ width: 100 }}
                 value={productWidth}
                 onChange={productWidthInputHandle}
               />
-              <Input
+              <InputText
                 placeholder="高"
                 style={{ width: 100 }}
                 value={productHeight}
@@ -771,7 +911,7 @@ function ProductCreateSku() {
             {/**== 重量尺寸体系 [productWeight] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="productWeight"></LabelHelpTip>
-              <Input
+              <InputText
                 placeholder="商品重量"
                 style={{ width: 300 }}
                 value={productWeight}
@@ -795,6 +935,7 @@ function ProductCreateSku() {
               <div className="line-box">
                 <div className="table-box">
                   <Table
+                    rowKey={(record) => record.attribute_name}
                     dataSource={product_detail}
                     columns={columnsProductAttribute()}
                     pagination={false}
@@ -812,10 +953,12 @@ function ProductCreateSku() {
                 type="primary"
                 size="large"
                 onClick={() => {
-                  handelSubmitCreateSku(queryParams.product_sku_option_status);
+                  handelSubmitCreateSku(queryParams && queryParams.product_sku_option_status);
                 }}
               >
-                {queryParams.product_sku_option_status > 0 ? '确认编辑SKU商品' : '确认创建SKU商品'}
+                {queryParams && queryParams.product_sku_option_status > 0
+                  ? '确认编辑SKU商品'
+                  : '确认创建SKU商品'}
               </Button>
             </div>
           </div>
@@ -827,6 +970,11 @@ function ProductCreateSku() {
         selectedType={currentImageProductType}
         imageLimitNum={imageLimitNum}
       ></ImageSelectModal>
+      <YouTubeVideoPlayModal
+        youTubeCallbackStatus={youTubeCallbackStatus}
+        youTubeId={youTubeId}
+        isYoutubeVideoOpen={isYoutubeVideoOpen}
+      ></YouTubeVideoPlayModal>
     </PageContainer>
   );
 }

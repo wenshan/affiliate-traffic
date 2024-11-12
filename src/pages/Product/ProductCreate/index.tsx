@@ -1,7 +1,13 @@
 import DefaultProject from '@/components/DefaultProject';
-import { defaultCurrentProductMain } from '@/constant/defaultCurrentData';
+import {
+  defaultCurrentProductMain,
+  defaultProductDetail,
+  languageOptionDropdown,
+} from '@/constant/defaultCurrentData';
+import { DownOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Modal, Table, Tag } from 'antd';
+import type { MenuProps } from 'antd';
+import { Button, Dropdown, Modal, Space, Table, Tag } from 'antd';
 import { JSX, useEffect, useState } from 'react';
 import { history, useModel } from 'umi';
 import CreateMainModal from '../components/CreateMainModal';
@@ -46,7 +52,6 @@ type ProductMainDetailType = {
   summaryKeywords: string;
   [key: string]: any;
 };
-
 function ProductCreate() {
   const {
     productMainDetail,
@@ -59,6 +64,7 @@ function ProductCreate() {
     setProductTypeName,
     shoppingCostsExchangeQuery,
   } = useModel('productMainModel');
+  const { setProductDetail } = useModel('productCreateSkuModel');
   const [currentOptionActionStatus, setCurrentOptionActionStatus] = useState(false);
 
   const createMainModalStatusHandle = () => {
@@ -66,6 +72,7 @@ function ProductCreate() {
     setCreateMainModalStatus(true);
     // @ts-ignore
     setProductMainDetail(defaultCurrentProductMain);
+    setProductDetail(defaultProductDetail);
   };
 
   const createMainModalCallbackOk = async (currentProductMain: any) => {
@@ -75,11 +82,13 @@ function ProductCreate() {
   };
 
   // table
-  const handelTableCreateSku = (record: ProductMainDetailType) => {
+  const handelTableCreateSku: MenuProps['onClick'] = (e: { key: any }, record: { id: any }) => {
     // const newCurrentProductMain = Object.assign({}, productMainDetail, record);
     // setProductMainDetail(newCurrentProductMain);
+    setProductDetail(defaultProductDetail);
+    //       `/product/productCreateSku?product_main_id=${record.product_main_id}&product_id=${record.id}&language=${record.language}&product_sku_option_status=1`,
     history.push(
-      `/product/productCreateSku?product_main_id=${record.id}&product_sku_option_status=0`,
+      `/product/productCreateSku?product_main_id=${record.id}&language=${e.key}&product_sku_option_status=0`,
     );
   };
 
@@ -119,6 +128,8 @@ function ProductCreate() {
     const updatePagination = Object.assign({}, paginationParams, { current: page, pageSize });
     await queryProductMainListFetch(updatePagination);
   };
+
+  const items: MenuProps['items'] = languageOptionDropdown;
 
   const tableColumnsMain = () => {
     return [
@@ -180,32 +191,38 @@ function ProductCreate() {
         render: (text: any, record: any) => {
           return (
             <div className="operate">
-              <Button
-                size="small"
-                onClick={() => {
-                  handelTableCreateSku(record);
+              <Dropdown
+                menu={{
+                  items,
+                  onClick: (e) => handelTableCreateSku(e, record),
                 }}
               >
-                创建SKU商品
-              </Button>
-              <br />
-              <Button
-                size="small"
-                onClick={() => {
-                  handelTableEdit(record);
-                }}
-              >
-                编辑
-              </Button>
-              <span className="line">|</span>
-              <Button
-                size="small"
-                onClick={() => {
-                  handelTableDel(record);
-                }}
-              >
-                删除
-              </Button>
+                <Button size="small">
+                  <Space>
+                    创建SKU商品
+                    <DownOutlined />
+                  </Space>
+                </Button>
+              </Dropdown>
+              <div className="button-wrap">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handelTableEdit(record);
+                  }}
+                >
+                  编辑
+                </Button>
+                <span className="line">|</span>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handelTableDel(record);
+                  }}
+                >
+                  删除
+                </Button>
+              </div>
             </div>
           );
         },
@@ -219,39 +236,42 @@ function ProductCreate() {
   }, []);
 
   return (
-    <PageContainer>
-      <div className="page">
-        <div className="product-create">
-          <DefaultProject></DefaultProject>
-          <div className="header">
-            <div className="creat-button">
-              <Button type="primary" size="large" onClick={createMainModalStatusHandle}>
-                创建主商品
-              </Button>
+    <>
+      <PageContainer>
+        <div className="page">
+          <div className="product-create">
+            <DefaultProject></DefaultProject>
+            <div className="header">
+              <div className="creat-button">
+                <Button type="primary" size="large" onClick={createMainModalStatusHandle}>
+                  创建主商品
+                </Button>
+              </div>
+            </div>
+            <div className="content">
+              <Table
+                rowKey={(record) => record.id}
+                dataSource={productMainList}
+                columns={tableColumnsMain()}
+                pagination={{
+                  position: ['bottomRight'],
+                  current: paginationParams.current,
+                  pageSize: paginationParams.pageSize,
+                  total: paginationParams.total,
+                  onChange: handelTablePagination,
+                }}
+              />
+            </div>
+            <div className="footer">
+              <CreateMainModal
+                callbackOk={createMainModalCallbackOk}
+                optionAction={currentOptionActionStatus}
+              ></CreateMainModal>
             </div>
           </div>
-          <div className="content">
-            <Table
-              dataSource={productMainList}
-              columns={tableColumnsMain()}
-              pagination={{
-                position: ['bottomRight'],
-                current: paginationParams.current,
-                pageSize: paginationParams.pageSize,
-                total: paginationParams.total,
-                onChange: handelTablePagination,
-              }}
-            />
-          </div>
-          <div className="footer">
-            <CreateMainModal
-              callbackOk={createMainModalCallbackOk}
-              optionAction={currentOptionActionStatus}
-            ></CreateMainModal>
-          </div>
         </div>
-      </div>
-    </PageContainer>
+      </PageContainer>
+    </>
   );
 }
 

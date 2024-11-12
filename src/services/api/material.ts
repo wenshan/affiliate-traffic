@@ -35,21 +35,33 @@ export const queryFolder = async (params?: ParamsType) => {
 };
 
 export const queryFolderMaterial = async (params?: ParamsType) => {
-  return request<{ data: any }>('/api/material/queryFolderMaterial', {
+  return request<{
+    status: number;
+    msg(msg: any): unknown;
+    data: any;
+  }>('/api/material/queryFolderMaterial', {
     method: 'POST',
     data: params,
   });
 };
 //
 export const delMaterial = async (params?: ParamsType) => {
-  return request<{ data: any }>('/api/material/delMaterial', {
+  return request<{
+    status: number;
+    msg(msg: any): unknown;
+    data: any;
+  }>('/api/material/delMaterial', {
     method: 'POST',
     data: params,
   });
 };
 // 彻底删除
 export const delRemoteMaterial = async (params?: ParamsType) => {
-  return request<{ data: any }>('/api/material/delRemoteMaterial', {
+  return request<{
+    status: number;
+    msg(msg: any): unknown;
+    data: any;
+  }>('/api/material/delRemoteMaterial', {
     method: 'POST',
     data: params,
   });

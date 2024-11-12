@@ -56,6 +56,13 @@ const defaultProductDetail = {
   preSalePrice: 0,
   targetProfitRatio: 0,
   summaryKeywords: '',
+  youTubeId: '',
+  baseProductHeight: '',
+  baseProductLength: '',
+  baseProductWidth: '',
+  baseProductWeight: '',
+  baseSizeUnit: 'cm',
+  baseWeightUnit: 'g',
 };
 const defaultCurrentProductMain = {
   id: '',
@@ -76,6 +83,12 @@ const defaultCurrentProductMain = {
   targetProfitRatio: 30,
   preSalePrice: 0,
   summaryKeywords: '',
+  baseProductHeight: '',
+  baseProductLength: '',
+  baseProductWidth: '',
+  baseProductWeight: '',
+  baseSizeUnit: 'cm',
+  baseWeightUnit: 'g',
 };
 
 const defaultCostsExchange = {
@@ -115,6 +128,12 @@ const languageOption = [
   { value: 'en-US', label: '英语' },
   { value: 'ja-JP', label: '日语' },
   { value: 'ko_KR', label: '韩语' },
+];
+const languageOptionDropdown = [
+  { key: 'zh-CN', label: '中文' },
+  { key: 'en-US', label: '英语' },
+  { key: 'ja-JP', label: '日语' },
+  { key: 'ko_KR', label: '韩语' },
 ];
 const sizeTypeOption = [
   { value: 'regular', label: '标准' },
@@ -161,12 +180,14 @@ const productSizeUnitOption = [
     label: 'cm',
   },
   {
-    value: 'm',
-    label: 'm',
-  },
-  {
     value: 'in',
     label: 'in',
+  },
+];
+const productSizeUnitOptionMain = [
+  {
+    value: 'cm',
+    label: 'cm',
   },
 ];
 
@@ -203,6 +224,16 @@ const productWeightUnitOption = [
     label: 'lb',
   },
 ];
+const productWeightUnitOptionMain = [
+  {
+    value: 'g',
+    label: 'g',
+  },
+  {
+    value: 'kg',
+    label: 'kg',
+  },
+];
 const defaultWeightUnitCountry = {
   US: {
     value: 'g',
@@ -231,6 +262,9 @@ const costsExchangeInit = {
   JPY: 20.5,
   KRW: 188,
   CNY: 1,
+  exchange_cm2in: 0.3937008,
+  exchange_kg2lb: 2.2046226,
+  exchange_g2lb: 0.0022046,
 };
 
 export {
@@ -245,9 +279,12 @@ export {
   defaultWeightUnitCountry,
   genderOption,
   languageOption,
+  languageOptionDropdown,
   monetaryUnitOption,
   productSizeUnitOption,
+  productSizeUnitOptionMain,
   productWeightUnitOption,
+  productWeightUnitOptionMain,
   sizeSystemOption,
   sizeTypeOption,
 };
