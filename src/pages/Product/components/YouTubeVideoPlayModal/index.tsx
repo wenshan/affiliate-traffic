@@ -20,16 +20,14 @@ export default (props: Props) => {
   const [light] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted] = useState(false);
-  const [played, setPlayed] = useState(0);
-  const [loaded, setLoaded] = useState(0);
+  // const [played, setPlayed] = useState(0);
+  // const [loaded, setLoaded] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [loop] = useState(false);
   const handleOk = () => {
     setUrl(url);
     setPlaying(false);
     props.youTubeCallbackStatus();
-    console.log(played);
-    console.log(loaded);
   };
   const handleCancel = () => {
     setUrl(url);

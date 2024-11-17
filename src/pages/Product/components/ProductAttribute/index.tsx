@@ -1,4 +1,5 @@
-import { Button, Input, Modal, Table } from 'antd';
+import InputText from '@/components/InputText';
+import { Button, Modal, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 
@@ -43,15 +44,13 @@ function ProductAttribute(props: any) {
     setAddOpen(false);
     setCurrentProductAttribute(currentProductAttributeInit);
   };
-  const nameInputHandle = (event: { target: { value: any } }) => {
-    const { value } = event.target;
+  const nameInputHandle = (value: string) => {
     const newCurrentProductAttribute = Object.assign({}, currentProductAttribute, {
       attribute_name: value,
     });
     setCurrentProductAttribute(newCurrentProductAttribute);
   };
-  const valueInputHandle = (event: { target: { value: any } }) => {
-    const { value } = event.target;
+  const valueInputHandle = (value: string) => {
     const newCurrentProductAttribute = Object.assign({}, currentProductAttribute, {
       attribute_value: value,
     });
@@ -81,7 +80,6 @@ function ProductAttribute(props: any) {
     });
   };
   const onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
-    console.log(selectedRowKeys, selectedRows);
     const newSelectedRows: any[] = [];
     if (selectedRows && selectedRows.length) {
       selectedRows.forEach((item: { attribute_name: any; attribute_value: any }) => {
@@ -201,8 +199,8 @@ function ProductAttribute(props: any) {
       >
         <div className="content form-box">
           <div className="form-item">
-            <span className="label">属性名称:</span>
-            <Input
+            <span className="label">属性名: </span>
+            <InputText
               placeholder="属性名称"
               style={{ width: 250 }}
               value={currentProductAttribute.attribute_name}
@@ -210,8 +208,8 @@ function ProductAttribute(props: any) {
             />
           </div>
           <div className="form-item">
-            <span className="label">属性值:</span>
-            <Input
+            <span className="label">属性值: </span>
+            <InputText
               placeholder="属性值"
               style={{ width: 250 }}
               value={currentProductAttribute.attribute_value}

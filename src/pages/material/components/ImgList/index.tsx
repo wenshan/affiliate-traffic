@@ -1,3 +1,4 @@
+import ResizeImg from '@/constant/resizeImg';
 import {
   DeleteOutlined,
   DownloadOutlined,
@@ -97,7 +98,7 @@ function ImgList() {
                 <span className="checkbox_inner"></span>
               </div>
               <div className="img-box" onClick={() => handelSelectCurrent(item)}>
-                <Image width={160} src={item.url} preview={false} />
+                <Image width={160} src={`${item.url}${ResizeImg['w_160']}`} preview={false} />
               </div>
               <div className="line"></div>
               <div className="tool">

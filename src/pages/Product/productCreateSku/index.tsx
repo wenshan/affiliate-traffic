@@ -11,6 +11,7 @@ import {
   sizeTypeOption,
 } from '@/constant/defaultCurrentData';
 import languageObj from '@/constant/language';
+import ResizeImg from '@/constant/resizeImg';
 import Tool from '@/utils/tool';
 import { CloseOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -245,7 +246,7 @@ function ProductCreateSku() {
             if (item) {
               html.push(
                 <div className="add-img-item" key={`${item}-${idx}`}>
-                  <img src={item} />
+                  <img src={`${item}${ResizeImg['w_100']}`} />
                   <span className="img-remove" onClick={() => imgListRemove(type, item)}>
                     <CloseOutlined style={{ fontSize: '24px' }} />
                   </span>
@@ -257,7 +258,7 @@ function ProductCreateSku() {
       } else {
         html.push(
           <div className="add-img-item" key={data}>
-            <img src={data} />
+            <img src={`${data}${ResizeImg['w_100']}`} />
             <span className="img-remove 111" onClick={() => imgListRemove(type, data)}>
               <CloseOutlined style={{ fontSize: '24px' }} />
             </span>
