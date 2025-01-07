@@ -3,11 +3,17 @@ import ResizeImg from '@/constant/resizeImg';
 import Tool from '@/utils/tool';
 import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Col, Modal, Row, Select, Spin, Table, message } from 'antd';
+import { Button, Col, Modal, Row, Select, Spin, Table, TableProps, message } from 'antd';
 import { JSX, Key, useEffect } from 'react';
 import { history, useModel } from 'umi';
 
 import './index.less';
+
+type ExpandableConfig<T extends object> = TableProps<T>['expandable'];
+
+interface DataType {
+  [key: string]: any;
+}
 
 function ProductList() {
   const {
@@ -47,7 +53,7 @@ function ProductList() {
   const handelGoogleMerchantUpdate = async (data: any) => {
     if (data.googleAccess) {
       if (data && data.id) {
-        await shoppingProductInsertFetch();
+        await shoppingProductInsertFetch(data);
       }
     } else {
       message.info('无权限，同步google merchant需要项目管理者权限。');
@@ -90,6 +96,79 @@ function ProductList() {
     await queryProductAllFetch();
     await queryProductMainOfferIdFetch();
   };
+
+  const columnsSaleSkus = () => {
+    return [
+      {
+        title: '售卖规格',
+        dataIndex: 'saleType',
+        key: 'saleType',
+      },
+      {
+        title: '规则名称',
+        dataIndex: 'saleValue',
+        key: 'saleValue',
+      },
+      {
+        title: '价格',
+        dataIndex: 'price',
+        key: 'price',
+        render: (_, record: any) => {
+          const html: any = [];
+          if (record && record.price && record.monetary_unit) {
+            html.push(
+              <span
+                key={`${record.price}_price`}
+              >{`价格: ${record.price} ${record.monetary_unit}`}</span>,
+            );
+          } else {
+            html.push(<span>-</span>);
+          }
+          if (record && record.sale_price && record.sale_price && record.monetary_unit) {
+            html.push(
+              <span
+                key={`${record.sale_price}_salePrice`}
+              >{`促销: ${record.sale_price} ${record.monetary_unit}`}</span>,
+            );
+          } else {
+            html.push(<span>-</span>);
+          }
+          if (record && record.discount && record.discount && record.monetary_unit) {
+            html.push(
+              <span key={`${record.discount}_discount`}>{`折扣: ${record.discount}%`}</span>,
+            );
+          } else {
+            html.push(<span>-</span>);
+          }
+          return html;
+        },
+      },
+      {
+        title: '库存',
+        dataIndex: 'availability',
+        key: 'availability',
+        width: 60,
+        render: (_, record: any) => {
+          if (record.availability === 'in_stock') {
+            return '有';
+          } else {
+            return '无';
+          }
+        },
+      },
+    ];
+  };
+
+  const defaultExpandable: ExpandableConfig<DataType> = {
+    expandedRowRender: (record: DataType) => (
+      <Table
+        rowKey={(record) => `${record.id}_${record.language}_${record.product_id}`}
+        dataSource={record.saleSkus}
+        columns={columnsSaleSkus()}
+      />
+    ),
+  };
+
   useEffect(() => {
     initPageParams();
   }, []);
@@ -101,7 +180,7 @@ function ProductList() {
       key: 'image_link',
       fixed: 'left',
       width: 60,
-      render: (text, record) => {
+      render: (_: any, record: any) => {
         if (record && record.image_link) {
           return <img src={`${record.image_link}${ResizeImg['w_100']}`} width={50}></img>;
         } else {
@@ -124,40 +203,11 @@ function ProductList() {
       width: 70,
     },
     {
-      title: '价格',
-      dataIndex: 'price',
-      key: 'price',
-      fixed: 'left',
-      width: 100,
-      render: (_, record: any) => {
-        const html: any = [];
-        if (record && record.price && record.monetary_unit) {
-          html.push(
-            <span
-              key={`${record.price}_price`}
-            >{`price: ${record.price} ${record.monetary_unit}`}</span>,
-          );
-        } else {
-          html.push(<span>-</span>);
-        }
-        if (record && record.sale_price && record.sale_price && record.monetary_unit) {
-          html.push(
-            <span
-              key={`${record.sale_price}_salePrice`}
-            >{`salePrice: ${record.sale_price} ${record.monetary_unit}`}</span>,
-          );
-        } else {
-          html.push(<span>-</span>);
-        }
-        return html;
-      },
-    },
-    {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
       width: 220,
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         if (record && record.description) {
           return (
             <div
@@ -181,7 +231,7 @@ function ProductList() {
       dataIndex: 'link',
       key: 'link',
       width: 60,
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         const html: any = [];
         if (record.link) {
           html.push(
@@ -216,24 +266,11 @@ function ProductList() {
       },
     },
     {
-      title: '商品分组',
-      dataIndex: 'product_type',
-      key: 'product_type',
-      width: 90,
-      render: (_, record) => {
-        if (record.product_type && record.product_type.title) {
-          return record.product_type.title;
-        } else {
-          return '-';
-        }
-      },
-    },
-    {
       title: 'Google类目',
       dataIndex: 'google_product_category',
       key: 'google_product_category',
       width: 110,
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         if (record.google_product_category && record.google_product_category.title) {
           return record.google_product_category.title;
         } else {
@@ -278,18 +315,6 @@ function ProductList() {
           });
         return html;
       },
-    },
-    {
-      title: '分组ID',
-      dataIndex: 'item_group_id',
-      key: 'item_group_id',
-      width: 90,
-    },
-    {
-      title: '颜色',
-      dataIndex: 'color',
-      key: 'color',
-      width: 90,
     },
     {
       title: '尺寸',
@@ -346,12 +371,6 @@ function ProductList() {
       },
     },
     {
-      title: '图案',
-      dataIndex: 'pattern',
-      key: 'pattern',
-      width: 90,
-    },
-    {
       title: '商品属性',
       dataIndex: 'product_detail',
       key: 'product_detail',
@@ -379,25 +398,12 @@ function ProductList() {
       key: 'product_highlight',
       ellipsis: true,
       width: 200,
-      render: (_, record: any) => (
+      render: (_: any, record: any) => (
         <span
           className="table-text clearfix"
           dangerouslySetInnerHTML={{ __html: record.product_highlight }}
         ></span>
       ),
-    },
-    {
-      title: '库存',
-      dataIndex: 'availability',
-      key: 'availability',
-      width: 60,
-      render: (_, record: any) => {
-        if (record.availability === 'in_stock') {
-          return '有';
-        } else {
-          return '无';
-        }
-      },
     },
     {
       title: '语言',
@@ -410,7 +416,7 @@ function ProductList() {
       key: 'operate',
       fixed: 'right',
       width: 160,
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         return (
           <div className="operate">
             <a
@@ -517,11 +523,12 @@ function ProductList() {
           </div>
           <div className="content">
             <Table
-              rowKey={(record) => record.attribute_name}
+              rowKey={(record) => `${record.id}_${record.language}_${record.title}`}
               dataSource={productList}
               columns={tableColumns}
               scroll={{ x: 1300 }}
               size="small"
+              expandable={defaultExpandable}
               pagination={{
                 position: ['bottomRight'],
                 current: pagination.current,

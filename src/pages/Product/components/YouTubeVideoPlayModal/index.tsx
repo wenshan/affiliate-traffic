@@ -13,15 +13,15 @@ type Props = {
 };
 
 export default (props: Props) => {
-  const [url, setUrl] = useState<string | null>(null);
+  const [url, setUrl] = useState<string>('');
   const [playing, setPlaying] = useState(false);
   const [pip, setPip] = useState(false);
   const [controls] = useState(false);
   const [light] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted] = useState(false);
-  // const [played, setPlayed] = useState(0);
-  // const [loaded, setLoaded] = useState(0);
+  const [played, setPlayed] = useState(0);
+  const [loaded, setLoaded] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [loop] = useState(false);
   const handleOk = () => {
@@ -46,7 +46,7 @@ export default (props: Props) => {
     setVolume(parseFloat(e.target.value));
   };
 
-  const handleOnPlaybackRateChange = (speed) => {
+  const handleOnPlaybackRateChange = (speed: string) => {
     setPlaybackRate(parseFloat(speed));
   };
 
@@ -78,11 +78,11 @@ export default (props: Props) => {
       setLoaded(0);
       setPip(false);
     } else {
-      setUrl(null);
+      setUrl('');
       setPlaying(false);
     }
   }, [props]);
-
+  console.log(played, loaded);
   return (
     <Modal
       width={690}
@@ -117,7 +117,7 @@ export default (props: Props) => {
         onSeek={(e) => console.log('onSeek', e)}
         onEnded={handleEnded}
         onError={(e) => console.log('onError', e)}
-        onPlaybackQualityChange={(e) => console.log('onPlaybackQualityChange', e)}
+        onPlaybackQualityChange={(e: any) => console.log('onPlaybackQualityChange', e)}
       />
       <div className="controls">
         <Button size="small" onClick={handleStop}>

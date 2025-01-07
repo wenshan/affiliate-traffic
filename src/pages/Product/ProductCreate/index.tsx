@@ -64,7 +64,7 @@ function ProductCreate() {
     setProductTypeName,
     shoppingCostsExchangeQuery,
   } = useModel('productMainModel');
-  const { setProductDetail } = useModel('productCreateSkuModel');
+  const { setProductDetail } = useModel('productCreateProductSkuModel');
   const [currentOptionActionStatus, setCurrentOptionActionStatus] = useState(false);
 
   const createMainModalStatusHandle = () => {

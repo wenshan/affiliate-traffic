@@ -2,7 +2,6 @@ import { AvatarDropdown, AvatarName, Footer, Question } from '@/components';
 import { currentUser } from '@/services/api/login';
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { Link, history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
@@ -21,18 +20,19 @@ const fetchUserInfo = async () => {
       return result.data;
     } else {
       history.push(loginPath);
-      return null;
+      return {};
     }
   } catch (error) {
     history.push(loginPath);
+    return {};
   }
-  return undefined;
+  return {};
 };
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<API.CurrentUser>;
 }> {
   // 如果不是登录页面，执行
   const { location } = history;
@@ -53,10 +53,11 @@ export async function getInitialState(): Promise<{
       loading: false,
     };
   }
+  return {};
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
-export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
     actionsRender: () => [<Question key="doc" />],
     avatarProps: {
@@ -111,27 +112,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态
-    childrenRender: (children) => {
-      // if (initialState?.loading) return <PageLoading />;
-      return (
-        <>
-          {children}
-          {isDev && (
-            <SettingDrawer
-              disableUrlParams
-              enableDarkTheme
-              settings={initialState?.settings}
-              onSettingChange={(settings) => {
-                setInitialState((preInitialState) => ({
-                  ...preInitialState,
-                  settings,
-                }));
-              }}
-            />
-          )}
-        </>
-      );
-    },
     ...initialState?.settings,
   };
 };

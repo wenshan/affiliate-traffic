@@ -31,7 +31,7 @@ const defaultCostsExchange = {
 };
 
 export default () => {
-  const { setCostsExchange } = useModel('productCreateSkuModel');
+  const { setCostsExchange } = useModel('productCreateProductSkuModel');
   const [form] = Form.useForm<CostsExchange>();
   return (
     <PageContainer>

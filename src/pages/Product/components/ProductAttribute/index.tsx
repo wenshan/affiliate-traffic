@@ -21,7 +21,7 @@ function ProductAttribute(props: any) {
     delAttrFetch,
     queryAttrFetch,
   } = useModel('productAttributeModel');
-  const { productDetail } = useModel('productCreateSkuModel');
+  const { productDetail } = useModel('productCreateProductSkuModel');
   const [selectedRowsProductAttr, setSelectedRowsProductAttr] = useState([]);
   const [optionAddStatus, setOptionAddStatus] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState(false);

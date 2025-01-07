@@ -95,6 +95,8 @@ function Material() {
   const [folderDirectory, setFolderDirectory] = useState([]);
   const [selectedMaterial, setSelectedMaterial] = useState([]); // 选取的素材
   const [currentOperateMaterial, setCurrentOperateMaterial] = useState({ keys: '' }); // 当前操作的素材
+  const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
+  const [imageLimitNum, setImageLimitNum] = useState(20);
   // 转化成  rowsTree rowsList
   const listToTreeSelf = (data: any) => {
     const { selectFolderDirectory, checkFolderDirectory, currentOperateMaterial, actionType } =
@@ -491,6 +493,10 @@ function Material() {
     updateOperateMaterial,
     updateOperateCheckFolderDirectory,
     updateOperateSelectFolderDirectory,
+    currentImageProductType,
+    setCurrentImageProductType,
+    imageLimitNum,
+    setImageLimitNum,
   };
 }
 

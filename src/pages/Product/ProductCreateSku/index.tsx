@@ -4,90 +4,77 @@ import {
   ageGroupOption,
   genderOption,
   languageOption,
-  monetaryUnitOption,
+  optionsProductSaleTypeObj,
   productSizeUnitOption,
   productWeightUnitOption,
-  sizeSystemOption,
-  sizeTypeOption,
 } from '@/constant/defaultCurrentData';
-import languageObj from '@/constant/language';
+// import languageObj from '@/constant/language';
 import ResizeImg from '@/constant/resizeImg';
+import CreateProductSkuDrawer from '@/pages/Product/components/CreateProductSkuDrawer';
+import ImageSelectModal from '@/pages/Product/components/ImageSelectModal';
+import LabelHelpTip from '@/pages/Product/components/LabelHelpTip';
+import ProductAttribute from '@/pages/Product/components/ProductAttribute';
+import RichTextEditor from '@/pages/Product/components/RichTextEditor';
+import YouTubeVideoPlayModal from '@/pages/Product/components/YouTubeVideoPlayModal';
 import Tool from '@/utils/tool';
 import { CloseOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import type { RadioChangeEvent } from 'antd';
-import { Button, Col, Input, InputNumber, Radio, Row, Select, Table, message } from 'antd';
+import { Button, Col, Input, Modal, Radio, Row, Select, Table, message } from 'antd';
 import { JSX, useEffect, useState } from 'react';
-import { useModel } from 'umi';
-import ImageSelectModal from '../components/ImageSelectModal';
-import LabelHelpTip from '../components/LabelHelpTip';
-import ProductAttribute from '../components/ProductAttribute';
-import RichTextEditor from '../components/RichTextEditor';
-import YouTubeVideoPlayModal from '../components/YouTubeVideoPlayModal';
-
+import { history, useModel } from 'umi';
 import './index.less';
 const { TextArea } = Input;
 
-type Event = { target: { value: any } };
-
 function ProductCreateSku() {
-  const { queryFolderFetch } = useModel('material');
   const {
     createProductFetch,
     editProductFetch,
-    costsExchange,
     costsExchangeTypeCurrencyLabel,
     costsExchangeTypeCurrencyValue,
     productDetail,
     setProductDetail,
     queryParams,
+    setQueryParams,
     initQueryParams,
-    currentPreSalePrice,
     queryProductMainDetailFetch,
     currentLanguage,
-  } = useModel('productCreateSkuModel');
+    setCurrentLanguage,
+    buttonSubmitCreateSkuLoading,
+    saleSkuItems,
+    setSaleSkuData,
+    setSaleSkuOperateType,
+    saleSkuDelFetch,
+  } = useModel('productCreateProductSkuModel');
+  const { product_sku_option_status, product_main_id, language } = queryParams;
   const { setProductAttributeModalStatus } = useModel('productAttributeModel');
-  const { setProductSkuImageModalStatus } = useModel('material');
-  const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
-  const [imageLimitNum, setImageLimitNum] = useState(20);
+  const {
+    setProductSkuImageModalStatus,
+    currentImageProductType,
+    setCurrentImageProductType,
+    setImageLimitNum,
+    queryFolderFetch,
+  } = useModel('material');
+  // const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
+  // const [imageLimitNum, setImageLimitNum] = useState(20);
   const [isYoutubeVideoOpen, setYoutubeVideoOpen] = useState(false);
-
+  const [isCreateProductSkuDrawer, setCreateProductSkuDrawer] = useState(false);
   // 语言
   // TODO: 创建时初始化货币单位
   const languageRadioHandle = (event: RadioChangeEvent) => {
     const { value } = event.target;
+    console.log('currentLanguage:', currentLanguage);
+    console.log('language:', language);
     if (value) {
-      // @ts-ignore
-      const languageInfor = languageObj[value];
-      const { preSalePrice } = productDetail;
-      const price = (preSalePrice * languageInfor.exchangeRate).toFixed(2);
-      const sale_price = price;
-      const newProductDetail = Object.assign({}, productDetail, {
-        language: value,
-        monetary_unit: languageInfor.exchangeKey,
-        preSalePrice,
-        sale_price,
-        price,
-      });
-      setProductDetail(newProductDetail);
+      // setProductMainDetail(defaultCurrentProductMain);
+      const newQueryParams = Object.assign({}, queryParams, { language: value });
+      setQueryParams(newQueryParams);
+      setCurrentLanguage(value);
+      history.push(
+        `/product/productCreateSku?product_main_id=${product_main_id}&language=${value}&product_sku_option_status=${product_sku_option_status}`,
+      );
+      initQueryParams();
     }
-  };
-  // 货币单位
-  const monetaryUnitSelectHandle = (value: string) => {
-    // @ts-ignore
-    const { discount } = productDetail;
-    const price = (costsExchange[value] * currentPreSalePrice).toFixed(2);
-    let sale_price = price;
-    if (discount > 0) {
-      const rate = ((100 - Number(discount)) / 100).toFixed(2);
-      sale_price = (Number(price) * Number(rate)).toFixed(2);
-    }
-    const newProductDetail = Object.assign({}, productDetail, {
-      price,
-      monetary_unit: value,
-      sale_price,
-    });
-    setProductDetail(newProductDetail);
   };
   // 名称
   const titleInputHandle = (value: string) => {
@@ -116,26 +103,13 @@ function ProductCreateSku() {
   const youTubeCallbackStatus = () => {
     setYoutubeVideoOpen(false);
   };
-  // 商品促销价格
-  const salePriceInputHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { sale_price: value });
-    setProductDetail(newProductDetail);
+  const skuDrawerCallbackStatus = (status: boolean) => {
+    setCreateProductSkuDrawer(status);
   };
-  // 商品折扣
-  const discountInputHandle = (value: null | string) => {
-    const { price, sale_price } = productDetail;
-    let newProductDetail;
-    if (value && Number(value) > 0) {
-      const rate = ((100 - Number(value)) / 100).toFixed(2);
-      const initSalePrice = (Number(price) * Number(rate)).toFixed(2);
-      newProductDetail = Object.assign({}, productDetail, {
-        discount: value,
-        sale_price: initSalePrice,
-      });
-    } else {
-      newProductDetail = Object.assign({}, productDetail, { discount: value, sale_price });
-    }
-    setProductDetail(newProductDetail);
+  // 创建销售规格
+  const createProductSaleSku = () => {
+    setSaleSkuOperateType(false);
+    setCreateProductSkuDrawer(true);
   };
   // 商品重量
   const productWeightInputHandle = (value: string) => {
@@ -268,21 +242,6 @@ function ProductCreateSku() {
     }
     return html;
   };
-  const handelRadioAvailability = (event: Event) => {
-    const { value } = event.target;
-    const newProductDetail = Object.assign({}, productDetail, { availability: value });
-    setProductDetail(newProductDetail);
-  };
-  // 商品组 ID [item_group_id]
-  const itemGroupIdInputHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { item_group_id: value });
-    setProductDetail(newProductDetail);
-  };
-  // 颜色 [color]
-  const colorInputHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { color: value });
-    setProductDetail(newProductDetail);
-  };
   // 年龄段 [age_group]
   const ageGroupSelectHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { age_group: value });
@@ -291,31 +250,6 @@ function ProductCreateSku() {
   // 适用性别 [gender]
   const genderSelectHandle = (value: string) => {
     const newProductDetail = Object.assign({}, productDetail, { age_group: value });
-    setProductDetail(newProductDetail);
-  };
-  // 材质 [material]
-  const materialInputHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { material: value });
-    setProductDetail(newProductDetail);
-  };
-  // 图案 [pattern]
-  const patternInputHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { pattern: value });
-    setProductDetail(newProductDetail);
-  };
-  // 尺寸 [size]
-  const sizeInputHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { size: value });
-    setProductDetail(newProductDetail);
-  };
-  // 尺码类型 [size_type]
-  const sizeTypeSelectHandle = (value: string | number) => {
-    const newProductDetail = Object.assign({}, productDetail, { size_type: value });
-    setProductDetail(newProductDetail);
-  };
-  // 尺码体系 [size_system]
-  const sizeSystemSelectHandle = (value: string) => {
-    const newProductDetail = Object.assign({}, productDetail, { size_system: value });
     setProductDetail(newProductDetail);
   };
   // 重量单位选择
@@ -357,13 +291,22 @@ function ProductCreateSku() {
   // 重置主数据
   const resetProductMainDetail = async () => {
     const data = Object.assign({}, queryParams, { language: currentLanguage });
-    await queryProductMainDetailFetch(data);
+    await queryProductMainDetailFetch(data, 'reset');
   };
   // 提交创建SKU
-  const handelSubmitCreateSku = async (product_sku_option_status: number) => {
+  const handelSubmitCreateSku = async (product_sku_option_status: number | string) => {
     const { image_link, additional_image_link, lifestyle_image_link } = productDetail;
-    if (image_link && additional_image_link.length <= 6 && lifestyle_image_link.length <= 10) {
-      if (product_sku_option_status > 0) {
+    if (
+      image_link &&
+      additional_image_link.length <= 6 &&
+      lifestyle_image_link.length <= 10 &&
+      saleSkuItems &&
+      saleSkuItems[0]
+    ) {
+      const newProductDetail = Object.assign({}, productDetail, { saleSkus: saleSkuItems });
+      setProductDetail(newProductDetail);
+      console.log('handelSubmitCreateSku productDetail:', newProductDetail);
+      if (Number(product_sku_option_status) > 0) {
         await editProductFetch();
       } else {
         await createProductFetch();
@@ -384,8 +327,132 @@ function ProductCreateSku() {
       },
     ];
   };
+  const handelTableEdit = (record: any) => {
+    setSaleSkuOperateType(true);
+    setSaleSkuData(record);
+    setCreateProductSkuDrawer(true);
+  };
+  const handelTableDel = async (record: any) => {
+    const { product_main_id, language } = productDetail;
+    if (record && record.id) {
+      Modal.confirm({
+        title: '确认删除',
+        content: '删除商品售卖规格',
+        onOk: async () => {
+          await saleSkuDelFetch({ product_main_id, language, id: record.id });
+        },
+      });
+    }
+  };
+  const saleSkuColumns = () => {
+    return [
+      {
+        title: '属性类型',
+        dataIndex: 'saleType',
+        key: 'saleType',
+        render: (_: any, record: any) => {
+          if (
+            record.saleType &&
+            optionsProductSaleTypeObj &&
+            optionsProductSaleTypeObj[record.saleType]
+          ) {
+            return optionsProductSaleTypeObj[record.saleType];
+          } else {
+            return '-';
+          }
+        },
+      },
+      {
+        title: '属性类型值',
+        dataIndex: 'saleValue',
+        key: 'saleValue',
+        render: (_: any, record: any) => {
+          let html;
+          if (record.saleType === 'pattern' && record.pattern_name && record.pattern) {
+            html = (
+              <>
+                <img src={record.pattern} className="img" width={50} />
+                <span className="name">{record.pattern_name}</span>
+              </>
+            );
+          } else {
+            if (!record.saleValue) {
+              html = '-';
+            } else {
+              html = record.saleValue;
+            }
+          }
+          return html;
+        },
+      },
+      {
+        title: '价格',
+        dataIndex: 'price',
+        key: 'price',
+        render: (_: any, record: any) => {
+          return `${record.price} ${record.monetary_unit}`;
+        },
+      },
+      {
+        title: '售卖价格',
+        dataIndex: 'sale_price',
+        key: 'sale_price',
+        render: (_: any, record: any) => {
+          return `${record.sale_price} ${record.monetary_unit}`;
+        },
+      },
+      {
+        title: '折扣',
+        dataIndex: 'discount',
+        key: 'discount',
+        render: (_: any, record: any) => {
+          return `${record.discount}%`;
+        },
+      },
+      {
+        title: '是否有货',
+        dataIndex: 'availability',
+        key: 'availability',
+        render: (_: any, record: any) => {
+          let html;
+          if (record.availability === 'in_stock') {
+            html = '有货';
+          } else {
+            html = '无货';
+          }
+          return html;
+        },
+      },
+      {
+        title: '操作',
+        dataIndex: 'operate',
+        render: (_: any, record: any) => {
+          return (
+            <div className="operate">
+              <span
+                className="tx"
+                onClick={() => {
+                  handelTableEdit(record);
+                }}
+              >
+                编辑
+              </span>
+              <span className="line">|</span>
+              <span
+                className="tx"
+                onClick={() => {
+                  handelTableDel(record);
+                }}
+              >
+                删除
+              </span>
+            </div>
+          );
+        },
+      },
+    ];
+  };
   const {
-    monetary_unit,
     image_link,
     additional_image_link,
     lifestyle_image_link,
@@ -394,22 +461,11 @@ function ProductCreateSku() {
     mobile_link,
     description,
     title,
-    price,
-    sale_price,
-    discount,
-    color,
-    material,
     product_highlight,
-    availability,
     productWeight,
     product_detail,
-    item_group_id,
     age_group,
     gender,
-    pattern,
-    size,
-    size_type,
-    size_system,
     weightUnit,
     sizeUnit,
     productHeight,
@@ -433,7 +489,6 @@ function ProductCreateSku() {
     baseWeightUnit,
   } = productDetail;
   const productTypeName = productTypeNameStr();
-
   useEffect(() => {
     initQueryParams();
   }, []);
@@ -446,7 +501,7 @@ function ProductCreateSku() {
           <div className="header">
             <div className="sub-header">
               <span>主数据</span>
-              <Button className="reset-main-button" onClick={resetProductMainDetail}>
+              <Button className="reset-main-button" type="primary" onClick={resetProductMainDetail}>
                 同步产品主数据
               </Button>
             </div>
@@ -582,7 +637,7 @@ function ProductCreateSku() {
             </Row>
           </div>
           <div className="header">
-            <div className="sub-header">基本商品数据</div>
+            <div className="sub-header">基础商品数据</div>
           </div>
           <div className="content form-box">
             <div className="form-item">
@@ -737,84 +792,27 @@ function ProductCreateSku() {
             </div>
           </div>
           <div className="header">
-            <div className="sub-header">价格和库存状况</div>
+            <div className="sub-header">
+              <span>价格和库存状况</span>
+              <Button className="reset-main-button" type="primary" onClick={createProductSaleSku}>
+                创建销售规格
+              </Button>
+            </div>
           </div>
           <div className="content form-box">
-            <div className="form-item">
-              <span className="label">
-                <i>*</i> 选择货币单位:
-              </span>
-              <Select
-                value={monetary_unit}
-                style={{ width: 130 }}
-                onChange={monetaryUnitSelectHandle}
-                options={monetaryUnitOption}
+            <div className="table-box">
+              <Table
+                dataSource={saleSkuItems}
+                columns={saleSkuColumns()}
+                rowKey={(record) => `${record.saleType}_${record.id}`}
+                pagination={false}
               />
-            </div>
-            <div className="form-item">
-              <LabelHelpTip keyLabel="price"></LabelHelpTip>
-              <InputText
-                placeholder="价格"
-                style={{ width: 130 }}
-                value={price}
-                suffix={monetary_unit}
-                disabled
-              />
-            </div>
-            <div className="form-item">
-              <LabelHelpTip keyLabel="discount"></LabelHelpTip>
-              <InputNumber
-                placeholder="折扣"
-                style={{ width: 130 }}
-                max={'60'}
-                min={'0'}
-                value={discount}
-                onChange={discountInputHandle}
-                suffix="%"
-              />
-            </div>
-            <div className="form-item">
-              <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
-              <InputText
-                placeholder="售卖价格"
-                style={{ width: 130 }}
-                value={sale_price}
-                onChange={salePriceInputHandle}
-                suffix={monetary_unit}
-              />
-            </div>
-            <div className="form-item">
-              <LabelHelpTip keyLabel="availability"></LabelHelpTip>
-              <Radio.Group value={availability} onChange={handelRadioAvailability}>
-                <Radio value="in_stock"> 有货 </Radio>
-                <Radio value="out_of_stock"> 缺货 </Radio>
-              </Radio.Group>
             </div>
           </div>
           <div className="header">
-            <div className="sub-header">详细商品描述&创建商品组合</div>
+            <div className="sub-header">详细商品描述</div>
           </div>
           <div className="content form-box">
-            {/** 商品组 ID [item_group_id] */}
-            <div className="form-item">
-              <LabelHelpTip keyLabel="item_group_id"></LabelHelpTip>
-              <InputText
-                placeholder="商品组 ID"
-                style={{ width: 120 }}
-                value={item_group_id}
-                onChange={itemGroupIdInputHandle}
-              />
-            </div>
-            {/* 颜色 [color] */}
-            <div className="form-item">
-              <LabelHelpTip keyLabel="color"></LabelHelpTip>
-              <InputText
-                placeholder="商品颜色"
-                style={{ width: 300 }}
-                value={color}
-                onChange={colorInputHandle}
-              />
-            </div>
             {/* 年龄段 [age_group] */}
             <div className="form-item">
               <LabelHelpTip keyLabel="age_group"></LabelHelpTip>
@@ -833,50 +831,6 @@ function ProductCreateSku() {
                 style={{ width: 120 }}
                 onChange={genderSelectHandle}
                 options={genderOption}
-              />
-            </div>
-            {/* 材质 [material] */}
-            <div className="form-item">
-              <LabelHelpTip keyLabel="material"></LabelHelpTip>
-              <InputText
-                placeholder="商品材料"
-                style={{ width: 300 }}
-                value={material}
-                onChange={materialInputHandle}
-              />
-            </div>
-            {/* 图案 [pattern] */}
-            <div className="form-item">
-              <LabelHelpTip keyLabel="pattern"></LabelHelpTip>
-              <InputText
-                placeholder="商品图案"
-                style={{ width: 300 }}
-                value={pattern}
-                onChange={patternInputHandle}
-              />
-            </div>
-            {/* 尺寸 [size] */}
-            <div className="form-item">
-              <LabelHelpTip keyLabel="size"></LabelHelpTip>
-              <InputText
-                placeholder="商品尺寸"
-                style={{ width: 150 }}
-                value={size}
-                onChange={sizeInputHandle}
-              />
-              <LabelHelpTip keyLabel="size_type"></LabelHelpTip>
-              <Select
-                value={size_type}
-                style={{ width: 80 }}
-                onChange={sizeTypeSelectHandle}
-                options={sizeTypeOption}
-              />
-              <LabelHelpTip keyLabel="size_system"></LabelHelpTip>
-              <Select
-                value={size_system}
-                style={{ width: 80 }}
-                onChange={sizeSystemSelectHandle}
-                options={sizeSystemOption}
               />
             </div>
             {/**== 尺码类型 [size_type] */}
@@ -953,11 +907,12 @@ function ProductCreateSku() {
               <Button
                 type="primary"
                 size="large"
+                disabled={buttonSubmitCreateSkuLoading}
                 onClick={() => {
                   handelSubmitCreateSku(queryParams && queryParams.product_sku_option_status);
                 }}
               >
-                {queryParams && queryParams.product_sku_option_status > 0
+                {queryParams && Number(queryParams.product_sku_option_status) > 0
                   ? '确认编辑SKU商品'
                   : '确认创建SKU商品'}
               </Button>
@@ -966,11 +921,11 @@ function ProductCreateSku() {
         </div>
       </div>
       <ProductAttribute callbackOk={productAttributeCallbackOk}></ProductAttribute>
-      <ImageSelectModal
-        callbackOk={productImageCallbackOk}
-        selectedType={currentImageProductType}
-        imageLimitNum={imageLimitNum}
-      ></ImageSelectModal>
+      <ImageSelectModal callbackOk={productImageCallbackOk}></ImageSelectModal>
+      <CreateProductSkuDrawer
+        isOpen={isCreateProductSkuDrawer}
+        skuDrawerCallback={skuDrawerCallbackStatus}
+      ></CreateProductSkuDrawer>
       <YouTubeVideoPlayModal
         youTubeCallbackStatus={youTubeCallbackStatus}
         youTubeId={youTubeId}

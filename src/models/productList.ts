@@ -100,12 +100,12 @@ function ProductList() {
     }
   };
   const delProductFetch = async (data: any) => {
-    const { id, language } = data;
+    const { id, language, product_main_id } = data;
     if (id) {
-      const result = await delProduct({ id, language });
+      const result = await delProduct({ id, language, product_main_id });
       if (result && result.status && result.status === 200) {
         await queryProductAllFetch();
-        console.log('删除商品SKU分类成功');
+        console.log('删除商品SKU成功');
       }
     }
   };
@@ -143,6 +143,7 @@ function ProductList() {
   return {
     onLoading,
     productList,
+    productMainOfferIds,
     initQueryParams,
     pagination,
     setPagination,

@@ -12,5 +12,6 @@
     "metas",
     "mfsu",
     "oneapi"
-  ]
+  ],
+  "i18n-ally.localesPaths": ["src/locales"]
 }

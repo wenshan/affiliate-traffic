@@ -3,7 +3,6 @@
 const defaultProductDetail = {
   id: '',
   product_id: '',
-  item_group_id: '',
   age_group: 'adult',
   gender: 'unisex',
   pattern: '',
@@ -24,7 +23,9 @@ const defaultProductDetail = {
   image_link: '',
   additional_image_link: [],
   lifestyle_image_link: [],
-  google_product_category: '',
+  google_product_category: {
+    title: '',
+  },
   google_product_category_id: '',
   product_type: [],
   product_type_id: '',
@@ -63,6 +64,7 @@ const defaultProductDetail = {
   baseProductWeight: '',
   baseSizeUnit: 'cm',
   baseWeightUnit: 'g',
+  saleSkus: [],
 };
 const defaultCurrentProductMain = {
   id: '',
@@ -267,6 +269,42 @@ const costsExchangeInit = {
   exchange_g2lb: 0.0022046,
 };
 
+const optionsProductSaleType = [
+  { label: '默认', value: 'default' },
+  { label: '图案', value: 'pattern' },
+  { label: '颜色', value: 'color' },
+  { label: '尺寸', value: 'size' },
+  { label: '材质', value: 'material' },
+];
+
+const optionsProductSaleTypeObj = {
+  default: '默认',
+  pattern: '图案',
+  color: '颜色',
+  size: '尺寸',
+  material: '材质',
+};
+
+const defaultSaleSkuData = {
+  product_id: '',
+  product_main_id: '',
+  item_group_id: '',
+  language: '',
+  saleType: 'default',
+  saleValue: '',
+  color: '',
+  material: '',
+  pattern: '',
+  pattern_name: '',
+  size: '',
+  price: '0',
+  sale_price: '0',
+  discount: '',
+  monetary_unit: 'USD',
+  availability: 'in_stock',
+  projectId: '',
+};
+
 export {
   ageGroupOption,
   costsExchangeInit,
@@ -275,12 +313,15 @@ export {
   defaultCurrentProductMain,
   defaultProductCustomType,
   defaultProductDetail,
+  defaultSaleSkuData,
   defaultSizeUnitCountry,
   defaultWeightUnitCountry,
   genderOption,
   languageOption,
   languageOptionDropdown,
   monetaryUnitOption,
+  optionsProductSaleType,
+  optionsProductSaleTypeObj,
   productSizeUnitOption,
   productSizeUnitOptionMain,
   productWeightUnitOption,

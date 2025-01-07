@@ -8,7 +8,6 @@ import {
   delProductMain,
   editProductMain,
   queryProductMainAll,
-  queryProductMainDetail,
 } from '@/services/api/productMain';
 import { message } from 'antd';
 import { useState } from 'react';
@@ -114,26 +113,6 @@ function ProductMainModel() {
     const result = await costsExchangeQuery();
     if (result && result.status === 200 && result.data) {
       setCostsExchange(result.data);
-    } else {
-      message.error({ content: result.msg });
-    }
-  };
-  // 获取详情
-  const queryProductMainDetailFetch = async (data: QueryParamsInitType) => {
-    const result = await queryProductMainDetail();
-    if (result && result.status === 200 && result.data) {
-      const productTypeNameArr: Array<string> = [];
-      if (result.data.product_type && result.data.product_type.length > 0) {
-        result.data.product_type.forEach((item: ProductTypeType) => {
-          if (item.title_zh) {
-            productTypeNameArr.push(item.title_zh);
-          }
-        });
-        const productTypeNameStr: string =
-          (productTypeNameArr[0] && productTypeNameArr.join(',')) || '';
-        setProductTypeName(productTypeNameStr);
-      }
-      setProductMainDetail(result.data);
     } else {
       message.error({ content: result.msg });
     }

@@ -36,6 +36,8 @@ export const googleGetUserinfo = async (params?: ParamsType) => {
 export async function currentUser(options?: ParamsType) {
   return request<{
     data: API.CurrentUser;
+    status: number;
+    msg: string | null;
   }>('/api/user/currentUser', {
     method: 'POST',
     data: options,

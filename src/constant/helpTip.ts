@@ -426,4 +426,12 @@ export default {
     exam: '1:1',
     link: '',
   },
+  saleType: {
+    title: '产品售卖属性',
+    des: '产品售卖属性',
+    rule: '',
+    required: true,
+    exam: '',
+    link: '',
+  },
 };

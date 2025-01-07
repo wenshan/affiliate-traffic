@@ -18,6 +18,7 @@ declare namespace API {
     };
     address?: string;
     phone?: string;
+    [key: string]: any;
   };
 
   type ErrorResponse = {

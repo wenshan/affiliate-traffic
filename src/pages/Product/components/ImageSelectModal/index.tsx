@@ -1,9 +1,9 @@
+import ImgList from '@/pages/Material/components/ImgList';
 import Tool from '@/utils/tool';
 import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { Col, Modal, Row } from 'antd';
 import { JSX, useEffect } from 'react';
 import { useModel } from 'umi';
-import ImgList from '../../../Material/components/ImgList';
 
 import './index.less';
 
@@ -18,6 +18,8 @@ function ImageSelectModal(props: any) {
     setProductSkuImageModalStatus,
     updateOperateSelectFolderDirectory,
     setCurrentOperateMaterial,
+    currentImageProductType,
+    imageLimitNum,
   } = useModel('material');
 
   // const [limit] = useState(props.imageLimitNum || 20);
@@ -174,14 +176,15 @@ function ImageSelectModal(props: any) {
   };
   const imageSubTitle = () => {
     let html = '';
-    const { selectedType, imageLimitNum } = props;
-    if (selectedType === 'image_link') {
+    if (currentImageProductType === 'image_link') {
       html = `选择商品主图（选择${imageLimitNum}张图片）`;
-    } else if (selectedType === 'additional_image_link') {
+    } else if (currentImageProductType === 'additional_image_link') {
       html = `商品附加图片（选择${imageLimitNum}张图片）`;
       // eslint-disable-next-line eqeqeq
-    } else if (selectedType === 'lifestyle_image_link') {
+    } else if (currentImageProductType === 'lifestyle_image_link') {
       html = `添加商品详情（最多选择${imageLimitNum}张图片）`;
+    } else if (currentImageProductType === 'pattern') {
+      html = `添加商品售卖规格（最多选择${imageLimitNum}张图片）`;
     }
     return html;
   };
@@ -200,6 +203,7 @@ function ImageSelectModal(props: any) {
         width={1100}
         onOk={handleOk}
         onCancel={handleCancel}
+        zIndex={9999}
       >
         <div className="content">
           <Row>
@@ -216,7 +220,7 @@ function ImageSelectModal(props: any) {
             <Col span={19}>
               <div className="sub-title">{imageSubTitle()}</div>
               <div className="imglist-modal">
-                <ImgList limit={props.imageLimitNum}></ImgList>
+                <ImgList></ImgList>
               </div>
             </Col>
           </Row>
