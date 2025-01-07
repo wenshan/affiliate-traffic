@@ -2,11 +2,11 @@ import InputText from '@/components/InputText';
 import { monetaryUnitOption, optionsProductSaleType } from '@/constant/defaultCurrentData';
 import ResizeImg from '@/constant/resizeImg';
 import ImageSelectModal from '@/pages/Product/components/ImageSelectModal';
+import LabelHelpTip from '@/pages/Product/components/LabelHelpTip';
 import { CloseOutlined, PictureOutlined } from '@ant-design/icons';
 import type { RadioChangeEvent } from 'antd';
 import { Button, Drawer, InputNumber, Radio, Select, Space, message } from 'antd';
 import { useModel } from 'umi';
-import LabelHelpTip from '../LabelHelpTip';
 
 import './index.less';
 
