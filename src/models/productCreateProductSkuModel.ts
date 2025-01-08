@@ -6,6 +6,7 @@ import {
   defaultCurrentProductMain,
   defaultProductDetail,
   defaultSaleSkuData,
+  optionsProductSaleType,
 } from '@/constant/defaultCurrentData';
 import { costsExchangeQuery } from '@/services/api/googleMerchant';
 import { createProduct, editProduct, queryProductDetail } from '@/services/api/product';
@@ -18,7 +19,7 @@ import {
 } from '@/services/api/productSaleSku';
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import { history } from 'umi';
 
 type QueryParamsType = {
@@ -72,7 +73,12 @@ const queryParamsInit = {
   product_sku_option_status: '0',
 };
 
+const saleSkuDataMap = new Map();
+
 function productCreateProductSkuModel() {
+  const [saleTypeSelectButtonOk, setSaleTypeSelectButtonOk] = useState(false);
+  const [optionsProductSaleTypeData, setOptionsProductSaleTypeDate] =
+    useState(optionsProductSaleType);
   const [buttonSubmitCreateSkuLoading, setButtonSubmitCreateSkuLoading] = useState(false);
   const [queryParams, setQueryParams] = useState<QueryParamsInitType>(queryParamsInit);
   const [currentLanguage, setCurrentLanguage] = useState('zh-CN');
@@ -240,6 +246,28 @@ function productCreateProductSkuModel() {
         setCurrentPreSalePrice(preSalePrice);
         setProductDetail(result.data);
         setSaleSkuItems(saleSkus);
+        const newOptionsProductSaleTypeData: SetStateAction<
+          { label: string; value: string; disabled: boolean }[]
+        > = [];
+        if (saleSkus && saleSkus.length) {
+          saleSkus.forEach((item: { saleType: string }) => {
+            console.log(item);
+            saleSkuDataMap.set(item.saleType, item);
+          });
+          if (saleSkuDataMap.get('default')) {
+            optionsProductSaleTypeData.forEach((item) => {
+              newOptionsProductSaleTypeData.push(Object.assign({}, item, { disabled: true }));
+            });
+            setOptionsProductSaleTypeDate(newOptionsProductSaleTypeData);
+            setSaleTypeSelectButtonOk(true);
+          } else {
+            setSaleTypeSelectButtonOk(false);
+            optionsProductSaleTypeData.forEach((item) => {
+              newOptionsProductSaleTypeData.push(Object.assign({}, item, { disabled: false }));
+            });
+            setOptionsProductSaleTypeDate(newOptionsProductSaleTypeData);
+          }
+        }
       }
     }
   };
@@ -395,6 +423,7 @@ function productCreateProductSkuModel() {
   // SKU创建
   const saleSkuCerateTempFetch = async (data: any) => {
     const { language, product_main_id } = data;
+    debugger;
     const { saleType, price, sale_price, discount, monetary_unit, availability } = saleSkuData;
     if (
       saleType &&
@@ -443,6 +472,28 @@ function productCreateProductSkuModel() {
       if (result && result.status === 200 && result.data && result.data.rows) {
         setSaleSkuItems(result.data.rows);
         setButtonSubmitCreateSkuLoading(false);
+        const newOptionsProductSaleTypeData: SetStateAction<
+          { label: string; value: string; disabled: boolean }[]
+        > = [];
+        if (result.data.rows && result.data.rows.length) {
+          result.data.rows.forEach((item: { saleType: string }) => {
+            console.log(item);
+            saleSkuDataMap.set(item.saleType, item);
+          });
+          if (saleSkuDataMap.get('default')) {
+            optionsProductSaleTypeData.forEach((item) => {
+              newOptionsProductSaleTypeData.push(Object.assign({}, item, { disabled: true }));
+            });
+            setOptionsProductSaleTypeDate(newOptionsProductSaleTypeData);
+            setSaleTypeSelectButtonOk(true);
+          } else {
+            setSaleTypeSelectButtonOk(false);
+            optionsProductSaleTypeData.forEach((item) => {
+              newOptionsProductSaleTypeData.push(Object.assign({}, item, { disabled: false }));
+            });
+            setOptionsProductSaleTypeDate(newOptionsProductSaleTypeData);
+          }
+        }
       } else {
         message.warning({ content: result.msg });
       }
@@ -481,6 +532,10 @@ function productCreateProductSkuModel() {
     saleSkuEditFetch,
     saleSkuDelFetch,
     saleSkuQueryTempFetch,
+    saleTypeSelectButtonOk,
+    setSaleTypeSelectButtonOk,
+    optionsProductSaleTypeData,
+    setOptionsProductSaleTypeDate,
   };
 }
 export default productCreateProductSkuModel;

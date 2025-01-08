@@ -270,11 +270,11 @@ const costsExchangeInit = {
 };
 
 const optionsProductSaleType = [
-  { label: '默认', value: 'default' },
-  { label: '图案', value: 'pattern' },
-  { label: '颜色', value: 'color' },
-  { label: '尺寸', value: 'size' },
-  { label: '材质', value: 'material' },
+  { label: '一口价', value: 'default', disabled: false },
+  { label: '图案', value: 'pattern', disabled: false },
+  { label: '颜色', value: 'color', disabled: false },
+  { label: '尺寸', value: 'size', disabled: false },
+  { label: '材质', value: 'material', disabled: false },
 ];
 
 const optionsProductSaleTypeObj = {
@@ -291,7 +291,7 @@ const defaultSaleSkuData = {
   item_group_id: '',
   language: '',
   saleType: 'default',
-  saleValue: '',
+  saleValue: '一口价售卖',
   color: '',
   material: '',
   pattern: '',

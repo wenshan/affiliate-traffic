@@ -1,5 +1,5 @@
 import InputText from '@/components/InputText';
-import { monetaryUnitOption, optionsProductSaleType } from '@/constant/defaultCurrentData';
+import { monetaryUnitOption } from '@/constant/defaultCurrentData';
 import ResizeImg from '@/constant/resizeImg';
 import ImageSelectModal from '@/pages/Product/components/ImageSelectModal';
 import LabelHelpTip from '@/pages/Product/components/LabelHelpTip';
@@ -20,6 +20,8 @@ export default (props: any) => {
     saleSkuOperateType,
     saleSkuCerateTempFetch,
     saleSkuEditFetch,
+    optionsProductSaleTypeData,
+    saleTypeSelectButtonOk,
   } = useModel('productCreateProductSkuModel');
 
   const {
@@ -35,10 +37,16 @@ export default (props: any) => {
   };
   const saleTypeRadioOnChange = (e: RadioChangeEvent) => {
     const { value } = e.target;
+    let saleValueInit = '';
     if (value) {
+      if (value === 'default') {
+        saleValueInit = '一口价售卖';
+      } else {
+        saleValueInit = '';
+      }
       const newSaleSkuData = Object.assign({}, saleSkuData, {
         saleType: value,
-        saleValue: '',
+        saleValue: saleValueInit,
         color: '',
         material: '',
         pattern: '',
@@ -119,7 +127,7 @@ export default (props: any) => {
         <>
           <LabelHelpTip keyLabel={saleType}></LabelHelpTip>
           <InputText
-            placeholder="售卖属性名称"
+            placeholder="售卖规格名称"
             style={{ width: 250 }}
             value={saleValue}
             onChange={(value) => {
@@ -138,7 +146,7 @@ export default (props: any) => {
       ) {
         html = inputText;
       } else {
-        html = <div className="tx">当前一个单品售卖</div>;
+        html = <div className="tx">一口价售卖</div>;
       }
     }
     return html;
@@ -268,7 +276,7 @@ export default (props: any) => {
       footer={
         <Space>
           <Button onClick={handleCancel}>取消</Button>
-          <Button onClick={handleOk} type="primary">
+          <Button onClick={handleOk} disabled={saleTypeSelectButtonOk} type="primary">
             确认
           </Button>
         </Space>
@@ -279,9 +287,9 @@ export default (props: any) => {
           <LabelHelpTip keyLabel="saleType"></LabelHelpTip>
           <Radio.Group
             onChange={saleTypeRadioOnChange}
-            defaultValue="pattern"
+            defaultValue="default"
             value={saleType}
-            options={optionsProductSaleType}
+            options={optionsProductSaleTypeData}
           ></Radio.Group>
         </div>
         <div className="form-item">

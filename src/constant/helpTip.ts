@@ -427,8 +427,8 @@ export default {
     link: '',
   },
   saleType: {
-    title: '产品售卖属性',
-    des: '产品售卖属性',
+    title: '产品售卖规则',
+    des: '产品售卖规则',
     rule: '',
     required: true,
     exam: '',
