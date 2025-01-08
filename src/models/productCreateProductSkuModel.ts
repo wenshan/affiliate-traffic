@@ -235,6 +235,7 @@ function productCreateProductSkuModel() {
     if (product_id && language) {
       const result = await queryProductDetail({ id: product_id, language: realLanguage });
       if (result && result.status && result.status === 200 && result.data) {
+        setButtonSubmitCreateSkuLoading(false);
         const { targetCountry, preSalePrice, saleSkus } = result.data;
         // @ts-check
         const targetCountryUnit =
@@ -307,6 +308,7 @@ function productCreateProductSkuModel() {
     ) {
       const result = await editProduct(productDetail);
       if (result && result.status && result.status === 200) {
+        setButtonSubmitCreateSkuLoading(false);
         Modal.confirm({
           title: '编辑成功',
           content: '编辑商品SKU成功,返回到列表页面',
@@ -375,6 +377,7 @@ function productCreateProductSkuModel() {
     ) {
       const result = await createProduct(productDetail);
       if (result && result.status === 200) {
+        setButtonSubmitCreateSkuLoading(false);
         Modal.confirm({
           title: '创建成功',
           content: '创建商品SKU,返回到列表页面',
