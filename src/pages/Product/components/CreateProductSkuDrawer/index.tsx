@@ -21,7 +21,6 @@ export default (props: any) => {
     saleSkuCerateTempFetch,
     saleSkuEditFetch,
     optionsProductSaleTypeData,
-    saleTypeSelectButtonOk,
   } = useModel('productCreateProductSkuModel');
 
   const {
@@ -267,7 +266,7 @@ export default (props: any) => {
       width={650}
       className="product-sku-drawer"
       open={props.isOpen}
-      title="新建销售规格"
+      title={`${saleSkuOperateType ? '编辑销售规格' : '新建销售规格'}`}
       closable
       destroyOnClose
       placement="right"
@@ -276,7 +275,7 @@ export default (props: any) => {
       footer={
         <Space>
           <Button onClick={handleCancel}>取消</Button>
-          <Button onClick={handleOk} disabled={saleTypeSelectButtonOk} type="primary">
+          <Button onClick={handleOk} type="primary">
             确认
           </Button>
         </Space>

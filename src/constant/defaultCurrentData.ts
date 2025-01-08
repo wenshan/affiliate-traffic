@@ -278,7 +278,7 @@ const optionsProductSaleType = [
 ];
 
 const optionsProductSaleTypeObj = {
-  default: '默认',
+  default: '一口价',
   pattern: '图案',
   color: '颜色',
   size: '尺寸',

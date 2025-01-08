@@ -423,7 +423,6 @@ function productCreateProductSkuModel() {
   // SKU创建
   const saleSkuCerateTempFetch = async (data: any) => {
     const { language, product_main_id } = data;
-    debugger;
     const { saleType, price, sale_price, discount, monetary_unit, availability } = saleSkuData;
     if (
       saleType &&
