@@ -113,7 +113,7 @@ function ProductList() {
         title: '价格',
         dataIndex: 'price',
         key: 'price',
-        render: (_, record: any) => {
+        render: (_: any, record: any) => {
           const html: any = [];
           if (record && record.price && record.monetary_unit) {
             html.push(
