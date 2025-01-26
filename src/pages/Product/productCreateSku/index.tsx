@@ -297,7 +297,7 @@ function ProductCreateSku() {
     if (
       image_link &&
       additional_image_link.length <= 6 &&
-      lifestyle_image_link.length <= 10 &&
+      lifestyle_image_link.length <= 30 &&
       saleSkuItems &&
       saleSkuItems[0]
     ) {
@@ -749,7 +749,7 @@ function ProductCreateSku() {
                   >
                     添加生活图片
                   </Button>
-                  <span className="des">（限最多10张产品生活图）</span>
+                  <span className="des">（限最多30张产品生活图）</span>
                 </div>
                 <div className="line-box">
                   <div className="add-img-list">
