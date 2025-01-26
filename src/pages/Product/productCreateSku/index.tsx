@@ -46,7 +46,7 @@ function ProductCreateSku() {
     setSaleSkuOperateType,
     saleSkuDelFetch,
   } = useModel('productCreateProductSkuModel');
-  const { product_sku_option_status, product_main_id, language } = queryParams;
+  const { product_sku_option_status, product_main_id } = queryParams;
   const { setProductAttributeModalStatus } = useModel('productAttributeModel');
   const {
     setProductSkuImageModalStatus,
@@ -63,8 +63,6 @@ function ProductCreateSku() {
   // TODO: 创建时初始化货币单位
   const languageRadioHandle = (event: RadioChangeEvent) => {
     const { value } = event.target;
-    console.log('currentLanguage:', currentLanguage);
-    console.log('language:', language);
     if (value) {
       // setProductMainDetail(defaultCurrentProductMain);
       const newQueryParams = Object.assign({}, queryParams, { language: value });
@@ -746,7 +744,7 @@ function ProductCreateSku() {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      imageSelectModel('lifestyle_image_link', 10);
+                      imageSelectModel('lifestyle_image_link', 30);
                     }}
                   >
                     添加生活图片

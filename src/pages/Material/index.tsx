@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
+import UploadFiles from './components/UploadFiles';
 
 import './index.less';
 
@@ -424,6 +425,7 @@ function MaterialPage() {
                       新建文件目录
                     </Button>
                     <UploadFile></UploadFile>
+                    <UploadFiles></UploadFiles>
                   </div>
                   <ImgList limit={20}></ImgList>
                   {selectFolderDirectory && (
