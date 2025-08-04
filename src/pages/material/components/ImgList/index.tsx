@@ -12,8 +12,7 @@ import { useModel } from 'umi';
 import './index.less';
 
 function ImgList() {
-  const { imageList, delRemoteMaterialFetch, delMaterialFetch, updateOperateMaterial } =
-    useModel('material');
+  const { imageList, delRemoteMaterialFetch, updateOperateMaterial } = useModel('material');
   // const [ limit] = useState(props.limit || 20);
   const onDownload = async (item: { url: string | URL | Request }) => {
     fetch(item.url)
@@ -44,9 +43,10 @@ function ImgList() {
     } else {
       Modal.confirm({
         title: '确认删除',
-        content: '当前的素材移动到垃圾桶内',
+        content: '当前的素材彻底删除，引用页面失效',
         onOk: async () => {
-          await delMaterialFetch(item);
+          // await delMaterialFetch(item);
+          await delRemoteMaterialFetch(item);
         },
         onCancel() {
           console.log('Cancel');

@@ -3,7 +3,18 @@ import ResizeImg from '@/constant/resizeImg';
 import Tool from '@/utils/tool';
 import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { Button, Col, Modal, Row, Select, Spin, Table, TableProps, message } from 'antd';
+import {
+  Button,
+  Col,
+  Modal,
+  Pagination,
+  Row,
+  Select,
+  Spin,
+  Table,
+  TableProps,
+  message,
+} from 'antd';
 import { JSX, Key, useEffect } from 'react';
 import { history, useModel } from 'umi';
 
@@ -19,8 +30,10 @@ function ProductList() {
   const {
     onLoading,
     initQueryParams,
-    pagination,
-    setPagination,
+    pagePagination,
+    setPagePagination,
+    pageCurrent,
+    setPageCurrent,
     searchParams,
     setSearchParams,
     setProductDetail,
@@ -75,8 +88,10 @@ function ProductList() {
 
   // 翻页
   const handelTablePagination = async (page: any) => {
-    const newPagination = Object.assign({}, pagination, { current: page });
-    setPagination(newPagination);
+    console.log('page:', page);
+    setPageCurrent(page);
+    const newPagination = Object.assign({}, pagePagination, { current: Number(page) });
+    setPagePagination(newPagination);
     await queryProductAllFetch();
   };
 
@@ -86,8 +101,8 @@ function ProductList() {
   };
   // 检索
   const handelSearchParamsButton = async () => {
-    const newPagination = Object.assign({}, pagination, { current: 1 });
-    setPagination(newPagination);
+    const newPagination = Object.assign({}, pagePagination, { current: 1 });
+    setPagePagination(newPagination);
     await queryProductAllFetch();
   };
 
@@ -200,7 +215,16 @@ function ProductList() {
       dataIndex: 'offer_id',
       key: 'offer_id',
       fixed: 'left',
-      width: 70,
+      width: 90,
+      render: (_: any, record: any) => {
+        return (
+          <p>
+            {record.offer_id}
+            <br></br>
+            {record.product_id}
+          </p>
+        );
+      },
     },
     {
       title: '描述',
@@ -529,14 +553,15 @@ function ProductList() {
               scroll={{ x: 1300 }}
               size="small"
               expandable={defaultExpandable}
-              pagination={{
-                position: ['bottomRight'],
-                current: pagination.current,
-                pageSize: pagination.pageSize,
-                total: pagination.total,
-                onChange: handelTablePagination,
-              }}
+              pagination={false}
             />
+            <Pagination
+              align="end"
+              total={pagePagination.total}
+              pageSize={pagePagination.pageSize}
+              current={pageCurrent}
+              onChange={handelTablePagination}
+            ></Pagination>
           </div>
           <div className="footer"></div>
         </div>

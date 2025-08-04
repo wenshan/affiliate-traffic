@@ -212,7 +212,7 @@ export default (props: any) => {
     setSaleSkuData(newSaleSkuData);
   };
   const handleOk = async () => {
-    const { product_main_id, language } = productDetail;
+    const { product_main_id, language, product_id } = productDetail;
     if (!saleSkuData.saleType) {
       message.warning({ content: '请填必要的字段' });
       return false;
@@ -238,9 +238,9 @@ export default (props: any) => {
     ) {
       // 编辑
       if (saleSkuOperateType) {
-        await saleSkuEditFetch({ product_main_id, language });
+        await saleSkuEditFetch({ product_main_id, product_id, language });
       } else {
-        await saleSkuCerateTempFetch({ product_main_id, language });
+        await saleSkuCerateTempFetch({ product_main_id, product_id, language });
       }
       props.skuDrawerCallback(false);
     }

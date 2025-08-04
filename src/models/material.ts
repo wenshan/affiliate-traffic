@@ -460,7 +460,8 @@ function Material() {
   const delRemoteMaterialFetch = async (data: any) => {
     const result = await delRemoteMaterial(data);
     if (result && result.status === 200 && result.data) {
-      await queryFolderMaterialFetch(otherFolderDirectoryInit, 'upload');
+      await queryFolderMaterialFetch(selectFolderDirectory, 'upload');
+      message.success(result.msg);
     } else {
       message.error(result.msg);
     }

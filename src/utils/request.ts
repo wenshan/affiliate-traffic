@@ -5,7 +5,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const limeet = 'https://api.limeetpet.com';
-const dreamstep = 'https://www.dreamstep.top';
 const devUrl = 'http://127.0.0.1:7001';
 
 const isDev = process.env.NODE_ENV === 'development';

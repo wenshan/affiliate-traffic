@@ -1,6 +1,5 @@
 import DefaultProject from '@/components/DefaultProject';
 import InputText from '@/components/InputText';
-import listToTreeSelf from '@/utils/listToTreeSelf';
 import Tool from '@/utils/tool';
 import {
   FolderAddOutlined,
@@ -30,14 +29,10 @@ function MaterialPage() {
     editFolderFetch,
     delFolderFetch,
     folderDirectoryRows,
-    setFolderDirectory,
-    setFolderDirectoryRows,
-    setSelectFolderDirectory,
     queryFolderMaterialFetch,
     folderDirectory,
     checkFolderDirectory,
-    otherFolderDirectory,
-    setOtherFolderDirectory,
+    // otherFolderDirectory,
     updateOperateCheckFolderDirectory,
     updateOperateSelectFolderDirectory,
   } = useModel('material');
@@ -348,17 +343,14 @@ function MaterialPage() {
     }
     return html;
   };
-  const handleClickFolderOtherMenu = async ({ active }: any) => {
-    const newOtherFolderDirectory = Object.assign({}, otherFolderDirectory, { active });
-    setOtherFolderDirectory(newOtherFolderDirectory);
-    const { rowsTree, rowsList } = listToTreeSelf(folderDirectoryRows);
-    setFolderDirectory(rowsTree);
-    setFolderDirectoryRows(rowsList);
-    setSelectFolderDirectory({});
-    if (selectFolderDirectory && selectFolderDirectory.is_leaf === 1) {
-      await queryFolderMaterialFetch(newOtherFolderDirectory);
+  /*
+  const handleClickFolderOtherMenu = async (item: any) => {
+    if (item && item.is_leaf === 1) {
+      await queryFolderMaterialFetch(item);
     }
   };
+  */
+  /*
   const otherFolderMenuHtml = () => {
     const html = [];
     html.push(
@@ -372,7 +364,7 @@ function MaterialPage() {
           <Checkbox disabled={true}></Checkbox>
           <span
             className="label ellipsis"
-            onClick={() => handleClickFolderOtherMenu({ active: true })}
+            onClick={() => handleClickFolderOtherMenu(otherFolderDirectory)}
           >
             {Tool.replaceExceedEnd(otherFolderDirectory.label, 20)}
           </span>
@@ -381,6 +373,7 @@ function MaterialPage() {
     );
     return html;
   };
+  */
 
   useEffect(() => {
     queryFolderFetch();
@@ -399,10 +392,7 @@ function MaterialPage() {
                     <FolderOpenOutlined /> 文件目录
                   </div>
                   <div className="menu-wrap">
-                    <ul>
-                      {folderDirectory && folderMenuHtml()}
-                      {otherFolderMenuHtml()}
-                    </ul>
+                    <ul>{folderDirectory && folderMenuHtml()}</ul>
                   </div>
                 </div>
               </Col>

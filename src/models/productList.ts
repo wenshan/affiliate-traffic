@@ -23,35 +23,19 @@ const initSearchParams = {
     { value: 'zh-CN', label: '中文' },
     { value: 'en-US', label: '英语' },
     { value: 'ja-JP', label: '日语' },
-    { value: 'ko_KR', label: '韩语' },
   ],
 };
-const initProductAttributeOption = [
-  {
-    attribute_name: '',
-    attribute_value: '',
-  },
-];
 function ProductList() {
   const [onLoading, setOnLoading] = useState(false);
-  const [pagination, setPagination] = useState(initPagination);
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pagePagination, setPagePagination] = useState(initPagination);
   const [searchParams, setSearchParams] = useState(initSearchParams);
-  const [product_sku_option_status, set_product_sku_option_status] = useState(0);
-  const [productTypeOption, setProductTypeOption] = useState([]);
-  const [googleProductCategoryOption, setGoogleProductCategoryOption] = useState({});
-  const [productAttributeOption, setProductAttributeOption] = useState(initProductAttributeOption);
   const [productList, setProductList] = useState([]);
-  const [productMainList, setProductMainList] = useState([]);
   const [productMainOfferIds, setProductMainOfferIds] = useState([]);
   const [productDetail, setProductDetail] = useState({});
 
   const initQueryParams = () => {
     const { search } = window.document.location;
-    const pagination = {
-      current: 1,
-      pageSize: 20,
-      total: 0,
-    };
     const query = QueryString.parse(search);
     if (query && query.product_main_id) {
       const newSearchParams = Object.assign({}, searchParams, {
@@ -72,23 +56,24 @@ function ProductList() {
       });
       setSearchParams(newSearchParams);
     }
-    setPagination(initPagination);
+    setPagePagination(initPagination);
   };
   const queryProductAllFetch = async () => {
     const { language, product_type_id, offer_id } = searchParams;
-    const { current, pageSize } = pagination;
-    if (current && pageSize && language) {
+    const { current, pageSize } = pagePagination;
+    if (pageSize && language) {
       const result = await queryProductAll({
-        current,
+        current: pageCurrent,
         pageSize,
         language,
         product_type_id,
         offer_id,
       });
       if (result && result.status && result.status === 200 && result.data && result.data.rows) {
-        const updatePagination = Object.assign({}, pagination, { total: result.data.count });
+        const updatePagination = Object.assign({}, pagePagination, { total: result.data.count });
+        console.log('updatePagination:', updatePagination);
         setProductList(result.data.rows);
-        setPagination(updatePagination);
+        setPagePagination(updatePagination);
         setOnLoading(false);
       } else {
         message.warning({ content: result.msg });
@@ -145,8 +130,10 @@ function ProductList() {
     productList,
     productMainOfferIds,
     initQueryParams,
-    pagination,
-    setPagination,
+    pagePagination,
+    setPagePagination,
+    pageCurrent,
+    setPageCurrent,
     searchParams,
     setSearchParams,
     productDetail,
