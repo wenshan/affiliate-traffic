@@ -763,9 +763,9 @@ export default {
     },
     *queryProductDetail({ payload: data }, { call, put, select }) {
       const { costsExchange } = yield select((state) => state.product);
-      const { id, language } = data;
+      const { id, language, product_id } = data;
       if (id) {
-        const result = yield call(queryProductDetail, { id, language });
+        const result = yield call(queryProductDetail, { id, language, product_id });
         if (result && result.status && result.status === 200 && result.data) {
           // 初始化计算 当前 语种下的 价格
           const { targetCountry, preSalePrice } = result.data;

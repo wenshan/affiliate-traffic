@@ -296,7 +296,7 @@ function ProductCreateSku() {
     const { image_link, additional_image_link, lifestyle_image_link } = productDetail;
     if (
       image_link &&
-      additional_image_link.length <= 6 &&
+      additional_image_link.length <= 8 &&
       lifestyle_image_link.length <= 30 &&
       saleSkuItems &&
       saleSkuItems[0]
@@ -331,13 +331,13 @@ function ProductCreateSku() {
     setCreateProductSkuDrawer(true);
   };
   const handelTableDel = async (record: any) => {
-    const { product_main_id, language } = productDetail;
+    const { product_main_id, language, product_id } = productDetail;
     if (record && record.id) {
       Modal.confirm({
         title: '确认删除',
         content: '删除商品售卖规格',
         onOk: async () => {
-          await saleSkuDelFetch({ product_main_id, language, id: record.id });
+          await saleSkuDelFetch({ product_main_id, language, id: record.id, product_id });
         },
       });
     }

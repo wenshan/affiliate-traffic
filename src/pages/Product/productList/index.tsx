@@ -54,10 +54,11 @@ function ProductList() {
   };
 
   const handelTableEdit = (record: any) => {
+    console.log(record);
     if (record) {
       setProductDetail(record);
       history.push(
-        `/product/productCreateSku?product_main_id=${record.product_main_id}&product_id=${record.id}&language=${record.language}&product_sku_option_status=1`,
+        `/product/productCreateSku?product_main_id=${record.product_main_id}&product_id=${record.product_id}&language=${record.language}&product_sku_option_status=1`,
       );
     }
   };

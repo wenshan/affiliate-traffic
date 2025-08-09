@@ -112,7 +112,7 @@ function productCreateProductSkuModel() {
         }
       } else {
         // 创建
-        if (query.product_main_id && query.language) {
+        if (query.product_main_id && query.language && query.product_id) {
           setProductDetail(defaultProductDetail);
           setProductMainDetail(defaultCurrentProductMain);
           await queryProductMainDetailFetch(query, 'init');
@@ -230,10 +230,14 @@ function productCreateProductSkuModel() {
   };
   // 获取当前商品信息
   const queryProductDetailFetch = async (data: QueryParamsInitType) => {
-    const { product_id, language } = data;
+    const { product_id, language, product_main_id } = data;
     const realLanguage = language || currentLanguage;
-    if (product_id && language) {
-      const result = await queryProductDetail({ id: product_id, language: realLanguage });
+    if (product_id && language && product_main_id) {
+      const result = await queryProductDetail({
+        product_main_id,
+        product_id,
+        language: realLanguage,
+      });
       if (result && result.status && result.status === 200 && result.data) {
         setButtonSubmitCreateSkuLoading(false);
         const { targetCountry, preSalePrice, saleSkus } = result.data;
@@ -414,10 +418,9 @@ function productCreateProductSkuModel() {
     ) {
       setButtonSubmitCreateSkuLoading(true);
       const newSaleSkuData = Object.assign({}, saleSkuData, { product_id });
-      console.log('newSaleSkuData:', newSaleSkuData);
       const result = await saleSkuEdit(newSaleSkuData);
       if (result && result.status && result.status === 200) {
-        await saleSkuQueryTempFetch({ language, product_main_id });
+        await saleSkuQueryTempFetch({ language, product_main_id, product_id });
         message.success({ content: '编辑商品售卖规则成功' });
       } else {
         message.warning({ content: result.msg });
@@ -446,7 +449,7 @@ function productCreateProductSkuModel() {
       const result = await saleSkuCerateTemp(postData);
       if (result && result.status === 200) {
         message.success({ content: '创建商品售卖规则成功' });
-        await saleSkuQueryTempFetch({ language, product_main_id });
+        await saleSkuQueryTempFetch({ language, product_main_id, product_id });
       } else {
         message.warning({ content: result.msg });
       }
@@ -456,13 +459,13 @@ function productCreateProductSkuModel() {
   };
   // SKU 删除
   const saleSkuDelFetch = async (data: any) => {
-    const { id, product_main_id, language } = data;
-    if (id && product_main_id && language) {
+    const { id, product_main_id, language, product_id } = data;
+    if (id && product_main_id && language && product_id) {
       setButtonSubmitCreateSkuLoading(true);
-      const result = await saleSkuDel({ id, product_main_id, language });
+      const result = await saleSkuDel({ id, product_main_id, language, product_id });
       if (result && result.status === 200) {
         message.success({ content: '删除成功' });
-        await saleSkuQueryTempFetch({ language, product_main_id });
+        await saleSkuQueryTempFetch({ language, product_main_id, product_id });
       } else {
         message.warning({ content: result.msg });
       }
@@ -472,9 +475,9 @@ function productCreateProductSkuModel() {
   };
   // SKU 查询
   const saleSkuQueryTempFetch = async (data: any) => {
-    const { language, product_main_id } = data;
-    if (language && product_main_id) {
-      const result = await saleSkuQueryTemp({ language, product_main_id });
+    const { language, product_main_id, product_id } = data;
+    if (language && product_main_id && product_id) {
+      const result = await saleSkuQueryTemp({ language, product_main_id, product_id });
       if (result && result.status === 200 && result.data && result.data.rows) {
         setSaleSkuItems(result.data.rows);
         setButtonSubmitCreateSkuLoading(false);
