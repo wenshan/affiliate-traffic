@@ -212,7 +212,7 @@ export default (props: any) => {
     setSaleSkuData(newSaleSkuData);
   };
   const handleOk = async () => {
-    const { product_main_id, language, product_id } = productDetail;
+    const { product_main_id, language } = productDetail;
     if (!saleSkuData.saleType) {
       message.warning({ content: '请填必要的字段' });
       return false;
@@ -233,14 +233,15 @@ export default (props: any) => {
       saleSkuData.saleType &&
       saleSkuData.price &&
       saleSkuData.sale_price &&
-      saleSkuData.discount &&
-      saleSkuData.availability
+      saleSkuData.availability &&
+      product_main_id &&
+      language
     ) {
       // 编辑
       if (saleSkuOperateType) {
-        await saleSkuEditFetch({ product_main_id, product_id, language });
+        await saleSkuEditFetch({ product_main_id, language });
       } else {
-        await saleSkuCerateTempFetch({ product_main_id, product_id, language });
+        await saleSkuCerateTempFetch({ product_main_id, language });
       }
       props.skuDrawerCallback(false);
     }
@@ -289,6 +290,7 @@ export default (props: any) => {
             defaultValue="default"
             value={saleType}
             options={optionsProductSaleTypeData}
+            disabled={false}
           ></Radio.Group>
         </div>
         <div className="form-item">

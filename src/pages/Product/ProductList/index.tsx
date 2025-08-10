@@ -89,7 +89,6 @@ function ProductList() {
 
   // 翻页
   const handelTablePagination = async (page: any) => {
-    console.log('page:', page);
     setPageCurrent(page);
     const newPagination = Object.assign({}, pagePagination, { current: Number(page) });
     setPagePagination(newPagination);
@@ -448,7 +447,7 @@ function ProductList() {
               className="tx"
               rel="noreferrer"
               target="_blank"
-              href={`https://www.limeetpet.com/detail.html?id=${record.id}&lang=${record.language}`}
+              href={`https://www.limeetpet.com/detail.html?id=${record.id}&product_id=${record.product_id}&lang=${record.language}`}
             >
               详情
             </a>

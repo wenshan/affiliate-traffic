@@ -331,13 +331,13 @@ function ProductCreateSku() {
     setCreateProductSkuDrawer(true);
   };
   const handelTableDel = async (record: any) => {
-    const { product_main_id, language, product_id } = productDetail;
+    const { product_main_id, language } = productDetail;
     if (record && record.id) {
       Modal.confirm({
         title: '确认删除',
         content: '删除商品售卖规格',
         onOk: async () => {
-          await saleSkuDelFetch({ product_main_id, language, id: record.id, product_id });
+          await saleSkuDelFetch({ product_main_id, language, id: record.id });
         },
       });
     }

@@ -544,6 +544,7 @@ export default {
         availability,
         description,
         discount,
+        pattern,
       } = productDetail;
       if (
         title &&
@@ -593,6 +594,7 @@ export default {
           gtin,
           brand,
           discount,
+          pattern,
         });
         if (result && result.status && result.status === 200) {
           yield put({ type: 'queryProductAll' });

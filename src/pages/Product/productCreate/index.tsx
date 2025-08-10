@@ -199,7 +199,7 @@ function ProductCreate() {
               >
                 <Button size="small">
                   <Space>
-                    创建SKU商品
+                    创建多语言SKU商品
                     <DownOutlined />
                   </Space>
                 </Button>
