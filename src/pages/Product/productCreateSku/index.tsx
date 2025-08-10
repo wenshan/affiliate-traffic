@@ -422,6 +422,19 @@ function ProductCreateSku() {
         },
       },
       {
+        title: '绑定状态',
+        key: 'state',
+        render: (_: any, record: any) => {
+          let html;
+          if (record.product_id) {
+            html = '已绑定';
+          } else {
+            html = '未绑定';
+          }
+          return html;
+        },
+      },
+      {
         title: '操作',
         dataIndex: 'operate',
         render: (_: any, record: any) => {

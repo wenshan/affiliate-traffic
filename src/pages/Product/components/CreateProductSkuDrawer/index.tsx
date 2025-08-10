@@ -12,7 +12,7 @@ import './index.less';
 
 export default (props: any) => {
   const { costsExchange, productDetail } = useModel('productCreateProductSkuModel');
-
+  console.log('productDetail:', productDetail);
   const {
     saleSkuData,
     setSaleSkuData,

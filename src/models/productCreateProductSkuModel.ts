@@ -261,7 +261,6 @@ function productCreateProductSkuModel() {
         > = [];
         if (saleSkus && saleSkus.length) {
           saleSkus.forEach((item: { saleType: string }) => {
-            console.log(item);
             saleSkuDataMap.set(item.saleType, item);
           });
           if (saleSkuDataMap.get('default')) {
@@ -278,6 +277,7 @@ function productCreateProductSkuModel() {
             setOptionsProductSaleTypeDate(newOptionsProductSaleTypeData);
           }
         }
+        await saleSkuQueryTempFetch({ language, product_main_id });
       }
     }
   };
@@ -426,7 +426,7 @@ function productCreateProductSkuModel() {
       const result = await saleSkuEdit(newSaleSkuData);
       if (result && result.status && result.status === 200) {
         await saleSkuQueryTempFetch({ language, product_main_id, product_id });
-        await queryProductDetailFetch(queryParams);
+        // await queryProductDetailFetch(queryParams);
         message.success({ content: '编辑商品售卖规则成功' });
       } else {
         message.warning({ content: result.msg });
@@ -470,7 +470,7 @@ function productCreateProductSkuModel() {
       if (result && result.status === 200) {
         message.success({ content: '删除成功' });
         await saleSkuQueryTempFetch({ language, product_main_id });
-        await queryProductDetailFetch(queryParams);
+        // await queryProductDetailFetch(queryParams);
       } else {
         message.warning({ content: result.msg });
       }
@@ -491,7 +491,6 @@ function productCreateProductSkuModel() {
         > = [];
         if (result.data.rows && result.data.rows.length) {
           result.data.rows.forEach((item: { saleType: string }) => {
-            console.log(item);
             saleSkuDataMap.set(item.saleType, item);
           });
           if (saleSkuDataMap.get('default')) {
