@@ -408,10 +408,9 @@ function productCreateProductSkuModel() {
 
   // SKU 编辑
   const saleSkuEditFetch = async (data: any) => {
-    const { language, product_main_id, product_id } = data;
+    const { language, product_main_id } = data;
     const { saleType, price, sale_price, discount, monetary_unit, availability } = saleSkuData;
     if (
-      product_id &&
       monetary_unit &&
       price &&
       sale_price &&
@@ -422,10 +421,9 @@ function productCreateProductSkuModel() {
       availability
     ) {
       setButtonSubmitCreateSkuLoading(true);
-      const newSaleSkuData = Object.assign({}, saleSkuData, { product_id });
-      const result = await saleSkuEdit(newSaleSkuData);
+      const result = await saleSkuEdit(saleSkuData);
       if (result && result.status && result.status === 200) {
-        await saleSkuQueryTempFetch({ language, product_main_id, product_id });
+        await saleSkuQueryTempFetch({ language, product_main_id });
         // await queryProductDetailFetch(queryParams);
         message.success({ content: '编辑商品售卖规则成功' });
       } else {

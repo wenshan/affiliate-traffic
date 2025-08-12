@@ -225,7 +225,6 @@ export default (props: any) => {
       message.warning({ content: '请填必要的字段' });
       return false;
     }
-
     if (
       props.skuDrawerCallback &&
       saleSkuItems &&
