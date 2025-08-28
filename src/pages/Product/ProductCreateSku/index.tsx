@@ -320,14 +320,19 @@ function ProductCreateSku() {
       {
         title: 'Key',
         dataIndex: 'key',
+        key: 'key',
+        width: '20%',
       },
       {
         title: '属性名称',
         dataIndex: 'attribute_name',
+        key: 'attribute_name',
+        width: '30%',
       },
       {
         title: '属性值',
         dataIndex: 'attribute_value',
+        key: 'attribute_value',
       },
     ];
   };
@@ -910,7 +915,8 @@ function ProductCreateSku() {
                     dataSource={product_detail}
                     columns={columnsProductAttribute()}
                     pagination={false}
-                    style={{ width: 300 }}
+                    style={{ width: 600 }}
+                    size="small"
                   />
                 </div>
               </div>
