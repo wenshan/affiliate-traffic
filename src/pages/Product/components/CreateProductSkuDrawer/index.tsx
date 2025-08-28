@@ -12,7 +12,6 @@ import './index.less';
 
 export default (props: any) => {
   const { costsExchange, productDetail } = useModel('productCreateProductSkuModel');
-  console.log('productDetail:', productDetail);
   const {
     saleSkuData,
     setSaleSkuData,
@@ -57,7 +56,6 @@ export default (props: any) => {
   };
   const saleValueInputHandle = (type: string, value: string) => {
     const objTemp = {};
-    // @ts-check
     objTemp[type] = value;
     const newSaleSkuData = Object.assign({}, saleSkuData, { saleValue: value }, objTemp);
     console.log('newSaleSkuData:', newSaleSkuData);

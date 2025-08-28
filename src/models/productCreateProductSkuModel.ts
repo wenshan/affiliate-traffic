@@ -224,7 +224,6 @@ function productCreateProductSkuModel() {
           targetCountry,
           contentLanguage,
         });
-        console.log('initProductDetail:', initProductDetail);
         setCurrentPreSalePrice(preSalePrice);
         setProductMainDetail(result.data);
         setProductDetail(initProductDetail);

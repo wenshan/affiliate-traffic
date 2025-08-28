@@ -46,7 +46,7 @@ function ProductCreateSku() {
     setSaleSkuOperateType,
     saleSkuDelFetch,
   } = useModel('productCreateProductSkuModel');
-  const { product_sku_option_status, product_main_id } = queryParams;
+  const { product_sku_option_status, product_main_id, language } = queryParams;
   const { setProductAttributeModalStatus } = useModel('productAttributeModel');
   const {
     setProductSkuImageModalStatus,
@@ -133,9 +133,12 @@ function ProductCreateSku() {
   const productAttributeButtonHandle = () => {
     setProductAttributeModalStatus(true);
   };
-  const productAttributeCallbackOk = (selectedRowsProductAttr: any) => {
+  const productAttributeCallbackOk = (selectedRowsProductAttr: any, selectedRowKeys: any) => {
+    const strSelectedRowKeys =
+      (selectedRowKeys && selectedRowKeys[0] && selectedRowKeys.join(',')) || '';
     const newProductDetail = Object.assign({}, productDetail, {
       product_detail: selectedRowsProductAttr,
+      product_detail_keys: strSelectedRowKeys,
     });
     setProductDetail(newProductDetail);
     setProductAttributeModalStatus(false);
@@ -303,7 +306,6 @@ function ProductCreateSku() {
     ) {
       const newProductDetail = Object.assign({}, productDetail, { saleSkus: saleSkuItems });
       setProductDetail(newProductDetail);
-      console.log('handelSubmitCreateSku productDetail:', newProductDetail);
       if (Number(product_sku_option_status) > 0) {
         await editProductFetch();
       } else {
@@ -315,6 +317,10 @@ function ProductCreateSku() {
   };
   const columnsProductAttribute = () => {
     return [
+      {
+        title: 'Key',
+        dataIndex: 'key',
+      },
       {
         title: '属性名称',
         dataIndex: 'attribute_name',
@@ -503,7 +509,6 @@ function ProductCreateSku() {
   useEffect(() => {
     initQueryParams();
   }, []);
-
   return (
     <PageContainer>
       <div className="page">
@@ -901,7 +906,7 @@ function ProductCreateSku() {
               <div className="line-box">
                 <div className="table-box">
                   <Table
-                    rowKey={(record) => record.attribute_name}
+                    rowKey={(record) => record.key}
                     dataSource={product_detail}
                     columns={columnsProductAttribute()}
                     pagination={false}
@@ -931,7 +936,11 @@ function ProductCreateSku() {
           </div>
         </div>
       </div>
-      <ProductAttribute callbackOk={productAttributeCallbackOk}></ProductAttribute>
+      <ProductAttribute
+        callbackOk={productAttributeCallbackOk}
+        product_main_id={product_main_id}
+        language={language}
+      ></ProductAttribute>
       <ImageSelectModal callbackOk={productImageCallbackOk}></ImageSelectModal>
       <CreateProductSkuDrawer
         isOpen={isCreateProductSkuDrawer}

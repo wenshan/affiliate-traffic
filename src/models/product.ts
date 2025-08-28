@@ -460,7 +460,6 @@ export default {
           message.error({ content: result.msg });
         }
       } else {
-        console.log('productDetail:', productDetail);
         message.error({ content: '缺少参数' });
       }
     },
@@ -504,7 +503,6 @@ export default {
           message.error({ content: result.msg });
         }
       } else {
-        console.log('productDetail:', productDetail);
         message.error({ content: '缺少参数' });
       }
     },
@@ -841,7 +839,6 @@ export default {
       }
     },
   },
-
   reducers: {
     updateProduct(state, { payload: data }) {
       const { productDetail } = state;

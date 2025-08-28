@@ -1,5 +1,5 @@
 import InputText from '@/components/InputText';
-import { Button, Modal, Table } from 'antd';
+import { Button, Modal, Table, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 
@@ -11,6 +11,7 @@ const currentProductAttributeInit = {
 };
 
 function ProductAttribute(props: any) {
+  const { product_main_id, language } = props;
   const {
     productAttributeModalStatus,
     setProductAttributeModalStatus,
@@ -24,18 +25,27 @@ function ProductAttribute(props: any) {
   const { productDetail } = useModel('productCreateProductSkuModel');
   const [selectedRowsProductAttr, setSelectedRowsProductAttr] = useState([]);
   const [optionAddStatus, setOptionAddStatus] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [addOpen, setAddOpen] = useState(false);
 
   const handleOk = async () => {
     if (props.callbackOk) {
-      props.callbackOk(selectedRowsProductAttr);
+      props.callbackOk(selectedRowsProductAttr, selectedRowKeys);
       setProductAttributeModalStatus(false);
     }
   };
   const handleAddOk = async () => {
     setAddOpen(false);
-    await cerateAttrFetch(currentProductAttribute);
+    const postData = Object.assign({}, currentProductAttribute, { product_main_id, language });
+    if (
+      product_main_id &&
+      currentProductAttribute.attribute_name &&
+      currentProductAttribute.attribute_value
+    ) {
+      await cerateAttrFetch(postData);
+    } else {
+      message.warning('缺少值');
+    }
   };
   const handleCancel = async () => {
     setProductAttributeModalStatus(false);
@@ -68,36 +78,33 @@ function ProductAttribute(props: any) {
     setCurrentProductAttribute(record);
   };
   const handelTableDel = (record: any) => {
-    Modal.confirm({
-      title: '确认删除',
-      content: '删除当前的商品属性',
-      onOk: async () => {
-        await delAttrFetch(record);
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
-  };
-  const onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
-    const newSelectedRows: any[] = [];
-    if (selectedRows && selectedRows.length) {
-      selectedRows.forEach((item: { attribute_name: any; attribute_value: any }) => {
-        if (item.attribute_name && item.attribute_value) {
-          newSelectedRows.push(
-            Object.assign(
-              {},
-              { attribute_name: item.attribute_name, attribute_value: item.attribute_value },
-            ),
-          );
-        }
+    const isFound = selectedRowKeys.find((item) => item === record.key);
+    if (isFound) {
+      message.warning('先取消选中在删除!');
+      return false;
+    } else {
+      Modal.confirm({
+        title: '确认删除',
+        content: '删除当前的商品属性',
+        onOk: async () => {
+          await delAttrFetch(record);
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
       });
-      //@ts-ignore
-      setSelectedRowsProductAttr(newSelectedRows);
-      setSelectedRowKeys(selectedRowKeys);
     }
   };
+  const onChangeSelectedRows = (selectedRowKeys: any, selectedRows: any) => {
+    setSelectedRowsProductAttr(selectedRows);
+    setSelectedRowKeys(selectedRowKeys);
+  };
   const columns = [
+    {
+      title: 'Key',
+      dataIndex: 'key',
+      key: 'key',
+    },
     {
       title: '属性名称',
       dataIndex: 'attribute_name',
@@ -142,21 +149,9 @@ function ProductAttribute(props: any) {
   ];
 
   useEffect(() => {
-    const selectedRowKeys: any[] = [];
-    if (productDetail && productDetail.id) {
-      const { language, product_main_id, product_detail } = productDetail;
-      if (language && product_main_id && product_detail) {
-        if (productDetail && productDetail.length) {
-          productDetail.forEach((item: { key: string }) => {
-            if (item.key) {
-              selectedRowKeys.push(item.key);
-            }
-          });
-        }
-        queryAttrFetch();
-        // @ts-ignore
-        setSelectedRowKeys(selectedRowKeys);
-      }
+    const { language, product_main_id } = productDetail;
+    if (language && product_main_id) {
+      queryAttrFetch({ product_main_id, language });
     }
   }, [productDetail]);
 
@@ -176,7 +171,7 @@ function ProductAttribute(props: any) {
       >
         {productAttributeList && productAttributeList.length > 0 ? (
           <Table
-            rowKey={(record) => record.attribute_name}
+            rowKey={(record) => record.key}
             dataSource={productAttributeList}
             columns={columns}
             pagination={false}
@@ -202,7 +197,7 @@ function ProductAttribute(props: any) {
             <span className="label">属性名: </span>
             <InputText
               placeholder="属性名称"
-              style={{ width: 250 }}
+              style={{ width: 350 }}
               value={currentProductAttribute.attribute_name}
               onChange={nameInputHandle}
             />
@@ -211,7 +206,7 @@ function ProductAttribute(props: any) {
             <span className="label">属性值: </span>
             <InputText
               placeholder="属性值"
-              style={{ width: 250 }}
+              style={{ width: 350 }}
               value={currentProductAttribute.attribute_value}
               onChange={valueInputHandle}
             />
