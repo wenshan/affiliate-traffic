@@ -20,8 +20,8 @@ export default (props: Props) => {
   const [light] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted] = useState(false);
-  const [played, setPlayed] = useState(0);
-  const [loaded, setLoaded] = useState(0);
+  // const [played, setPlayed] = useState(0);
+  // const [loaded, setLoaded] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [loop] = useState(false);
   const handleOk = () => {
@@ -74,15 +74,12 @@ export default (props: Props) => {
     if (props.youTubeId && props.isYoutubeVideoOpen) {
       setUrl(`https://www.youtube.com/watch?v=${props.youTubeId}`);
       setPlaying(true);
-      setPlayed(0);
-      setLoaded(0);
       setPip(false);
     } else {
       setUrl('');
       setPlaying(false);
     }
   }, [props]);
-  console.log(played, loaded);
   return (
     <Modal
       width={690}

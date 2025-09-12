@@ -8,6 +8,7 @@ import {
   productSizeUnitOption,
   productWeightUnitOption,
 } from '@/constant/defaultCurrentData';
+type ObjKey = keyof typeof optionsProductSaleTypeObj;
 // import languageObj from '@/constant/language';
 import ResizeImg from '@/constant/resizeImg';
 import CreateProductSkuDrawer from '@/pages/Product/components/CreateProductSkuDrawer';
@@ -19,10 +20,11 @@ import YouTubeVideoPlayModal from '@/pages/Product/components/YouTubeVideoPlayMo
 import Tool from '@/utils/tool';
 import { CloseOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
+import { history, useModel } from '@umijs/max';
 import type { RadioChangeEvent } from 'antd';
 import { Button, Col, Input, Modal, Radio, Row, Select, Table, message } from 'antd';
 import { JSX, useEffect, useState } from 'react';
-import { history, useModel } from 'umi';
+
 import './index.less';
 const { TextArea } = Input;
 
@@ -360,12 +362,9 @@ function ProductCreateSku() {
         dataIndex: 'saleType',
         key: 'saleType',
         render: (_: any, record: any) => {
-          if (
-            record.saleType &&
-            optionsProductSaleTypeObj &&
-            optionsProductSaleTypeObj[record.saleType]
-          ) {
-            return optionsProductSaleTypeObj[record.saleType];
+          const key: ObjKey = record.saleType;
+          if (record.saleType && optionsProductSaleTypeObj && optionsProductSaleTypeObj[key]) {
+            return optionsProductSaleTypeObj[key];
           } else {
             return '-';
           }

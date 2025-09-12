@@ -1,8 +1,8 @@
 import DefaultProject from '@/components/DefaultProject';
 import { costsExchangeQuery, costsExchangeSave } from '@/services/api/googleMerchant';
 import { PageContainer, ProForm, ProFormDigit } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
 import { Form, message } from 'antd';
-import { useModel } from 'umi';
 
 import './index.less';
 

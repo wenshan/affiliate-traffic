@@ -6,10 +6,10 @@ import {
 } from '@/constant/defaultCurrentData';
 import { DownOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
+import { history, useModel } from '@umijs/max';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Modal, Space, Table, Tag } from 'antd';
 import { JSX, useEffect, useState } from 'react';
-import { history, useModel } from 'umi';
 import CreateMainModal from '../components/CreateMainModal';
 
 import './index.less';
@@ -82,11 +82,8 @@ function ProductCreate() {
   };
 
   // table
-  const handelTableCreateSku: MenuProps['onClick'] = (e: { key: any }, record: { id: any }) => {
-    // const newCurrentProductMain = Object.assign({}, productMainDetail, record);
-    // setProductMainDetail(newCurrentProductMain);
+  const handelTableCreateSku = (e: { key: any }, record: { id: any }) => {
     setProductDetail(defaultProductDetail);
-    //       `/product/productCreateSku?product_main_id=${record.product_main_id}&product_id=${record.id}&language=${record.language}&product_sku_option_status=1`,
     history.push(
       `/product/productCreateSku?product_main_id=${record.id}&language=${e.key}&product_sku_option_status=0`,
     );

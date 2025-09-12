@@ -33,7 +33,7 @@ const defaultProductDetail = {
   material: '',
   price: '',
   sale_price: '',
-  discount: '',
+  discount: 5,
   product_detail: [], // 商品属性
   product_detail_keys: '',
   product_highlight: '',
@@ -300,7 +300,7 @@ const defaultSaleSkuData = {
   size: '',
   price: '0',
   sale_price: '0',
-  discount: '',
+  discount: 5,
   monetary_unit: 'USD',
   availability: 'in_stock',
   projectId: '',

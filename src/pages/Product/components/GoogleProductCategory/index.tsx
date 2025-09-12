@@ -1,8 +1,8 @@
 import tableData3 from '@/utils/google_product_category3';
 import listToTreeSelf from '@/utils/listToTreeSelf';
+import { useModel } from '@umijs/max';
 import { Modal, Tree } from 'antd';
 import { useState } from 'react';
-import { useModel } from 'umi';
 
 import './index.less';
 

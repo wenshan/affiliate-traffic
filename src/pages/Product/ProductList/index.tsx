@@ -3,6 +3,7 @@ import ResizeImg from '@/constant/resizeImg';
 import Tool from '@/utils/tool';
 import { SearchOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
+import { history, useModel } from '@umijs/max';
 import {
   Button,
   Col,
@@ -16,7 +17,6 @@ import {
   message,
 } from 'antd';
 import { JSX, Key, useEffect } from 'react';
-import { history, useModel } from 'umi';
 
 import './index.less';
 
@@ -447,7 +447,7 @@ function ProductList() {
               className="tx"
               rel="noreferrer"
               target="_blank"
-              href={`https://www.limeetpet.com/detail.html?id=${record.id}&product_id=${record.product_id}&lang=${record.language}`}
+              href={`https://www.limeetpet.com/detail/${record.language}/${record.id}/${record.product_id}`}
             >
               详情
             </a>
@@ -489,6 +489,7 @@ function ProductList() {
       },
     },
   ];
+  // https://limeetpet.com/detail/ja-JP/416/70500845
 
   return (
     <PageContainer>

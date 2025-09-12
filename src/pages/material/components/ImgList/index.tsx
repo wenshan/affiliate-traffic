@@ -5,9 +5,9 @@ import {
   RotateRightOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
+import { useModel } from '@umijs/max';
 import { Image, Modal } from 'antd';
 import React from 'react';
-import { useModel } from 'umi';
 
 import './index.less';
 

@@ -4,9 +4,9 @@ import {
   productSizeUnitOptionMain,
   productWeightUnitOptionMain,
 } from '@/constant/defaultCurrentData';
+import { useModel } from '@umijs/max';
 import { Button, Col, Input, InputNumber, Modal, Row, Select, Switch, message } from 'antd';
 import React from 'react';
-import { useModel } from 'umi';
 import GoogleProductCategory from '../GoogleProductCategory';
 import LabelHelpTip from '../LabelHelpTip';
 import ProductCustomTypeModalSelect from '../ProductCustomTypeModalSelect';

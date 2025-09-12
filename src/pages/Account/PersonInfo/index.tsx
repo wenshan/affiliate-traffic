@@ -1,8 +1,8 @@
 import { UploadOutlined } from '@ant-design/icons';
 import { PageContainer, ProForm, ProFormText } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
 import { Avatar, Button, ConfigProvider, Upload, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useModel } from 'umi';
 
 import './index.less';
 

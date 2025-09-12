@@ -8,9 +8,9 @@ import {
   PlusSquareOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
 import { Button, Checkbox, Col, Modal, Row, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useModel } from 'umi';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
 import UploadFiles from './components/UploadFiles';

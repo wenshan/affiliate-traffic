@@ -4,9 +4,9 @@ import ResizeImg from '@/constant/resizeImg';
 import ImageSelectModal from '@/pages/Product/components/ImageSelectModal';
 import LabelHelpTip from '@/pages/Product/components/LabelHelpTip';
 import { CloseOutlined, PictureOutlined } from '@ant-design/icons';
+import { useModel } from '@umijs/max';
 import type { RadioChangeEvent } from 'antd';
 import { Button, Drawer, InputNumber, Radio, Select, Space, message } from 'antd';
-import { useModel } from 'umi';
 
 import './index.less';
 
@@ -172,14 +172,18 @@ export default (props: any) => {
   const priceInputHandle = (value: null | string) => {
     const { discount } = saleSkuData;
     let newSaleSkuData;
-    if (discount) {
-      const initSalePrice = (Number(value) * Number(discount)).toFixed(2);
-      newSaleSkuData = Object.assign({}, saleSkuData, {
-        price: value,
-        sale_price: initSalePrice,
-      });
-    } else {
-      newSaleSkuData = Object.assign({}, saleSkuData, { price: value, sale_price: value });
+    if (value) {
+      if (discount) {
+        const rate = ((100 - Number(discount)) / 100).toFixed(2);
+        const sale_price = (Number(value) * Number(rate)).toFixed(2);
+        console.log('sale_price:', sale_price);
+        newSaleSkuData = Object.assign({}, saleSkuData, {
+          price: value,
+          sale_price,
+        });
+      } else {
+        newSaleSkuData = Object.assign({}, saleSkuData, { price: value, sale_price: value });
+      }
     }
     setSaleSkuData(newSaleSkuData);
   };
@@ -251,11 +255,15 @@ export default (props: any) => {
   const { costPrice, preSalePrice } = productDetail;
   const { saleType, monetary_unit, price, discount, sale_price, availability } = saleSkuData;
 
+  if (!saleType || !monetary_unit) {
+    console.log('saleType 参数：', saleType);
+    return false;
+  }
   if (!price || Number(price) === 0) {
     const newSaleSkuData = Object.assign({}, saleSkuData, {
       price: preSalePrice,
       sale_price: preSalePrice,
-      discount: 0,
+      discount,
     });
     setSaleSkuData(newSaleSkuData);
   }
@@ -323,6 +331,7 @@ export default (props: any) => {
               {monetary_unit}{' '}
             </span>
           </div>
+
           <div className="form-item">
             <LabelHelpTip keyLabel="discount"></LabelHelpTip>
             <InputNumber
@@ -335,6 +344,7 @@ export default (props: any) => {
               suffix="%"
             />
           </div>
+
           <div className="form-item">
             <LabelHelpTip keyLabel="sale_price"></LabelHelpTip>
             <InputText
@@ -345,6 +355,7 @@ export default (props: any) => {
               suffix={monetary_unit}
             />
           </div>
+
           <div className="form-item">
             <LabelHelpTip keyLabel="availability"></LabelHelpTip>
             <Radio.Group value={availability} onChange={handelRadioAvailability}>

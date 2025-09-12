@@ -1,9 +1,9 @@
 import ImgList from '@/pages/Material/components/ImgList';
 import Tool from '@/utils/tool';
 import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { useModel } from '@umijs/max';
 import { Col, Modal, Row } from 'antd';
 import { JSX, useEffect } from 'react';
-import { useModel } from 'umi';
 
 import './index.less';
 

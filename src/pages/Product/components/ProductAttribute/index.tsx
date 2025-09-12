@@ -1,7 +1,7 @@
 import InputText from '@/components/InputText';
+import { useModel } from '@umijs/max';
 import { Button, Modal, Table, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { useModel } from 'umi';
 
 import './index.less';
 

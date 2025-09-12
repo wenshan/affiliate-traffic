@@ -1,8 +1,8 @@
 import { uploadFileURL } from '@/services/api/uploadFile';
 import { UploadOutlined } from '@ant-design/icons';
+import { useModel } from '@umijs/max';
 import { Button, Upload, message } from 'antd';
 import axios from 'axios';
-import { useModel } from 'umi';
 
 import './index.less';
 // https://github.com/react-component/upload#customrequest

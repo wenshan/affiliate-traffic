@@ -1,8 +1,8 @@
 import { queryTypeAll } from '@/services/api/productType';
+import { useModel } from '@umijs/max';
 import type { TableColumnsType, TableProps } from 'antd';
 import { Modal, Table, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { useModel } from 'umi';
 
 import './index.less';
 
