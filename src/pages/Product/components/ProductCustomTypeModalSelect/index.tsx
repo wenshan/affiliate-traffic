@@ -9,10 +9,10 @@ import './index.less';
 type ProductType = {
   id: number;
   key: React.Key;
-  title_zh: string;
-  title_en: string;
-  title_ja: string;
-  title_ko: string;
+  zh_CN: string;
+  en_US: string;
+  ko_KR: string;
+  ja_JP: string;
   projectId: string;
   [key: string]: any;
 };
@@ -59,19 +59,19 @@ export default (props: Props) => {
   const columns: TableColumnsType<ProductType> = [
     {
       title: '中文',
-      dataIndex: 'title_zh',
+      dataIndex: 'zh_CN',
     },
     {
       title: '英文',
-      dataIndex: 'title_en',
+      dataIndex: 'en_US',
     },
     {
       title: '日本',
-      dataIndex: 'title_ja',
+      dataIndex: 'ja_JP',
     },
     {
       title: '韩文',
-      dataIndex: 'title_ko',
+      dataIndex: 'ko_KR',
     },
   ];
   const rowSelection: TableProps<ProductType>['rowSelection'] = {

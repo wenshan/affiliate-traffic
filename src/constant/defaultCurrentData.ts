@@ -113,10 +113,10 @@ const costsExchangeTypeCurrency = {
 };
 
 const defaultProductCustomType = {
-  title_zh: '',
-  title_en: '',
-  title_ja: '',
-  title_ko: '',
+  zh_CN: '',
+  en_US: '',
+  ja_JP: '',
+  ko_KR: '',
 };
 
 const monetaryUnitOption = [

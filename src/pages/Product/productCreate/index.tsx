@@ -23,10 +23,10 @@ type GoogleProductCategory = {
 type ProductType = {
   id: number;
   key: React.Key;
-  title_zh: string;
-  title_en: string;
-  title_ja: string;
-  title_ko: string;
+  zh_CN: string;
+  en_US: string;
+  ja_JP: string;
+  ko_KR: string;
   projectId: string;
   [key: string]: any;
 };
@@ -156,8 +156,8 @@ function ProductCreate() {
           const txt: JSX.Element[] = [];
           if (record.product_type && record.product_type.length) {
             record.product_type.forEach((item: any) => {
-              if (item.title_zh) {
-                txt.push(<Tag>{item.title_zh}</Tag>);
+              if (item.zh_CN) {
+                txt.push(<Tag>{item.zh_CN}</Tag>);
               }
             });
           }

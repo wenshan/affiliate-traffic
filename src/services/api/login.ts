@@ -54,7 +54,6 @@ export async function outLogin(options?: ParamsType) {
 
 /** 登录接口 POST /api/user/login */
 export async function login(params: API.LoginParams) {
-  console.log('request:', request);
   return request<API.LoginResult>('/api/user/login', {
     method: 'POST',
     data: params,

@@ -41,10 +41,10 @@ type Props = {
 type ProductType = {
   id: number;
   key: React.Key;
-  title_zh: string;
-  title_en: string;
-  title_ja: string;
-  title_ko: string;
+  zh_CN: string;
+  en_US: string;
+  ja_JP: string;
+  ko_KR: string;
   projectId: string;
   [key: string]: any;
 };

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkaffiliate_traffic=self.webpackChunkaffiliate_traffic||[]).push([[1576],{41576:function(e,n,t){t.r(n),t.d(n,{default:function(){return a}});var c=t(67294),u=t(14776),f=t(85893);function a(){var E=(0,u.useOutletContext)();return(0,f.jsx)(u.Outlet,{context:E})}}}]);

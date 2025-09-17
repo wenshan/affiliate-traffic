@@ -12,10 +12,10 @@ type ProductCustomType = {
   id: number;
   key: string;
   userid: number;
-  title_zh: string;
-  title_en: string;
-  title_ja: string;
-  title_ko: string;
+  zh_CN: string;
+  en_US: string;
+  ja_JP: string;
+  ko_KR: string;
   projectId: number;
   createdAt: string;
   updatedAt: string;
@@ -88,23 +88,23 @@ export default () => {
     },
     {
       title: '分类名称-中文',
-      dataIndex: 'title_zh',
-      key: 'title_zh',
+      dataIndex: 'zh_CN',
+      key: 'zh_CN',
     },
     {
       title: '分类名称-英文',
-      dataIndex: 'title_en',
-      key: 'title_en',
+      dataIndex: 'en_US',
+      key: 'en_US',
     },
     {
       title: '分类名称-日文',
-      dataIndex: 'title_ja',
-      key: 'title_ja',
+      dataIndex: 'ja_JP',
+      key: 'ja_JP',
     },
     {
       title: '分类名称-韩文',
-      dataIndex: 'title_ko',
-      key: 'title_ko',
+      dataIndex: 'ko_KR',
+      key: 'ko_KR',
     },
     {
       title: '操作',

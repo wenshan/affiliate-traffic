@@ -278,17 +278,17 @@ function ProductCreateSku() {
   };
   // 自定义产品分类处理
   const productTypeNameStr = () => {
-    const { product_type, contentLanguage } = productDetail;
+    const { product_type, language } = productDetail;
+    const lang = language.replace(/-/, '_');
     const nameStr: any[] = [];
     if (product_type && product_type.length && product_type.length > 0) {
       product_type.forEach((item: { [x: string]: any }) => {
         if (item) {
-          nameStr.push(item[`title_${contentLanguage}`]);
+          nameStr.push(item[lang]);
         }
       });
     }
     return nameStr.join(',');
-    // contentLanguage && product_type && product_type[`title_${contentLanguage}`]
   };
 
   // 重置主数据
