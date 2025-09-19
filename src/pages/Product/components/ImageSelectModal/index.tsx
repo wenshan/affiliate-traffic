@@ -49,7 +49,7 @@ function ImageSelectModal(props: any) {
     const html: JSX.Element[] = [];
     if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
       folderDirectory.map((item, index) => {
-        if (item.children) {
+        if (item && item.children) {
           html.push(
             <li key={`${item.key}_${index}`} className={`pad00 ${item.active ? 'active' : ''}`}>
               <div

@@ -25,6 +25,7 @@ export default {
       user_project_group_id: 1,
     },
     defaultProject: {},
+    isLoading: false,
   },
 
   effects: {

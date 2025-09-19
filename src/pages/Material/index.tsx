@@ -1,16 +1,10 @@
 import DefaultProject from '@/components/DefaultProject';
 import InputText from '@/components/InputText';
-import Tool from '@/utils/tool';
-import {
-  FolderAddOutlined,
-  FolderOpenOutlined,
-  MinusSquareOutlined,
-  PlusSquareOutlined,
-} from '@ant-design/icons';
+import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { Button, Checkbox, Col, Modal, Row, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, Col, Modal, Row, Spin, Tree, message } from 'antd';
+import { useEffect, useState } from 'react';
 import ImgList from './components/ImgList';
 import UploadFile from './components/UploadFile';
 import UploadFiles from './components/UploadFiles';
@@ -28,68 +22,58 @@ function MaterialPage() {
     createFolderFetch,
     editFolderFetch,
     delFolderFetch,
-    folderDirectoryRows,
     queryFolderMaterialFetch,
-    folderDirectory,
-    checkFolderDirectory,
-    // otherFolderDirectory,
-    updateOperateCheckFolderDirectory,
-    updateOperateSelectFolderDirectory,
+    selectedKeys,
+    setSelectedKeys,
+    setSelectFolderDirectory,
+    folderDirectoryRowsTree,
+    grandParentKeys,
+    setOperateFolderDirectory,
+    operateFolderDirectory,
+    setImageList,
   } = useModel('material');
+  const { isLoading } = useModel('material');
   const [optionAction, setOptionAction] = useState(false);
   const [folderOpenStatus, setFolderOpenStatus] = useState(false);
-  const [operateFolderDirectory, setOperateFolderDirectory] = useState(operateFolderDirectoryInit);
   const handelFolderCancel = async () => {
     setFolderOpenStatus(false);
     setOperateFolderDirectory(operateFolderDirectoryInit);
   };
-  const handelFolderOk = async () => {
-    let addFolderDirectory = Object.assign({}, operateFolderDirectory);
-    if (checkFolderDirectory && checkFolderDirectory.key && checkFolderDirectory.checked) {
-      if (checkFolderDirectory.key) {
-        addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-          father_key: checkFolderDirectory.key,
-          key_path: `${checkFolderDirectory.father_key}/${checkFolderDirectory.key}`,
-          is_leaf: 1,
-          active: false,
-          is_default: false,
-        });
+  // 添加和编辑文件夹
+  const handelAddFolderOk = async () => {
+    if (selectFolderDirectory && operateFolderDirectory) {
+      if (optionAction) {
+        const editFolderDirectory = Object.assign(
+          {},
+          selectFolderDirectory,
+          operateFolderDirectory,
+        );
+        await editFolderFetch(editFolderDirectory);
       } else {
-        addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-          father_key: '',
-          key_path: `${checkFolderDirectory.key}`,
+        const addFolderDirectory = Object.assign({}, operateFolderDirectory, {
+          father_key: selectFolderDirectory.key,
+          key_path: selectFolderDirectory.keys && selectFolderDirectory.keys.join('/'),
           is_leaf: 1,
           active: false,
           is_default: false,
         });
+        await createFolderFetch(addFolderDirectory);
       }
-    } else {
-      addFolderDirectory = Object.assign({}, operateFolderDirectory, {
-        father_key: '',
-        key_path: '',
-        key: '',
-        is_leaf: 1,
-        active: false,
-        is_default: false,
-      });
-    }
-    if (optionAction) {
-      await editFolderFetch(addFolderDirectory);
-    } else {
-      await createFolderFetch(addFolderDirectory);
     }
     setFolderOpenStatus(false);
   };
+  // 新建文件夹
   const handelCreateFolderAdd = async () => {
     setOptionAction(false);
     setFolderOpenStatus(true);
     setOperateFolderDirectory(operateFolderDirectoryInit);
   };
+  // 编辑文件夹
   const handleClickDropdownEdit = async () => {
-    if (checkFolderDirectory && checkFolderDirectory.key) {
+    if (selectFolderDirectory) {
       setOptionAction(true);
       setFolderOpenStatus(true);
-      setOperateFolderDirectory(checkFolderDirectory);
+      setOperateFolderDirectory(selectFolderDirectory);
     } else {
       message.info('选择当前文件夹');
     }
@@ -97,7 +81,7 @@ function MaterialPage() {
   const folderInputHandle = async (value: string) => {
     if (optionAction) {
       // 编辑
-      const inputOperateFolderDirectory = Object.assign({}, checkFolderDirectory, {
+      const inputOperateFolderDirectory = Object.assign({}, selectFolderDirectory, {
         label: value,
         title: value,
       });
@@ -109,12 +93,12 @@ function MaterialPage() {
     }
   };
   const handleClickDropdownDel = async () => {
-    if (checkFolderDirectory && checkFolderDirectory.key) {
+    if (selectFolderDirectory && selectFolderDirectory.key) {
       Modal.confirm({
         title: '确认',
         content: '确认删除',
         onOk: async () => {
-          await delFolderFetch(checkFolderDirectory);
+          await delFolderFetch(selectFolderDirectory);
         },
         onCancel() {
           console.log('Cancel');
@@ -124,260 +108,31 @@ function MaterialPage() {
       message.info('选择当前文件夹');
     }
   };
-  const handleOnCheckSelectFolderMenu = async (event: any, key: string) => {
-    const { checked } = event.target;
-    let currentItem = {
-      key: '',
-    };
-    if (key && folderDirectoryRows) {
-      folderDirectoryRows.map((item: { key: any; checked: any }) => {
-        if (item.key === key) {
-          currentItem = Object.assign({}, item, { checked });
-        }
-      });
-      if (currentItem.key) {
-        updateOperateCheckFolderDirectory(currentItem);
-      }
+
+  const onSelectTree = async (selectedKey: any, e: any) => {
+    console.log('selectedKeys:', selectedKey);
+    console.log('selectedKeys e:', e);
+    if (selectedKeys.includes(e.node.key)) {
+      setSelectedKeys([]);
+      setImageList([]);
+      console.log('取消选择');
+    } else {
+      const keys = grandParentKeys(e.node);
+      const currentItemKeys = Object.assign({}, e.node, { keys });
+      console.log('currentItemKeys:', currentItemKeys);
+      setSelectFolderDirectory(currentItemKeys);
+      setSelectedKeys(selectedKey);
+      await queryFolderMaterialFetch(currentItemKeys);
     }
   };
-  const handleClickFolderMenu = async (currentItem: any) => {
-    console.log('currentItem1:', currentItem);
-    if (currentItem && currentItem.key) {
-      updateOperateSelectFolderDirectory(currentItem);
-      if (currentItem && currentItem.is_leaf === 1) {
-        await queryFolderMaterialFetch(currentItem);
-      }
-    }
-  };
-  const handleClickFolderMenuSecond = async (currentItem: any) => {
-    console.log('currentItem2:', currentItem);
-    if (currentItem && currentItem.key) {
-      updateOperateSelectFolderDirectory(currentItem);
-      if (currentItem && currentItem.is_leaf === 1) {
-        await queryFolderMaterialFetch(currentItem);
-      }
-    }
-  };
-  const handleClickFolderMenuThird = async (currentItem: any) => {
-    console.log('currentItem3:', currentItem);
-    if (currentItem && currentItem.key) {
-      updateOperateSelectFolderDirectory(currentItem);
-      if (currentItem && currentItem.is_leaf === 1) {
-        await queryFolderMaterialFetch(currentItem);
-      }
-    }
-  };
-  const handleClickFolderMenuFourth = async (currentItem: any) => {
-    console.log('currentItem4:', currentItem);
-    if (currentItem && currentItem.key) {
-      updateOperateSelectFolderDirectory(currentItem);
-      if (currentItem && currentItem.is_leaf === 1) {
-        await queryFolderMaterialFetch(currentItem);
-      }
-    }
-  };
-  const folderMenuHtml = () => {
-    const html: React.JSX.Element[] = [];
-    if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
-      // eslint-disable-next-line array-callback-return
-      folderDirectory.map((item: any, index: number) => {
-        if (item.children && item.children.length > 0) {
-          html.push(
-            <li key={`${item.key}_${index}`} className={`pad00 ${item.active ? 'active' : ''}`}>
-              <div title={item.label} className="item" key={item.key}>
-                <span className="space"></span>
-                {item.is_leaf === 1 ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
-                <Checkbox
-                  disabled={!!item.is_default}
-                  checked={item.checked}
-                  onChange={(event) => handleOnCheckSelectFolderMenu(event, item.key)}
-                ></Checkbox>
-                <span onClick={() => handleClickFolderMenu(item)}>
-                  {Tool.replaceExceedEnd(item.label, 20)}
-                </span>
-              </div>
-              {item.children && item.children.length && (
-                <ul key={`${item.key}_ul`}>
-                  {item.children.map((childrenItem: any, idx: number) => {
-                    return (
-                      <li
-                        key={`${childrenItem.key}_${idx}`}
-                        className={`pad01 ${childrenItem.active ? 'active-second' : ''}`}
-                      >
-                        <div title={childrenItem.label} className="item item-second">
-                          <span className="space"></span>
-                          {childrenItem.is_default === 0 ? (
-                            childrenItem.is_leaf === 1 ? (
-                              <MinusSquareOutlined />
-                            ) : (
-                              <PlusSquareOutlined />
-                            )
-                          ) : null}
-                          <Checkbox
-                            disabled={!!childrenItem.is_default}
-                            checked={childrenItem.checked}
-                            onChange={(event) =>
-                              handleOnCheckSelectFolderMenu(event, childrenItem.key)
-                            }
-                          ></Checkbox>
-                          <span
-                            className="label ellipsis"
-                            onClick={() => handleClickFolderMenuSecond(childrenItem)}
-                          >
-                            {Tool.replaceExceedEnd(childrenItem.label, 20)}
-                          </span>
-                        </div>
-                        {childrenItem.children && childrenItem.children.length > 0 && (
-                          <ul key={`${childrenItem.key}_${idx}_ul`}>
-                            {childrenItem.children.map((children2Item: any, idx2: number) => {
-                              return (
-                                <li
-                                  key={`${children2Item.key}_${idx2}`}
-                                  className={`pad02 ${children2Item.active ? 'active-third' : ''}`}
-                                >
-                                  <div title={children2Item.label} className="item item-third">
-                                    <span className="space"></span>
-                                    {children2Item.is_default === 0 ? (
-                                      children2Item.is_leaf === 1 ? (
-                                        <MinusSquareOutlined />
-                                      ) : (
-                                        <PlusSquareOutlined />
-                                      )
-                                    ) : null}
-                                    <Checkbox
-                                      disabled={!!children2Item.is_default}
-                                      checked={children2Item.checked}
-                                      onChange={(event) =>
-                                        handleOnCheckSelectFolderMenu(event, children2Item.key)
-                                      }
-                                    ></Checkbox>
-                                    <span
-                                      className="label ellipsis"
-                                      onClick={() => handleClickFolderMenuThird(children2Item)}
-                                    >
-                                      {Tool.replaceExceedEnd(children2Item.label, 20)}
-                                    </span>
-                                  </div>
-                                  {children2Item.children && children2Item.children.length > 0 && (
-                                    <ul key={`${children2Item.key}_${idx2}_ul`}>
-                                      {children2Item.children.map(
-                                        (children3Item: any, idx3: number) => {
-                                          return (
-                                            <li
-                                              key={`${children3Item.key}_${idx3}`}
-                                              className={`pad03 ${
-                                                children3Item.active ? 'active-fourth' : ''
-                                              }`}
-                                            >
-                                              <div
-                                                title={children3Item.label}
-                                                className="item item-fourth"
-                                              >
-                                                <span className="space"></span>
-                                                {children3Item.is_default === 0 ? (
-                                                  children3Item.is_leaf === 1 ? (
-                                                    <MinusSquareOutlined />
-                                                  ) : (
-                                                    <PlusSquareOutlined />
-                                                  )
-                                                ) : null}
-                                                <Checkbox
-                                                  disabled={!!children3Item.is_default}
-                                                  checked={children3Item.checked}
-                                                  onChange={(event) =>
-                                                    handleOnCheckSelectFolderMenu(
-                                                      event,
-                                                      children3Item.key,
-                                                    )
-                                                  }
-                                                ></Checkbox>
-                                                <span
-                                                  className="label ellipsis"
-                                                  onClick={() =>
-                                                    handleClickFolderMenuFourth(children3Item)
-                                                  }
-                                                >
-                                                  {Tool.replaceExceedEnd(children3Item.label, 20)}
-                                                </span>
-                                              </div>
-                                            </li>
-                                          );
-                                        },
-                                      )}
-                                    </ul>
-                                  )}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </li>,
-          );
-        } else {
-          html.push(
-            <li
-              key={`${item.key}_${item.is_default}`}
-              className={`pad00 ${item.active ? 'active' : ''}`}
-            >
-              <div title={item.label} className="item" key={item.key}>
-                <span className="space"></span>
-                {item.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
-                <Checkbox
-                  disabled={!!item.is_default}
-                  checked={item.checked}
-                  onChange={(event) => handleOnCheckSelectFolderMenu(event, item.key)}
-                ></Checkbox>
-                <span className="label ellipsis" onClick={() => handleClickFolderMenu(item)}>
-                  {Tool.replaceExceedEnd(item.label, 20)}
-                </span>
-              </div>
-            </li>,
-          );
-        }
-      });
-    }
-    return html;
-  };
-  /*
-  const handleClickFolderOtherMenu = async (item: any) => {
-    if (item && item.is_leaf === 1) {
-      await queryFolderMaterialFetch(item);
-    }
-  };
-  */
-  /*
-  const otherFolderMenuHtml = () => {
-    const html = [];
-    html.push(
-      <li
-        key={`${otherFolderDirectory.key}_${otherFolderDirectory.is_default}`}
-        className={`pad00 ${otherFolderDirectory.active ? 'active' : ''}`}
-      >
-        <div title={otherFolderDirectory.label} className="item" key={otherFolderDirectory.key}>
-          <span className="space"></span>
-          {otherFolderDirectory.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
-          <Checkbox disabled={true}></Checkbox>
-          <span
-            className="label ellipsis"
-            onClick={() => handleClickFolderOtherMenu(otherFolderDirectory)}
-          >
-            {Tool.replaceExceedEnd(otherFolderDirectory.label, 20)}
-          </span>
-        </div>
-      </li>,
-    );
-    return html;
-  };
-  */
 
   useEffect(() => {
     queryFolderFetch();
   }, []);
+  console.log('folderDirectoryRowsTree:', folderDirectoryRowsTree);
+  console.log('selectFolderDirectory:', selectFolderDirectory);
+  console.log('selectedKeys:', selectedKeys[0]);
+  console.log('isLoading:', isLoading);
 
   return (
     <PageContainer>
@@ -392,7 +147,16 @@ function MaterialPage() {
                     <FolderOpenOutlined /> 文件目录
                   </div>
                   <div className="menu-wrap">
-                    <ul>{folderDirectory && folderMenuHtml()}</ul>
+                    {folderDirectoryRowsTree && (
+                      <Tree
+                        treeData={folderDirectoryRowsTree}
+                        selectedKeys={selectedKeys} // 选中的 key 数组
+                        onSelect={onSelectTree}
+                        showLine // 显示连接线
+                        selectable // 是否可选中
+                        checkable={false}
+                      />
+                    )}
                   </div>
                 </div>
               </Col>
@@ -401,29 +165,40 @@ function MaterialPage() {
                   <div className="header">
                     <Button
                       onClick={() => handleClickDropdownDel()}
-                      disabled={checkFolderDirectory && !!!checkFolderDirectory.checked}
+                      disabled={!!!(selectedKeys && selectedKeys[0])}
                     >
                       删除文件夹
                     </Button>
                     <Button
                       onClick={() => handleClickDropdownEdit()}
-                      disabled={checkFolderDirectory && !!!checkFolderDirectory.checked}
+                      disabled={!!!(selectedKeys && selectedKeys[0])}
                     >
                       编辑文件夹
                     </Button>
-                    <Button icon={<FolderAddOutlined />} onClick={() => handelCreateFolderAdd()}>
+                    <Button
+                      disabled={!!!(selectedKeys && selectedKeys[0])}
+                      icon={<FolderAddOutlined />}
+                      onClick={() => handelCreateFolderAdd()}
+                    >
                       新建文件目录
                     </Button>
-                    <UploadFile></UploadFile>
-                    <UploadFiles></UploadFiles>
+                    <UploadFile selectedKeys={selectedKeys}></UploadFile>
+                    <UploadFiles selectedKeys={selectedKeys}></UploadFiles>
                   </div>
-                  <ImgList limit={20}></ImgList>
+                  <div>
+                    {selectFolderDirectory && selectFolderDirectory.is_leaf === 1 ? (
+                      <ImgList></ImgList>
+                    ) : (
+                      <div>...不是叶子节点...</div>
+                    )}
+                  </div>
+
                   {selectFolderDirectory && (
                     <Modal
                       title={optionAction ? '编辑文件目录' : '添加文件目录'}
                       open={folderOpenStatus}
                       width={500}
-                      onOk={() => handelFolderOk()}
+                      onOk={() => handelAddFolderOk()}
                       onCancel={() => handelFolderCancel()}
                     >
                       <div className="content">
@@ -444,6 +219,7 @@ function MaterialPage() {
             </Row>
           </div>
         </div>
+        <Spin size="large" fullscreen spinning={false} tip="加载中..." />
       </div>
     </PageContainer>
   );

@@ -232,14 +232,14 @@ const Dashboard: React.FC = () => {
         dataIndex: 'buildRoom',
         key: 'buildRoom',
         ellipsis: false,
-        render: (_, record) => {
+        render: (_: any, record: { buildRoom: any }) => {
           let html: React.JSX.Element[] = [];
           if (record && record.buildRoom) {
             const items = record.buildRoom;
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             items &&
               items.length &&
-              items.map((item, idx) => {
+              items.map((item: any, idx: any) => {
                 html.push(
                   <>
                     <div key={`${item.unit}_${idx}`} className="room-list clearfix">
@@ -249,7 +249,7 @@ const Dashboard: React.FC = () => {
                       <div className="list clearfix" key={`${item.unit}_${idx}notlist`}>
                         {item.room &&
                           item.room.length > 0 &&
-                          item.room.map((list, index) => (
+                          item.room.map((list: any, index: any) => (
                             <Space key={`${item.unit}_${idx}_${index}_s`}>
                               <Tag key={`${item.unit}_${idx}_${index}_t`}>{list}</Tag>
                             </Space>

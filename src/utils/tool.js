@@ -7,7 +7,7 @@ const Tool = {
    * @return {boolean}
    */
 
-  isEmptyObject(obj: any) {
+  isEmptyObject(obj) {
     let key;
     for (key in obj) {
       if (obj[key]) {
@@ -22,11 +22,11 @@ const Tool = {
    * @param {string} s
    * @return {string}
    */
-  trim(s: any) {
+  trim(s) {
     return s.replace(/(^\s*)|(\s*$)/g, '');
   },
   // 数组判断
-  isArray(value: any) {
+  isArray(value) {
     return value && Object.prototype.toString.call(value) === '[object Array]';
   },
   /**
@@ -37,12 +37,12 @@ const Tool = {
    * @return {string} 替换后的字符串
    * 中文 code 范围： U+4E00 - U+9FFFF
    */
-  replaceExceedEnd(str: any, maxWidth = 12, replace = '...') {
+  replaceExceedEnd(str, maxWidth = 12, replace = '...') {
     let width = 0;
     let index;
-
-    for (let i = 0; i < (str && str.length); i++) {
-      let code = str.charCodeAt(i);
+    let text = str.replace(/<[^>]+>/g, '');
+    for (let i = 0; i < (text && text.length); i++) {
+      let code = text.charCodeAt(i);
       if (code >= 0x4e00 && code <= 0x9fff) {
         width += 2;
       } else {
@@ -56,10 +56,10 @@ const Tool = {
     }
 
     if (index) {
-      str = `${str.slice(0, index)}...`;
+      text = `${text.slice(0, index)}...`;
     }
 
-    return str;
+    return text;
   },
 
   /**
@@ -90,7 +90,7 @@ const Tool = {
    *
    */
 
-  objectToString(object: any, separator = '&') {
+  objectToString(object, separator = '&') {
     if (!object) {
       return false;
     }
@@ -101,18 +101,10 @@ const Tool = {
     });
     return str;
   },
-
-  checkPhone(phone: any) {
-    if (!/^1[34578]\d{9}$/.test(phone)) {
-      return false;
-    }
-    return true;
-  },
-
   /*
    * 格式价格
    */
-  formatPrice(price: any, type = 2) {
+  formatPrice(price, type = 2) {
     if (typeof price !== 'number' || Number.isNaN(price)) {
       return '￥0.00';
     }
@@ -135,22 +127,6 @@ const Tool = {
       s += '00';
     }
     return `￥${s}`;
-  },
-
-  isWeiXin() {
-    const ua = window.navigator.userAgent.toLowerCase();
-    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-      return true;
-    }
-    return false;
-  },
-
-  isMobile() {
-    const u = navigator.userAgent;
-    if (!!u.match(/AppleWebKit.*Mobile.*/) || u.indexOf('iPad') > -1) {
-      return true;
-    }
-    return false;
   },
 
   /**

@@ -71,7 +71,6 @@ function ProductList() {
       });
       if (result && result.status && result.status === 200 && result.data && result.data.rows) {
         const updatePagination = Object.assign({}, pagePagination, { total: result.data.count });
-        console.log('updatePagination:', updatePagination);
         setProductList(result.data.rows);
         setPagePagination(updatePagination);
         setOnLoading(false);

@@ -9,8 +9,13 @@ import {
   queryFolder,
   queryFolderMaterial,
 } from '@/services/api/material';
+import listToTree from '@/utils/listToTree';
 import { message } from 'antd';
 import { useState } from 'react';
+
+const operateFolderDirectoryInit = {
+  label: '',
+};
 
 const ROWSLISTMAP = new Map();
 
@@ -24,13 +29,14 @@ type FolderData = {
 };
 type DefaultFolderDirectoryType = {
   label?: string;
-  key: string;
+  key?: string;
   is_default?: boolean;
   active?: number | boolean;
   is_leaf?: string | number;
   key_path?: string;
   father_key?: string;
   data?: FolderData;
+  keys?: any;
   [key: string]: any;
 };
 const resetFolderDirectory = {
@@ -84,12 +90,23 @@ const otherFolderDirectoryInit = {
   active: false,
   is_leaf: 1,
 };
-
+//     selectedKeys, expandedKeys,
 function Material() {
+  // 选中当前的节点
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  // 展开当前的节点
+  const [expandedKeys, setExpandedKeys] = useState([]);
   const [productSkuImageModalStatus, setProductSkuImageModalStatus] = useState(false);
   const [imageList, setImageList] = useState<ImageListObject>();
   const [checkFolderDirectory, setCheckFolderDirectory] = useState<DefaultFolderDirectoryType>();
+  // 操作
+  const [operateFolderDirectory, setOperateFolderDirectory] = useState<DefaultFolderDirectoryType>(
+    operateFolderDirectoryInit,
+  );
+  // 选中当前的节点
   const [selectFolderDirectory, setSelectFolderDirectory] = useState<DefaultFolderDirectoryType>();
+  const [folderDirectoryRowsTree, setFolderDirectoryRowsTree] = useState<any>([]);
+
   const [otherFolderDirectory, setOtherFolderDirectory] = useState(otherFolderDirectoryInit);
   const [folderDirectoryRows, setFolderDirectoryRows] = useState([]);
   const [folderDirectory, setFolderDirectory] = useState([]);
@@ -97,6 +114,51 @@ function Material() {
   const [currentOperateMaterial, setCurrentOperateMaterial] = useState({ keys: '' }); // 当前操作的素材
   const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
   const [imageLimitNum, setImageLimitNum] = useState(20);
+
+  // get keys
+  // key_path = "99185496/59867357/46999078"
+  // keys = ['46999078', '59867357', '99185496', '65655558']
+  const grandParentKeys = (item: any) => {
+    const keys = [];
+    keys.push(item.key);
+    if (item.key && item.father_key) {
+      keys.push(item.father_key);
+      // 一层
+      const fatherItem = ROWSLISTMAP.get(item.father_key);
+      if (fatherItem && fatherItem.father_key) {
+        const fatherItem2 = ROWSLISTMAP.get(fatherItem.father_key);
+        if (fatherItem2) {
+          keys.push(fatherItem2.key);
+          const fatherItem3 = ROWSLISTMAP.get(fatherItem2.father_key);
+          if (fatherItem3) {
+            keys.push(fatherItem3.key);
+            const fatherItem4 = ROWSLISTMAP.get(fatherItem3.father_key);
+            if (fatherItem4) {
+              keys.push(fatherItem4.key);
+              const fatherItem5 = ROWSLISTMAP.get(fatherItem4.father_key);
+              if (fatherItem5) {
+                keys.push(fatherItem5.key);
+                const fatherItem6 = ROWSLISTMAP.get(fatherItem5.father_key);
+                if (fatherItem6) {
+                  keys.push(fatherItem6.key);
+                  const fatherItem7 = ROWSLISTMAP.get(fatherItem6.father_key);
+                  if (fatherItem7) {
+                    keys.push(fatherItem7.key);
+                    const fatherItem8 = ROWSLISTMAP.get(fatherItem7.father_key);
+                    if (fatherItem8) {
+                      keys.push(fatherItem8.key);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    const reversedArr = keys.reverse();
+    return reversedArr;
+  };
   // 转化成  rowsTree rowsList
   const listToTreeSelf = (data: any) => {
     const { selectFolderDirectory, checkFolderDirectory, currentOperateMaterial, actionType } =
@@ -268,106 +330,46 @@ function Material() {
       });
     }
   };
-  // 重置所以得数据配置
-  const resetFolder = () => {};
   // 获取 分类
   const queryFolderFetch = async () => {
     ROWSLISTMAP.clear();
-    // console.log(ROWSLISTMAP.size);
-    const newImageList: any[] = [];
-    //  selectFolderDirectory, checkFolderDirectory, currentOperateMaterial
-    // console.log('selectFolderDirectory1:', selectFolderDirectory);
-    // console.log('checkFolderDirectory1:', checkFolderDirectory);
-    // console.log('currentOperateMaterial1:', currentOperateMaterial);
-    // console.log('selectedMaterial1:', selectedMaterial);
-    // console.log('otherFolderDirectory1:', otherFolderDirectory);
-    // console.log('imageList:', imageList);
-    // setCheckFolderDirectory(resetFolderDirectory);
-    // setSelectFolderDirectory(resetFolderDirectory);
-    setFolderDirectoryRows([]);
-    setCurrentOperateMaterial({ keys: '' });
-
     const result = await queryFolder();
     if (result.status === 200 && result.data && result.data.rows) {
-      setCurrentOperateMaterial({ keys: '' });
-      // 已删除文件放在最后排序
       const rows = result.data.rows;
-      const newRows: {
-        key: string;
-        father_key: string;
-        is_leaf: any;
-        label: string;
-        [key: string]: any;
-      }[] = [];
-      rows.forEach((item: { label: string; key: string }) => {
-        // @ts-ignore
-        newRows.push(
-          Object.assign({}, item, {
-            title: item.label,
-            checked: false,
-            active: false,
-            data: {
-              requested: false,
-              rows: [],
-              count: 0,
-            },
-          }),
-        );
-        ROWSLISTMAP.set(
-          item.key,
-          Object.assign({}, item, {
-            title: item.label,
-            checked: false,
-            active: false,
-            data: {
-              requested: false,
-              rows: [],
-              count: 0,
-            },
-          }),
-        );
-      });
-      // @ts-ignore
-      const initFolderDirectory =
-        selectFolderDirectory && selectFolderDirectory.key
-          ? selectFolderDirectory
-          : Object.assign({}, newRows[0], { active: 1 });
-      // const { rowsTree, rowsList } = listToTreeSelf(newRows, initFolderDirectory);
-      // setFolderDirectory(rowsTree);
-      // setFolderDirectoryRows(rowsList);
-
-      // await queryFolderMaterialFetch(rowsTree[0]);
-      // console.log('selectFolderDirectory2=:', selectFolderDirectory);
-      // console.log('checkFolderDirectory2=:', checkFolderDirectory);
-      // console.log('currentOperateMaterial2=:', currentOperateMaterial);
-      // console.log('selectedMaterial2=:', selectedMaterial);
-      // console.log('otherFolderDirectory2=:', otherFolderDirectory);
-
-      if (selectFolderDirectory && selectFolderDirectory.key && imageList && imageList.length) {
-        imageList.forEach((item: any) => {
-          newImageList.push(Object.assign({}, item, { current: false }));
-        });
-        const mapData = ROWSLISTMAP.get(selectFolderDirectory.key);
-        if (mapData && mapData.data) {
-          mapData.data = Object.assign({}, mapData.data, { rows: newImageList, requested: false });
-          ROWSLISTMAP.set(selectFolderDirectory.key, mapData);
-          setImageList(newImageList);
-          console.log('newImageList:', newImageList);
+      const newRows: any[] = [];
+      rows.forEach((item: { father_key: any; label: string; key: string; is_leaf: number }) => {
+        if (item.is_leaf == 1) {
+          newRows.push(
+            Object.assign({}, item, { title: item.label, children: [], disableCheckbox: true }),
+          );
+        } else {
+          newRows.push(
+            Object.assign({}, item, { title: item.label, children: [], disableCheckbox: false }),
+          );
         }
-      } else {
-        setSelectFolderDirectory(initFolderDirectory);
-        setImageList([]);
-      }
-      listToTreeSelf({
-        selectFolderDirectory: initFolderDirectory,
-        checkFolderDirectory,
-        currentOperateMaterial,
-        actionType: 'select',
+        ROWSLISTMAP.set(item.key, item);
       });
+      if (!(selectedKeys && selectedKeys[0])) {
+        const itemData = newRows[0];
+        // 初始化 当前节点 展开节点 节点数据
+        setSelectedKeys(itemData.key);
+        const keys = grandParentKeys(itemData);
+        // 获取层级keys
+        console.log('keys:', keys);
+        const newRowsKeys = Object.assign({}, itemData, { keys });
+        setSelectFolderDirectory(newRowsKeys);
+      }
+      // list to tree
+      const rowsTree = listToTree(newRows);
+      setFolderDirectoryRowsTree(rowsTree);
+
+      // 初始化节点图片数据
+      await queryFolderMaterialFetch(newRows[0]);
     } else {
       message.error(result.msg);
     }
   };
+  // 编辑文件夹
   const editFolderFetch = async (data: { [key: string]: any }) => {
     const result = await editFolder(data);
     if (result && result.status === 200 && result.data) {
@@ -381,6 +383,7 @@ function Material() {
       if (data.is_leaf === 1) {
         const result = await delFolder(data);
         if (result && result.status === 200 && result.data) {
+          setSelectedKeys([]);
           await queryFolderFetch();
           message.success('文件夹删除成功');
         } else {
@@ -391,6 +394,7 @@ function Material() {
       }
     }
   };
+  // 创建添加新文件夹
   const createFolderFetch = async (data: any) => {
     const result = await createFolder(data);
     if (result && result.status === 200 && result.data) {
@@ -399,53 +403,15 @@ function Material() {
       message.error(result.msg);
     }
   };
-  const queryFolderMaterialFetch = async (data: { key: any; children?: any }, action?: string) => {
-    if (
-      data &&
-      data.key &&
-      folderDirectory &&
-      folderDirectory.length > 0 &&
-      folderDirectoryRows &&
-      folderDirectoryRows.length > 0
-    ) {
-      const paramsKeys = [];
-      paramsKeys.push(data.key);
-      if (data.children && data.children.length > 0) {
-        data.children.map((itemChildren: { key: any; children: any[] }) => {
-          paramsKeys.push(itemChildren.key);
-          if (itemChildren.children && itemChildren.children.length) {
-            itemChildren.children.map((itemChildren2) => {
-              paramsKeys.push(itemChildren2.key);
-              if (itemChildren2.children && itemChildren2.children.length) {
-                itemChildren2.children.map((itemChildren3: { key: any }) => {
-                  paramsKeys.push(itemChildren3.key);
-                });
-              }
-            });
-          }
-        });
-      }
-      const key = paramsKeys.join(',');
-      if (ROWSLISTMAP && key && ROWSLISTMAP.has(key) && data && data.key) {
-        let mapData = ROWSLISTMAP.get(key);
-        if (mapData && mapData.data) {
-          if (action && action === 'upload') {
-            mapData.data = Object.assign({}, mapData.data, { requested: false });
-          }
-          if (!mapData.data.requested) {
-            const result = await queryFolderMaterial({ key });
-            if (result.status === 200 && result.data) {
-              mapData.data = Object.assign({}, result.data, { requested: false });
-              ROWSLISTMAP.set(key, mapData);
-              setImageList(result.data.rows);
-            } else {
-              message.error(result.msg);
-            }
-          } else {
-            setImageList(mapData.data.rows);
-          }
-        }
-        // 转化成  rowsTree rowsList
+  // 获取图片素材
+  const queryFolderMaterialFetch = async (data: any, action?: string) => {
+    if (data && data.key && data.is_leaf == 1) {
+      const key = data.key;
+      const result = await queryFolderMaterial({ key });
+      if (result.status === 200 && result.data) {
+        setImageList(result.data.rows);
+      } else {
+        message.error(result.msg);
       }
     }
   };
@@ -498,6 +464,14 @@ function Material() {
     setCurrentImageProductType,
     imageLimitNum,
     setImageLimitNum,
+    selectedKeys,
+    expandedKeys,
+    setSelectedKeys,
+    setExpandedKeys,
+    folderDirectoryRowsTree,
+    grandParentKeys,
+    setOperateFolderDirectory,
+    operateFolderDirectory,
   };
 }
 

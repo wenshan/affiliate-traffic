@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import './index.less';
 // https://github.com/react-component/upload#customrequest
-const UploadFiles: React.FC = () => {
+const UploadFiles: React.FC = (props: any) => {
   // console.log('UploadFile props:', props);
   const { selectFolderDirectory, queryFolderMaterialFetch } = useModel('material');
   const uploadProps = {
@@ -89,7 +89,12 @@ const UploadFiles: React.FC = () => {
   return (
     <div className="uploadfiles">
       <Upload {...uploadProps}>
-        <Button icon={<UploadOutlined />}>文件夹图片上传</Button>
+        <Button
+          icon={<UploadOutlined />}
+          disabled={!!!(props.selectedKeys && props.selectedKeys[0])}
+        >
+          文件夹图片上传
+        </Button>
       </Upload>
     </div>
   );

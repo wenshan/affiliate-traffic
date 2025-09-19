@@ -1,10 +1,5 @@
 import ResizeImg from '@/constant/resizeImg';
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  RotateRightOutlined,
-  SwapOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useModel } from '@umijs/max';
 import { Image, Modal } from 'antd';
 import React from 'react';
@@ -98,13 +93,11 @@ function ImgList() {
                 <span className="checkbox_inner"></span>
               </div>
               <div className="img-box" onClick={() => handelSelectCurrent(item)}>
-                <Image width={160} src={`${item.url}${ResizeImg['w_160']}`} preview={false} />
+                <Image width={160} src={`${item.url}${ResizeImg['w_160']}`} preview={true} />
               </div>
               <div className="line"></div>
               <div className="tool">
                 <DeleteOutlined onClick={() => handelDelMaterial(item)} />
-                <RotateRightOutlined />
-                <SwapOutlined />
                 <DownloadOutlined onClick={() => onDownload(item)} />
               </div>
               <div className="line"></div>

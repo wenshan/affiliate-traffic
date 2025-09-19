@@ -9,6 +9,7 @@ import {
   Col,
   Modal,
   Pagination,
+  Popover,
   Row,
   Select,
   Spin,
@@ -233,11 +234,22 @@ function ProductList() {
       width: 220,
       render: (_: any, record: any) => {
         if (record && record.description) {
+          // product_highlight
+          const desTitle = Tool.replaceExceedEnd(record.description, 10);
+          const desHtml = <div dangerouslySetInnerHTML={{ __html: record.description }}></div>;
+          const highlightTitle = Tool.replaceExceedEnd(record.description, 10);
+          const highlightHtml = (
+            <div dangerouslySetInnerHTML={{ __html: record.description }}></div>
+          );
           return (
-            <div
-              className="table-text clearfix"
-              dangerouslySetInnerHTML={{ __html: record.description ? record.description : '' }}
-            />
+            <div className="table-text clearfix">
+              <Popover content={highlightHtml} trigger="click" title={highlightTitle}>
+                <Button>亮点:{highlightTitle}</Button>
+              </Popover>
+              <Popover content={desHtml} trigger="click" title={desTitle}>
+                <Button>描述:{desTitle}</Button>
+              </Popover>
+            </div>
           );
         } else {
           return '-';
@@ -303,98 +315,6 @@ function ProductList() {
       },
     },
     {
-      title: '附加图片',
-      dataIndex: 'additional_image_link',
-      key: 'additional_image_link',
-      width: 200,
-      render: (_: any, record: { additional_image_link: string[] }) => {
-        const html: JSX.Element[] = [];
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        record &&
-          Tool.isArray(record.additional_image_link) &&
-          record.additional_image_link.length &&
-          record.additional_image_link.map((item: string, idx: Key) => {
-            html.push(
-              <img key={`${idx}_${item}`} src={`${item}${ResizeImg['w_50']}`} width={50}></img>,
-            );
-          });
-        return html;
-      },
-    },
-    {
-      title: '详情图',
-      dataIndex: 'lifestyle_image_link',
-      key: 'lifestyle_image_link',
-      width: 190,
-      render: (_: any, record: { lifestyle_image_link: string[] }) => {
-        const html: JSX.Element[] = [];
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        record &&
-          Tool.isArray(record.lifestyle_image_link) &&
-          record.lifestyle_image_link.length > 0 &&
-          record.lifestyle_image_link.map((item: string, idx: Key) => {
-            html.push(
-              <img key={`${idx}_${item}`} src={`${item}${ResizeImg['w_50']}`} width={30}></img>,
-            );
-          });
-        return html;
-      },
-    },
-    {
-      title: '尺寸',
-      dataIndex: 'size',
-      key: 'size',
-      width: 200,
-      render: (_: any, record: any) => {
-        if (record.size && record.size_type && record.size_system) {
-          return (
-            <>
-              <p>{`尺寸: ${record.size}`}</p>
-              <p>{`尺码类型: ${record.size_type} 尺码体系: ${record.size_system}`}</p>
-            </>
-          );
-        } else {
-          return '-';
-        }
-      },
-    },
-    {
-      title: '商品尺寸',
-      dataIndex: 'product_size',
-      key: 'product_size',
-      width: 200,
-      render: (_: any, record: any) => {
-        if (record.productHeight && record.productLength && record.sizeUnit) {
-          return (
-            <>
-              <p>{`LWH: ${record.productLength}x${record.productWidth}x${record.productHeight} ${record.sizeUnit}`}</p>
-              <p>{`W: ${record.productWeight} ${record.weightUnit}`}</p>
-            </>
-          );
-        } else {
-          return '-';
-        }
-      },
-    },
-    {
-      title: '适用人群',
-      dataIndex: 'age_group',
-      key: 'age_group',
-      width: 120,
-      render: (_: any, record: any) => {
-        if (record.age_group && record.gender) {
-          return (
-            <>
-              <p>{`年龄: ${record.age_group}`}</p>
-              <p>{`性别: ${record.gender}`}</p>
-            </>
-          );
-        } else {
-          return '-';
-        }
-      },
-    },
-    {
       title: '商品属性',
       dataIndex: 'product_detail',
       key: 'product_detail',
@@ -417,23 +337,103 @@ function ProductList() {
       },
     },
     {
-      title: '亮点',
-      dataIndex: 'product_highlight',
-      key: 'product_highlight',
-      ellipsis: true,
+      title: '商品尺寸',
+      dataIndex: 'product_size',
+      key: 'product_size',
       width: 200,
-      render: (_: any, record: any) => (
-        <span
-          className="table-text clearfix"
-          dangerouslySetInnerHTML={{ __html: record.product_highlight }}
-        ></span>
-      ),
+      render: (_: any, record: any) => {
+        if (record.productHeight && record.productLength && record.sizeUnit) {
+          return (
+            <>
+              <p>{`LWH: ${record.productLength}x${record.productWidth}x${record.productHeight} ${record.sizeUnit}`}</p>
+              <p>{`W: ${record.productWeight} ${record.weightUnit}`}</p>
+            </>
+          );
+        } else {
+          return '-';
+        }
+      },
+    },
+    {
+      title: '尺寸',
+      dataIndex: 'size',
+      key: 'size',
+      width: 200,
+      render: (_: any, record: any) => {
+        if (record.size && record.size_type && record.size_system) {
+          return (
+            <>
+              <p>{`尺寸: ${record.size}`}</p>
+              <p>{`尺码类型: ${record.size_type} 尺码体系: ${record.size_system}`}</p>
+            </>
+          );
+        } else {
+          return '-';
+        }
+      },
     },
     {
       title: '语言',
       dataIndex: 'language',
       key: 'language',
       width: 90,
+    },
+    {
+      title: '适用人群',
+      dataIndex: 'age_group',
+      key: 'age_group',
+      width: 120,
+      render: (_: any, record: any) => {
+        if (record.age_group && record.gender) {
+          return (
+            <>
+              <p>{`年龄: ${record.age_group}`}</p>
+              <p>{`性别: ${record.gender}`}</p>
+            </>
+          );
+        } else {
+          return '-';
+        }
+      },
+    },
+
+    {
+      title: '详情图',
+      dataIndex: 'lifestyle_image_link',
+      key: 'lifestyle_image_link',
+      width: 190,
+      render: (_: any, record: { lifestyle_image_link: string[] }) => {
+        const html: JSX.Element[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        record &&
+          Tool.isArray(record.lifestyle_image_link) &&
+          record.lifestyle_image_link.length > 0 &&
+          record.lifestyle_image_link.map((item: string, idx: Key) => {
+            html.push(
+              <img key={`${idx}_${item}`} src={`${item}${ResizeImg['w_50']}`} width={30}></img>,
+            );
+          });
+        return html;
+      },
+    },
+    {
+      title: '附加图片',
+      dataIndex: 'additional_image_link',
+      key: 'additional_image_link',
+      width: 200,
+      render: (_: any, record: { additional_image_link: string[] }) => {
+        const html: JSX.Element[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        record &&
+          Tool.isArray(record.additional_image_link) &&
+          record.additional_image_link.length &&
+          record.additional_image_link.map((item: string, idx: Key) => {
+            html.push(
+              <img key={`${idx}_${item}`} src={`${item}${ResizeImg['w_50']}`} width={50}></img>,
+            );
+          });
+        return html;
+      },
     },
     {
       title: '操作',

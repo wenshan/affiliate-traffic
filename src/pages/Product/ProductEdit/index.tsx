@@ -1,10 +1,6 @@
-import React from 'react';
-import { connect } from 'umi';
-
 import './index.less';
 
-const ProductEdit: React.FC = (props) => {
-  console.log('props:', props);
+function ProductEdit() {
   return (
     <div className="material">
       <div className="content">
@@ -14,11 +10,6 @@ const ProductEdit: React.FC = (props) => {
       </div>
     </div>
   );
-};
+}
 
-const mapStateToProps = (state: { common: any; material: any; productEdit: any }) => ({
-  common: state.common,
-  productEdit: state.productEdit,
-});
-
-export default connect(mapStateToProps)(ProductEdit);
+export default ProductEdit;
