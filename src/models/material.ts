@@ -92,6 +92,7 @@ const otherFolderDirectoryInit = {
 };
 //     selectedKeys, expandedKeys,
 function Material() {
+  const [isLoading, setLoading] = useState(false);
   // 选中当前的节点
   const [selectedKeys, setSelectedKeys] = useState([]);
   // 展开当前的节点
@@ -109,8 +110,9 @@ function Material() {
 
   const [otherFolderDirectory, setOtherFolderDirectory] = useState(otherFolderDirectoryInit);
   const [folderDirectoryRows, setFolderDirectoryRows] = useState([]);
-  const [folderDirectory, setFolderDirectory] = useState([]);
-  const [selectedMaterial, setSelectedMaterial] = useState([]); // 选取的素材
+  const [folderDirectory, setFolderDirectory] = useState<any>([]);
+  // 当前选择的素材列表
+  const [selectedMaterial, setSelectedMaterial] = useState<any>([]); // 选取的素材
   const [currentOperateMaterial, setCurrentOperateMaterial] = useState({ keys: '' }); // 当前操作的素材
   const [currentImageProductType, setCurrentImageProductType] = useState('image_link');
   const [imageLimitNum, setImageLimitNum] = useState(20);
@@ -159,162 +161,25 @@ function Material() {
     const reversedArr = keys.reverse();
     return reversedArr;
   };
-  // 转化成  rowsTree rowsList
-  const listToTreeSelf = (data: any) => {
-    const { selectFolderDirectory, checkFolderDirectory, currentOperateMaterial, actionType } =
-      data;
-    const result: any[] = [];
-    const rowsList: any[] = [];
-    const father_key: any[] = [];
-    // const checkedData: any[] = [...selectedMaterial];
-    const checkedData: any[] = [];
-    // console.log('action:', actionType);
-    // 当前文件夹的值
-    ROWSLISTMAP.forEach((item) => {
-      ROWSLISTMAP.set(
-        item.key,
-        Object.assign({}, item, { active: false, checked: false, children: [] }),
-      );
-    });
-
-    if (selectFolderDirectory && selectFolderDirectory.key) {
-      if (!selectFolderDirectory.active) {
-        // 关闭=》展开
-        father_key.push(selectFolderDirectory.key);
-        if (selectFolderDirectory.father_key) {
-          const father01 = ROWSLISTMAP.get(selectFolderDirectory.father_key);
-          if (father01) {
-            father_key.push(father01.key);
-            if (father01.father_key) {
-              const father02 = ROWSLISTMAP.get(father01.father_key);
-              father_key.push(father02.key);
-              if (father02.father_key) {
-                const father03 = ROWSLISTMAP.get(father02.father_key);
-                father_key.push(father03.key);
-                if (father03.father_key) {
-                  const father04 = ROWSLISTMAP.get(father02.father_key);
-                  father_key.push(father04.key);
-                }
-              }
-            }
-          }
-        }
-      } else {
-        // 展开=》关闭
-        if (selectFolderDirectory.father_key) {
-          const father01 = ROWSLISTMAP.get(selectFolderDirectory.father_key);
-          if (father01) {
-            father_key.push(father01.key);
-            if (father01.father_key) {
-              const father02 = ROWSLISTMAP.get(father01.father_key);
-              father_key.push(father02.key);
-              if (father02.father_key) {
-                const father03 = ROWSLISTMAP.get(father02.father_key);
-                father_key.push(father03.key);
-                if (father03.father_key) {
-                  const father04 = ROWSLISTMAP.get(father02.father_key);
-                  father_key.push(father04.key);
-                }
-              }
-            }
-          }
-        }
-      }
-
-      father_key.forEach((itemKey) => {
-        const currentMap = ROWSLISTMAP.get(itemKey);
-        if (currentMap) {
-          ROWSLISTMAP.set(itemKey, Object.assign({}, currentMap, { children: [], active: true }));
-        }
-      });
-    }
-    // 文件夹被选中
-    if (checkFolderDirectory && checkFolderDirectory.key) {
-      ROWSLISTMAP.forEach((item) => {
-        if (checkFolderDirectory.key === item.key) {
-          ROWSLISTMAP.set(
-            item.key,
-            Object.assign({}, item, { checked: checkFolderDirectory.checked }, { children: [] }),
-          );
-        } else {
-          ROWSLISTMAP.set(item.key, Object.assign({}, item, { children: [], checked: false }));
-        }
-      });
-    }
-    // imgList
-    if (
-      currentOperateMaterial &&
-      currentOperateMaterial.keys &&
-      selectFolderDirectory &&
-      selectFolderDirectory.key
-    ) {
-      if (selectFolderDirectory.is_leaf === 1) {
-        if (ROWSLISTMAP.get(selectFolderDirectory.key)) {
-          const mapData = ROWSLISTMAP.get(selectFolderDirectory.key);
-          // if (mapData.data && mapData.data.requested && mapData.data.rows) {
-          if (mapData.data && mapData.data.rows) {
-            mapData.data.rows.forEach((item: { keys: any; current: any }, idx: string | number) => {
-              if (currentOperateMaterial.keys === item.keys) {
-                if (currentOperateMaterial.current) {
-                  mapData.data.rows[idx] = Object.assign({}, item, { current: false });
-                } else {
-                  mapData.data.rows[idx] = Object.assign({}, item, { current: true });
-                  checkedData.push(Object.assign({}, item, { current: true }));
-                }
-              } else {
-                if (item && item.current) {
-                  checkedData.push(item);
-                }
-              }
-            });
-          }
-        }
-      }
-    }
-
-    ROWSLISTMAP.forEach((item) => {
-      rowsList.push(Object.assign({}, item));
-      if (item.father_key) {
-        const parentItem = ROWSLISTMAP.get(item.father_key);
-        if (parentItem) {
-          if (!parentItem.children) {
-            parentItem['children'] = [];
-          }
-          // console.log(item.key, parentItem.children);
-          parentItem.children.push(item);
-        }
-      } else {
-        result.push(item);
-      }
-    });
-    // console.log('result:', result);
-    // console.log('checkedData:', checkedData);
-    setFolderDirectory(result);
-    setFolderDirectoryRows(rowsList);
-    setSelectedMaterial(checkedData);
-  };
   // 同步更新选中的状态
   const updateOperateMaterial = (currentItem: { keys: string; [key: string]: any }) => {
-    if (currentItem && currentItem.keys) {
-      setCurrentOperateMaterial(currentItem);
-      listToTreeSelf({
-        selectFolderDirectory,
-        checkFolderDirectory,
-        currentOperateMaterial: currentItem,
-        actionType: 'imglist',
+    const newImageList: ({ keys: string; current: boolean } & { current: boolean })[] = [];
+    const selectImageList: ({ keys: string; current: boolean } & { current: boolean })[] = [];
+    if (currentItem && currentItem.keys && imageList) {
+      imageList.forEach((item: { keys: string; current: boolean }) => {
+        if (item.keys == currentItem.keys) {
+          newImageList.push(Object.assign({}, item, { current: !item.current }));
+        } else {
+          newImageList.push(item);
+        }
       });
-    }
-  };
-  // 同步更新 select
-  const updateOperateCheckFolderDirectory = (currentItem: any) => {
-    if (currentItem && currentItem.key) {
-      setCheckFolderDirectory(Object.assign({}, currentItem, { children: [], data: {} }));
-      listToTreeSelf({
-        selectFolderDirectory,
-        checkFolderDirectory: currentItem,
-        currentOperateMaterial,
-        actionType: 'select',
+      newImageList.forEach((item) => {
+        if (item.current) {
+          selectImageList.push(item);
+        }
       });
+      setImageList(newImageList);
+      setSelectedMaterial(selectImageList);
     }
   };
   // 同步更新 checkbox
@@ -322,12 +187,6 @@ function Material() {
     if (currentItem && currentItem.key) {
       setSelectFolderDirectory(currentItem);
       setCheckFolderDirectory({ key: '' });
-      listToTreeSelf({
-        selectFolderDirectory: currentItem,
-        checkFolderDirectory: { key: '' },
-        currentOperateMaterial,
-        actionType: 'checkbox',
-      });
     }
   };
   // 获取 分类
@@ -349,22 +208,35 @@ function Material() {
         }
         ROWSLISTMAP.set(item.key, item);
       });
-      if (!(selectedKeys && selectedKeys[0])) {
-        const itemData = newRows[0];
-        // 初始化 当前节点 展开节点 节点数据
-        setSelectedKeys(itemData.key);
-        const keys = grandParentKeys(itemData);
-        // 获取层级keys
-        console.log('keys:', keys);
-        const newRowsKeys = Object.assign({}, itemData, { keys });
-        setSelectFolderDirectory(newRowsKeys);
+      if (newRows && newRows[0]) {
+        if (!(selectedKeys && selectedKeys[0])) {
+          const itemData = newRows[0];
+          // 初始化 当前节点 展开节点 节点数据
+          const keys = grandParentKeys(itemData);
+          // 获取层级keys
+          console.log('keys:', keys);
+          const newRowsKeys = Object.assign({}, itemData, { keys });
+          setSelectFolderDirectory(newRowsKeys);
+          // list to tree
+          const rowsTree = listToTree(newRows);
+          setFolderDirectoryRowsTree(rowsTree);
+          const arrTemp = [];
+          arrTemp.push(rowsTree[0].key);
+          setSelectedKeys(arrTemp);
+          // 初始化节点图片数据
+          await queryFolderMaterialFetch(newRowsKeys);
+        } else {
+          // list to tree
+          const rowsTree = listToTree(newRows);
+          setFolderDirectoryRowsTree(rowsTree);
+          await queryFolderMaterialFetch(selectFolderDirectory);
+        }
+      } else {
+        setSelectedKeys([]);
+        setOperateFolderDirectory({});
+        setFolderDirectoryRowsTree([]);
+        setSelectFolderDirectory({});
       }
-      // list to tree
-      const rowsTree = listToTree(newRows);
-      setFolderDirectoryRowsTree(rowsTree);
-
-      // 初始化节点图片数据
-      await queryFolderMaterialFetch(newRows[0]);
     } else {
       message.error(result.msg);
     }
@@ -407,12 +279,14 @@ function Material() {
   const queryFolderMaterialFetch = async (data: any, action?: string) => {
     if (data && data.key && data.is_leaf == 1) {
       const key = data.key;
+      setLoading(true);
       const result = await queryFolderMaterial({ key });
       if (result.status === 200 && result.data) {
         setImageList(result.data.rows);
       } else {
         message.error(result.msg);
       }
+      setLoading(false);
     }
   };
   const delMaterialFetch = async (data: any) => {
@@ -433,6 +307,7 @@ function Material() {
     }
   };
   return {
+    isLoading,
     setFolderDirectory,
     setFolderDirectoryRows,
     setSelectFolderDirectory,
@@ -456,9 +331,7 @@ function Material() {
     queryFolderMaterialFetch,
     productSkuImageModalStatus,
     setProductSkuImageModalStatus,
-    setCurrentOperateMaterial,
     updateOperateMaterial,
-    updateOperateCheckFolderDirectory,
     updateOperateSelectFolderDirectory,
     currentImageProductType,
     setCurrentImageProductType,
@@ -472,6 +345,7 @@ function Material() {
     grandParentKeys,
     setOperateFolderDirectory,
     operateFolderDirectory,
+    setFolderDirectoryRowsTree,
   };
 }
 

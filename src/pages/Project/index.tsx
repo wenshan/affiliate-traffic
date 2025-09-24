@@ -5,35 +5,62 @@ import {
   googleMerchantAccountInsert,
   queryProjectList,
   setDefault,
+  updateProject,
 } from '@/services/api/googleAccount';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
 import {
-  ModalForm,
-  PageContainer,
-  ProForm,
-  ProFormSwitch,
-  ProFormText,
-} from '@ant-design/pro-components';
-import { Button, Descriptions, Form, Input, Modal, Table, message } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+  Button,
+  Col,
+  Descriptions,
+  Divider,
+  Input,
+  Modal,
+  Row,
+  Switch,
+  Table,
+  message,
+} from 'antd';
+import { useEffect, useState } from 'react';
 import JsonView from 'react18-json-view';
 const { Search } = Input;
 
 import 'react18-json-view/src/style.css';
 import './index.less';
 
+type objType = {
+  [key: string]: any;
+};
+const initGMCAccount = {
+  merchantId: '',
+  accountId: '',
+};
+const initAccountInfo = {
+  accountId: '',
+  name: '',
+  merchantId: '',
+  projectId: '',
+  websiteUrl: '',
+  state: false,
+  user_ids: '',
+};
+
 export default () => {
-  const formRef = useRef();
-  const [form] = Form.useForm();
-  const [formSearch] = Form.useForm<{ accountId: string; merchantId: string }>();
+  const [optionAction, setOptionAction] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
-  const [modalAccount, setModalAccount] = useState(false);
+  const [gmcAccount, setGmcAccount] = useState(initGMCAccount);
+
+  // 新建项目的浮层状态
+  const [modalProjectAccountState, setModalProjectAccountState] = useState(false);
+  // 添加用户浮层
   const [modalUser, setModalUser] = useState(false);
-  const [accountInfo, setAccountInfo] = useState(null);
+  // 项目信息
+  const [accountInfo, setAccountInfo] = useState(initAccountInfo);
+
   const [projectList, setProjectList] = useState({ rows: [] });
   const [userEmail, setUserEmail] = useState('');
-  const [userInfoCurrent, setUserInfoCurrent] = useState();
-  const [userTableList, setUserTableList] = useState([]);
+  const [userInfoCurrent, setUserInfoCurrent] = useState<any>({});
+  const [userTableList, setUserTableList] = useState<any>([]);
 
   // 获取项目列表
   const queryProjectListFetch = async () => {
@@ -45,7 +72,7 @@ export default () => {
     }
   };
 
-  const setDefaultStateFetch2 = async (accountId: any) => {
+  const setDefaultStateFetch = async (accountId: any) => {
     const result = await setDefault({ accountId });
     if (result && result.status === 200 && result.data) {
       queryProjectListFetch();
@@ -65,15 +92,9 @@ export default () => {
         }
       });
     const userIdStr = userIdArr.join(',');
-    form.setFieldValue('user_ids', userIdStr);
+    const newAccountInfo = Object.assign({}, accountInfo, { user_ids: userIdStr });
+    setAccountInfo(newAccountInfo);
     setUserTableList(newList);
-  };
-
-  const accountUpdate = (record: any) => {
-    form.setFieldsValue(record);
-    setModalAccount(true);
-    // 用户列表
-    setUserTableList(record.userList);
   };
 
   const columnsAccount = [
@@ -101,20 +122,23 @@ export default () => {
       title: '状态',
       dataIndex: 'state',
       key: 'state',
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         return record.state ? '开启' : '关闭';
       },
     },
     {
       title: '操作',
       key: 'operate',
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         const html = [];
         html.push(
           <a
             key={`${record.projectId}_edit`}
             onClick={() => {
-              accountUpdate(record);
+              setOptionAction(true);
+              setModalProjectAccountState(true);
+              setAccountInfo(record);
+              setUserTableList(record.userList);
             }}
           >
             编辑
@@ -127,7 +151,7 @@ export default () => {
           ) : (
             <a
               key={`${record.projectId}_default`}
-              onClick={() => setDefaultStateFetch2(record.accountId)}
+              onClick={() => setDefaultStateFetch(record.accountId)}
             >
               设置默认为项目
             </a>
@@ -138,6 +162,11 @@ export default () => {
     },
   ];
   const columnsUser = [
+    {
+      title: '用户ID',
+      dataIndex: 'id',
+      key: 'id',
+    },
     {
       title: '邮箱',
       dataIndex: 'email',
@@ -151,7 +180,7 @@ export default () => {
     {
       title: '操作',
       key: 'operate',
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         return (
           <a key={record.email} onClick={() => userTableListDel(record.email)}>
             删除
@@ -161,29 +190,12 @@ export default () => {
     },
   ];
 
-  // 插入子账号信息
-  const googleAccountInsertFetch = async (value: { [key: string]: any } | undefined) => {
-    const result = await googleMerchantAccountInsert(value);
-    if (result && result.status === 200 && result.data) {
-      queryProjectListFetch();
-      message.info('创建项目成功！');
-    } else {
-      message.error(result.msg);
-    }
-  };
-
   // 获取值账号信息
   const googleMerchantAccountGetFetchSearch = async (value: any) => {
     const { merchantId, accountId } = value;
     const result = await googleMerchantAccountGet({ accountId, merchantId });
     if (result && result.status === 200 && result.data) {
       setAccountInfo(result.data);
-      const formData = Object.assign({}, result.data, {
-        accountId: result.data.id,
-        state: true,
-        defaultState: false,
-      });
-      form.setFieldsValue(formData);
     }
   };
 
@@ -196,16 +208,16 @@ export default () => {
       setUserLoading(false);
     } else {
       setUserLoading(false);
-      message.error(result.msg);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      result && result.msg && message.error(result.msg);
     }
   };
-  // user 确认添加
-  const userAddSubmit = () => {
-    // setUserTableList userTableList userInfoCurrent
+  // 添加 user 数据
+  const userAddAdminSubmit = () => {
     if (userInfoCurrent) {
       const userIdArr: any[] = [];
-      const obj = {};
-      userTableList.forEach((item) => {
+      const obj: objType = {};
+      userTableList.forEach((item: { email: string | number }) => {
         obj[item.email] = Object.assign({}, item);
       });
       if (obj[userInfoCurrent.email]) {
@@ -223,8 +235,78 @@ export default () => {
           userIdArr.push(item.id);
         });
       const userIdStr = userIdArr.join(',');
-      form.setFieldValue('user_ids', userIdStr);
+      const newAccountInfo = Object.assign({}, accountInfo, { user_ids: userIdStr });
+      setAccountInfo(newAccountInfo);
     }
+  };
+  // 添加编辑/创建项目
+  const userAddProjectSubmit = async () => {
+    const { accountId, name, websiteUrl, user_ids } = accountInfo;
+    if (name && websiteUrl && user_ids && accountId) {
+      if (optionAction) {
+        // 编辑
+        setUserLoading(true);
+        const result = await updateProject(accountInfo);
+        if (result && result.status === 200 && result.data) {
+          await queryProjectListFetch();
+          message.info('项目更新成功');
+          setUserLoading(false);
+          setModalProjectAccountState(false);
+          await queryProjectListFetch();
+        } else {
+          message.error('接口请求错误');
+        }
+      } else {
+        // 新增加
+        setUserLoading(true);
+        const result = await googleMerchantAccountInsert(accountInfo);
+        if (result && result.status === 200 && result.data) {
+          await queryProjectListFetch();
+          message.info('创建项目成功！');
+          setUserLoading(false);
+          setModalProjectAccountState(false);
+          await queryProjectListFetch();
+        } else {
+          message.error('接口请求错误');
+        }
+      }
+    } else {
+      message.error('缺少参数');
+    }
+  };
+  // 取消
+  const userAddProjectCancel = () => {
+    setModalProjectAccountState(false);
+  };
+  // switchStat
+  const switchStateOnChange = (checked: boolean) => {
+    const newAccountInfo = Object.assign({}, accountInfo, { state: checked });
+    setAccountInfo(newAccountInfo);
+  };
+
+  // switchStat
+  const inputAccountInfoOnChange = (name: string, event: any) => {
+    const { value } = event.target;
+    const temp: any = {};
+    temp[name] = value;
+    const newAccountInfo = Object.assign({}, accountInfo, temp);
+    setAccountInfo(newAccountInfo);
+  };
+
+  // google-account
+  const googleAccountInput = (name: string, event: any) => {
+    const { value } = event.target;
+    const temp: any = {};
+    temp[name] = value;
+    const newGmcAccount = Object.assign({}, gmcAccount, temp);
+    setGmcAccount(newGmcAccount);
+  };
+  // button
+  const googleAccountSearch = async () => {
+    await googleMerchantAccountGetFetchSearch(gmcAccount);
+  };
+  const googleAccountRestart = () => {
+    setGmcAccount(initGMCAccount);
   };
 
   useEffect(() => {
@@ -240,45 +322,56 @@ export default () => {
         </div>
         <div className="content">
           <div className="input">
-            <ProForm
-              form={formSearch}
-              layout="inline"
-              initialValues={{
-                layout: 'inline',
-              }}
-              grid={true}
-              rowProps={{ gutter: [16, 16] }}
-              onFinish={async (value) => {
-                googleMerchantAccountGetFetchSearch(value);
-              }}
-            >
-              <ProFormText
-                key="merchantId"
-                name="merchantId"
-                label="Merchant ID"
-                placeholder="input Merchant ID"
-              />
-              <ProFormText
-                key="accountId"
-                name="accountId"
-                label="AccountId ID"
-                placeholder="input AccountId ID"
-              />
-            </ProForm>
+            <div className="account-search">
+              <Row>
+                <Col span={14}>
+                  <div>
+                    <span className="label">Merchant ID</span>
+                    <Input
+                      onChange={(event) => googleAccountInput('merchantId', event)}
+                      key="merchantId"
+                      name="merchantId"
+                      placeholder="input Merchant ID"
+                    />
+                  </div>
+                  <div>
+                    <span className="label">AccountId ID</span>
+                    <Input
+                      onChange={(event) => googleAccountInput('accountId', event)}
+                      key="accountId"
+                      name="accountId"
+                      placeholder="input AccountId ID"
+                    />
+                  </div>
+                </Col>
+                <Col span={10}>
+                  <div className="button">
+                    <Button type="primary" icon={<SearchOutlined />} onClick={googleAccountSearch}>
+                      查询
+                    </Button>{' '}
+                    <Button onClick={googleAccountRestart}>重置</Button>
+                  </div>
+                </Col>
+              </Row>
+            </div>
           </div>
           <div className="text"></div>
           <div className="account-info">
-            <div className="data">{accountInfo && <JsonView src={accountInfo} />}</div>
+            <div className="data">{accountInfo.name && <JsonView src={accountInfo} />}</div>
           </div>
         </div>
         <div className="footer"></div>
       </div>
+      <Divider></Divider>
       <div className="table-box">
         <div className="button-new">
           <Button
             type="primary"
             onClick={() => {
-              setModalAccount(true);
+              setOptionAction(false);
+              setModalProjectAccountState(true);
+              setAccountInfo(initAccountInfo);
+              setUserTableList([]);
             }}
           >
             <PlusOutlined />
@@ -294,61 +387,61 @@ export default () => {
         />
       </div>
 
-      <ModalForm
-        open={modalAccount}
-        onOpenChange={setModalAccount}
-        onFinish={async (value) => {
-          googleAccountInsertFetch(value);
-          setModalAccount(false);
-        }}
-        formRef={formRef}
-        autoFocusFirstInput
-        form={form}
+      <Modal
+        open={modalProjectAccountState}
+        title={`${optionAction ? '编辑项目信息' : '创建新项目'}`}
+        width={750}
+        onCancel={userAddProjectCancel}
+        onOk={userAddProjectSubmit}
       >
-        <ProForm.Group>
-          <ProFormText
+        <div className="box">
+          <span className="label">项目名称</span>
+          <Input
             width="md"
             name="name"
-            required
-            label="项目名称"
-            tooltip="最长为 24 位"
             placeholder="请输入名称"
-            disabled
-            rules={[{ required: true, message: '这是必填项' }]}
+            value={accountInfo.name}
+            onChange={(event) => inputAccountInfoOnChange('name', event)}
           />
-          <ProFormText
+          <span className="label">商家的网站</span>
+          <Input
             width="md"
             name="websiteUrl"
-            label="商家的网站"
             placeholder="请输入网站"
-            disabled
+            value={accountInfo.websiteUrl}
+            onChange={(event) => inputAccountInfoOnChange('websiteUrl', event)}
           />
-        </ProForm.Group>
-        <ProForm.Group>
-          <ProFormText
+        </div>
+        <Divider></Divider>
+        <div className="box">
+          <span className="label">账户ID</span>
+          <Input
             width="md"
             name="accountId"
-            label="账户ID"
             placeholder="请输入网站ID"
-            disabled
+            value={accountInfo.accountId}
+            onChange={(event) => inputAccountInfoOnChange('accountId', event)}
           />
-          <ProFormSwitch
-            name="state"
+          <span className="label">项目状态</span>
+          <Switch
+            onChange={switchStateOnChange}
             checkedChildren="开启"
             unCheckedChildren="关闭"
-            label="项目状态"
-          ></ProFormSwitch>
-        </ProForm.Group>
-        <ProForm.Group>
-          <ProFormText
+          ></Switch>
+        </div>
+        <div className="box">
+          <span className="label">项目管理员账号</span>
+          <Input
             width="md"
             name="user_ids"
-            label="项目管理员账号"
             placeholder="请输入用户ID','隔开"
-            disabled
+            value={accountInfo.user_ids}
+            disabled={true}
+            onChange={(event) => inputAccountInfoOnChange('user_ids', event)}
           />
-        </ProForm.Group>
-        <ProForm.Group>
+        </div>
+        <Divider></Divider>
+        <div>
           <div className="user-ids">
             <div className="header">
               <h3>项目管理员账号</h3>
@@ -370,8 +463,8 @@ export default () => {
               />
             </div>
           </div>
-        </ProForm.Group>
-      </ModalForm>
+        </div>
+      </Modal>
       <Modal
         title="项目管理员账号"
         okText="确认添加此账号"
@@ -380,7 +473,7 @@ export default () => {
         onCancel={() => {
           setModalUser(false);
         }}
-        onOk={userAddSubmit}
+        onOk={userAddAdminSubmit}
       >
         <Search
           placeholder="input search email"
@@ -395,6 +488,9 @@ export default () => {
         />
         {userInfoCurrent && (
           <Descriptions title="用户信息">
+            <Descriptions.Item key="ID" label="ID">
+              {userInfoCurrent.id}
+            </Descriptions.Item>
             <Descriptions.Item key="Nickname" label="Nickname">
               {userInfoCurrent.nickname}
             </Descriptions.Item>

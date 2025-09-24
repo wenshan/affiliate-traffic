@@ -27,9 +27,9 @@ import {
   queryProductMainOfferId,
 } from '@/services/api/productMain';
 import { cerateType, delType, editType, queryType } from '@/services/api/productType';
+import { history } from '@umijs/max';
 import { Modal, message } from 'antd';
 import QueryString from 'query-string';
-import { history } from 'umi';
 
 export default {
   namespace: 'product',

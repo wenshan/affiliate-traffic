@@ -7,7 +7,7 @@ const Tool = {
    * @return {boolean}
    */
 
-  isEmptyObject(obj) {
+  isEmptyObject(obj: any) {
     let key;
     for (key in obj) {
       if (obj[key]) {
@@ -37,11 +37,11 @@ const Tool = {
    * @return {string} 替换后的字符串
    * 中文 code 范围： U+4E00 - U+9FFFF
    */
-  replaceExceedEnd(str, maxWidth = 12, replace = '...') {
+  replaceExceedEnd(str: string, maxWidth = 12, replace = '...') {
     let width = 0;
     let index;
-    let text = str.replace(/<[^>]+>/g, '');
-    for (let i = 0; i < (text && text.length); i++) {
+    let text: string = str.replace(/<[^>]+>/g, '');
+    for (let i = 0; i < text.length; i++) {
       let code = text.charCodeAt(i);
       if (code >= 0x4e00 && code <= 0x9fff) {
         width += 2;
@@ -90,7 +90,7 @@ const Tool = {
    *
    */
 
-  objectToString(object, separator = '&') {
+  objectToString(object: any, separator = '&') {
     if (!object) {
       return false;
     }
@@ -104,7 +104,7 @@ const Tool = {
   /*
    * 格式价格
    */
-  formatPrice(price, type = 2) {
+  formatPrice(price: any, type = 2) {
     if (typeof price !== 'number' || Number.isNaN(price)) {
       return '￥0.00';
     }
@@ -134,7 +134,7 @@ const Tool = {
    * @param search: string
    * @return search: object
    */
-  getSearchObject(search) {
+  getSearchObject(search: string) {
     search = search || window.location.search;
     const pairs = search.replace('?', '').split('&');
     const obj = {};
@@ -151,7 +151,7 @@ const Tool = {
   /*
     format date for clothes detail
   */
-  formatDete(val) {
+  formatDete(val: any) {
     const date = new Date(val); // Mon Jul 16 2018 13:55:59 GMT+0800 (中国标准时间)
     const str = date.toLocaleString(); // "2018/7/16 下午1:55:59"
     const msString = String(date); // 'Mon Jul 16 2018 13:55:59 GMT+0800 (中国标准时间)'
@@ -169,10 +169,10 @@ const Tool = {
     substr = `${substr1}   ${substr2}`;
     return substr;
   },
-  isArray(value) {
+  isArray(value: any) {
     return Object.prototype.toString.call(value) === '[object Array]';
   },
-  isNonEmptyObject(obj) {
+  isNonEmptyObject(obj: any) {
     return (
       obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length > 0
     );

@@ -39,7 +39,7 @@ export default [
       {
         name: '项目列表',
         path: '/project/index',
-        component: './ProjectGroup',
+        component: './Project',
       },
     ],
   },

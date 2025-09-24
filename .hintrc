@@ -19,7 +19,8 @@
       "default",
       {
         "ignore": [
-          "text-align: center"
+          "text-align: center",
+          "text-align: right"
         ]
       }
     ]

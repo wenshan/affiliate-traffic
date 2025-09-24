@@ -1,9 +1,8 @@
 import ImgList from '@/pages/Material/components/ImgList';
-import Tool from '@/utils/tool';
-import { FolderOpenOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { FolderOpenOutlined } from '@ant-design/icons';
 import { useModel } from '@umijs/max';
-import { Col, Modal, Row } from 'antd';
-import { JSX, useEffect } from 'react';
+import { Col, Modal, Row, Tree, message } from 'antd';
+import { SetStateAction, useEffect } from 'react';
 
 import './index.less';
 
@@ -11,168 +10,68 @@ function ImageSelectModal(props: any) {
   const {
     queryFolderFetch,
     queryFolderMaterialFetch,
-    folderDirectory,
     selectedMaterial,
     setSelectedMaterial,
     productSkuImageModalStatus,
     setProductSkuImageModalStatus,
-    updateOperateSelectFolderDirectory,
-    setCurrentOperateMaterial,
     currentImageProductType,
     imageLimitNum,
+    folderDirectoryRowsTree,
+    selectedKeys,
+    setSelectedKeys,
+    grandParentKeys,
+    setSelectFolderDirectory,
+    setImageList,
+    imageList,
   } = useModel('material');
 
   // const [limit] = useState(props.imageLimitNum || 20);
   // const [selectedType] = useState(props.selectedType);
 
-  const handleOk = () => {
-    if (props.callbackOk) {
+  const handleOkSelect = () => {
+    let msg = '';
+    if (props.callbackOk && selectedMaterial) {
       console.log('selectedMaterial:', selectedMaterial);
+
+      if (currentImageProductType === 'image_link' && selectedMaterial.length > 1) {
+        msg = `商品主图（限制1张图片）`;
+        message.warning({ content: msg });
+        return false;
+      } else if (
+        currentImageProductType === 'additional_image_link' &&
+        selectedMaterial.length > 5
+      ) {
+        msg = `商品附加图片（选择5张图片）`;
+        message.warning({ content: msg });
+        return false;
+      } else if (
+        currentImageProductType === 'lifestyle_image_link' &&
+        selectedMaterial.length > 30
+      ) {
+        msg = `商品详情（最多选择30张图片）`;
+        message.warning({ content: msg });
+        return false;
+      } else if (currentImageProductType === 'pattern' && selectedMaterial.length > 1) {
+        msg = `商品售卖规格（限制1张图片）`;
+        message.warning({ content: msg });
+        return false;
+      }
+
       props.callbackOk(selectedMaterial);
       setProductSkuImageModalStatus(false);
       setSelectedMaterial([]);
     }
   };
-  const handleCancel = () => {
+  const handleCancelSelect = () => {
+    const newImageList: any[] | SetStateAction<{ [key: string]: any } | undefined> = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    imageList &&
+      imageList.forEach((item: any) => {
+        newImageList.push(Object.assign({}, item, { current: false }));
+      });
     setProductSkuImageModalStatus(false);
     setSelectedMaterial([]);
-  };
-  const handleClickFolderMenu = async (currentItem: any) => {
-    if (currentItem && currentItem.key) {
-      updateOperateSelectFolderDirectory(currentItem);
-      if (currentItem.is_leaf === 1) {
-        await queryFolderMaterialFetch(currentItem);
-      }
-    }
-  };
-  const folderMenuHtml = () => {
-    const html: JSX.Element[] = [];
-    if (folderDirectory && folderDirectory.length > 0 && folderDirectory[0]) {
-      folderDirectory.map((item, index) => {
-        if (item && item.children) {
-          html.push(
-            <li key={`${item.key}_${index}`} className={`pad00 ${item.active ? 'active' : ''}`}>
-              <div
-                title={item.label}
-                className="item"
-                onClick={() => handleClickFolderMenu(item)}
-                key={item.key}
-              >
-                <span className="space"></span>
-                {item.is_leaf === 1 ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
-                {Tool.replaceExceedEnd(item.label, 20)}
-              </div>
-              {item.children && item.children.length > 0 && (
-                <ul>
-                  {item.children.map((childrenItem, idx) => {
-                    return (
-                      <li
-                        key={`${childrenItem.key}_${idx}`}
-                        className={`pad01 ${childrenItem.active ? 'active-second' : ''}`}
-                      >
-                        <div
-                          title={childrenItem.label}
-                          className="item item-second"
-                          onClick={() => handleClickFolderMenu(childrenItem)}
-                        >
-                          <span className="space"></span>
-                          {childrenItem.is_default === 0 ? (
-                            childrenItem.is_leaf === 1 ? (
-                              <MinusSquareOutlined />
-                            ) : (
-                              <PlusSquareOutlined />
-                            )
-                          ) : null}
-                          {Tool.replaceExceedEnd(childrenItem.label, 20)}
-                        </div>
-                        {childrenItem.children && childrenItem.children.length > 0 && (
-                          <ul key={`${childrenItem.key}_${idx}_ul`}>
-                            {childrenItem.children.map((children2Item, idx2) => {
-                              return (
-                                <li
-                                  key={`${children2Item.key}_${idx2}`}
-                                  className={`pad02 ${children2Item.active ? 'active-third' : ''}`}
-                                >
-                                  <div
-                                    title={children2Item.label}
-                                    className="item item-third"
-                                    onClick={() => handleClickFolderMenu(children2Item)}
-                                  >
-                                    <span className="space"></span>
-                                    {children2Item.is_default === 0 ? (
-                                      children2Item.is_leaf === 1 ? (
-                                        <MinusSquareOutlined />
-                                      ) : (
-                                        <PlusSquareOutlined />
-                                      )
-                                    ) : null}
-                                    {Tool.replaceExceedEnd(children2Item.label, 20)}
-                                  </div>
-                                  {children2Item.children && children2Item.children.length > 0 && (
-                                    <ul key={`${children2Item.key}_${idx2}_ul`}>
-                                      {children2Item.children.map((children3Item, idx3) => {
-                                        return (
-                                          <li
-                                            key={`${children3Item.key}_${idx3}`}
-                                            className={`pad03 ${
-                                              children3Item.active ? 'active-fourth' : ''
-                                            }`}
-                                          >
-                                            <div
-                                              title={children3Item.label}
-                                              className="item item-fourth"
-                                              onClick={() => handleClickFolderMenu(children3Item)}
-                                            >
-                                              <span className="space"></span>
-                                              {children3Item.is_default === 0 ? (
-                                                children3Item.is_leaf === 1 ? (
-                                                  <MinusSquareOutlined />
-                                                ) : (
-                                                  <PlusSquareOutlined />
-                                                )
-                                              ) : null}
-                                              {Tool.replaceExceedEnd(children3Item.label, 20)}
-                                            </div>
-                                          </li>
-                                        );
-                                      })}
-                                    </ul>
-                                  )}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </li>,
-          );
-        } else {
-          html.push(
-            <li
-              key={`${item.key}_${item.is_default}`}
-              className={`pad00 ${item.active ? 'active' : ''}`}
-            >
-              <div
-                title={item.label}
-                className="item"
-                onClick={() => handleClickFolderMenu(item)}
-                key={item.key}
-              >
-                <span className="space"></span>
-                {item.is_leaf ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
-                {Tool.replaceExceedEnd(item.label, 20)}
-              </div>
-            </li>,
-          );
-        }
-      });
-    }
-
-    return html;
+    setImageList(newImageList);
   };
   const imageSubTitle = () => {
     let html = '';
@@ -189,10 +88,32 @@ function ImageSelectModal(props: any) {
     return html;
   };
 
+  const onSelectTree = async (selectedKey: any, e: any) => {
+    console.log('selectedKeys:', selectedKey);
+    console.log('selectedKeys e:', e);
+    if (selectedKeys.includes(e.node.key)) {
+      setSelectedKeys([]);
+      console.log('取消选择');
+    } else {
+      const keys = grandParentKeys(e.node);
+      const currentItemKeys = Object.assign({}, e.node, { keys });
+      console.log('currentItemKeys:', currentItemKeys);
+      setSelectFolderDirectory(currentItemKeys);
+      setSelectedKeys(selectedKey);
+      await queryFolderMaterialFetch(currentItemKeys);
+    }
+  };
+  const onExpandTree = async (expandedKeys: any, e: any) => {
+    console.log('expandedKeys:', expandedKeys);
+    console.log('e:', e);
+  };
+
   useEffect(() => {
-    setCurrentOperateMaterial({ keys: '' });
     queryFolderFetch();
   }, []);
+
+  console.log('folderDirectoryRowsTree:', folderDirectoryRowsTree);
+  console.log('selectedKeys:', selectedKeys);
 
   return (
     <div className="image-select-modal">
@@ -201,8 +122,8 @@ function ImageSelectModal(props: any) {
         title="选择图片素材 "
         open={productSkuImageModalStatus}
         width={1100}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        onOk={handleOkSelect}
+        onCancel={handleCancelSelect}
         zIndex={9999}
       >
         <div className="content">
@@ -213,7 +134,17 @@ function ImageSelectModal(props: any) {
                   <FolderOpenOutlined /> 文件目录
                 </div>
                 <div className="menu-wrap">
-                  <ul>{folderDirectory && folderMenuHtml()}</ul>
+                  {folderDirectoryRowsTree && (
+                    <Tree
+                      treeData={folderDirectoryRowsTree}
+                      selectedKeys={selectedKeys} // 选中的 key 数组
+                      onSelect={onSelectTree}
+                      onExpand={onExpandTree}
+                      showLine // 显示连接线
+                      selectable // 是否可选中
+                      checkable={false}
+                    />
+                  )}
                 </div>
               </div>
             </Col>

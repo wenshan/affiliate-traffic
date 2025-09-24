@@ -11,7 +11,8 @@
     "IIFE",
     "metas",
     "mfsu",
-    "oneapi"
+    "oneapi",
+    "xmid"
   ],
   "i18n-ally.localesPaths": ["src/locales"]
 }

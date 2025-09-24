@@ -69,6 +69,8 @@ export async function register(params: API.LoginParams) {
 // getUserEmail
 export async function getUserEmail(options?: ParamsType) {
   return request<{
+    msg: { status: number; data: API.CurrentUser };
+    status: number;
     data: API.CurrentUser;
   }>('/api/user/getUserEmail', {
     method: 'POST',

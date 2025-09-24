@@ -2,11 +2,11 @@ import ResizeImg from '@/constant/resizeImg';
 import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useModel } from '@umijs/max';
 import { Image, Modal } from 'antd';
-import React from 'react';
 
 import './index.less';
 
 function ImgList() {
+  const selectImgCurrentList = [];
   const { imageList, delRemoteMaterialFetch, updateOperateMaterial } = useModel('material');
   // const [ limit] = useState(props.limit || 20);
   const onDownload = async (item: { url: string | URL | Request }) => {
@@ -51,37 +51,13 @@ function ImgList() {
   };
   const handelSelectCurrent = async (currentItem: any) => {
     console.log('currentItem1:', currentItem);
-
     if (currentItem && currentItem.keys && imageList && imageList.length > 0) {
-      /*
-      imageList.map((item: any) => {
-        if (item.keys === currentItem.keys) {
-          if (currentItem.current) {
-            checkedData.push(Object.assign({}, item, { current: false }));
-            newImageList.push(Object.assign({}, item, { current: false }));
-          } else {
-            checkedData.push(Object.assign({}, item, { current: true }));
-            newImageList.push(Object.assign({}, item, { current: true }));
-          }
-        } else {
-          if (item && item.current) {
-            checkedData.push(item);
-          }
-          newImageList.push(Object.assign({}, item));
-        }
-      });
-      */
       updateOperateMaterial(currentItem);
-
+      selectImgCurrentList.push(currentItem);
       console.log('currentItem2:', currentItem);
-      /*
-      if (checkedData && checkedData.length > limit) {
-        message.success(`当前场景下素材一次操作限制${limit}张素材`);
-        return false;
-      }
-        */
     }
   };
+
   const htmlLi = () => {
     const html: React.JSX.Element[] = [];
     if (imageList && imageList.length) {
@@ -93,10 +69,17 @@ function ImgList() {
                 <span className="checkbox_inner"></span>
               </div>
               <div className="img-box" onClick={() => handelSelectCurrent(item)}>
-                <Image width={160} src={`${item.url}${ResizeImg['w_160']}`} preview={true} />
+                <Image
+                  width={160}
+                  src={`${item.url}${ResizeImg['w_160']}`}
+                  preview={{ src: item.url }}
+                />
               </div>
               <div className="line"></div>
               <div className="tool">
+                <span className="tx">
+                  {item.width}x{item.height} | {item.fileSize} | {item.extension}
+                </span>
                 <DeleteOutlined onClick={() => handelDelMaterial(item)} />
                 <DownloadOutlined onClick={() => onDownload(item)} />
               </div>
