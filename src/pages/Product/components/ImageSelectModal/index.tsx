@@ -151,7 +151,7 @@ function ImageSelectModal(props: any) {
             <Col span={19}>
               <div className="sub-title">{imageSubTitle()}</div>
               <div className="imglist-modal">
-                <ImgList></ImgList>
+                <ImgList from="selectModal"></ImgList>
               </div>
             </Col>
           </Row>

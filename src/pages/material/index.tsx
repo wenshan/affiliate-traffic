@@ -211,7 +211,7 @@ function MaterialPage() {
                   </div>
                   <div>
                     {selectFolderDirectory && selectFolderDirectory.is_leaf === 1 ? (
-                      <ImgList></ImgList>
+                      <ImgList from="material"></ImgList>
                     ) : (
                       <div className="no-leaf">
                         <Empty description="...不是叶子节点，无图片素材..."></Empty>

@@ -66,6 +66,17 @@ export const delRemoteMaterial = async (params?: ParamsType) => {
     data: params,
   });
 };
+// 重新补足素材信息
+export const resetImgInfo = async (params?: ParamsType) => {
+  return request<{
+    status: number;
+    msg(msg: any): unknown;
+    data: any;
+  }>('/api/material/resetImgInfo', {
+    method: 'POST',
+    data: params,
+  });
+};
 
 /** 获取规则列表 GET /api/rule */
 export async function rule(params: {

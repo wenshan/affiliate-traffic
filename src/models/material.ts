@@ -8,6 +8,7 @@ import {
   editFolder,
   queryFolder,
   queryFolderMaterial,
+  resetImgInfo,
 } from '@/services/api/material';
 import listToTree from '@/utils/listToTree';
 import { message } from 'antd';
@@ -282,7 +283,10 @@ function Material() {
       setLoading(true);
       const result = await queryFolderMaterial({ key });
       if (result.status === 200 && result.data) {
-        setImageList(result.data.rows);
+        const keysList = result.data.rows;
+        setImageList(keysList);
+        // 补足素材信息
+        await resetImgInfo({ keysList });
       } else {
         message.error(result.msg);
       }

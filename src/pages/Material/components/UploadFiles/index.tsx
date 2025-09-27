@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import './index.less';
 // https://github.com/react-component/upload#customrequest
-const UploadFiles: React.FC = (props: any) => {
+const UploadFiles: React.FC = (props: { [key: string]: string | any }) => {
   // console.log('UploadFile props:', props);
   const { selectFolderDirectory, queryFolderMaterialFetch } = useModel('material');
   const uploadProps = {

@@ -5,7 +5,9 @@ import { Image, Modal } from 'antd';
 
 import './index.less';
 
-function ImgList() {
+function ImgList(props: { [key: string]: string }) {
+  console.log('props:', props);
+  const { from } = props;
   const selectImgCurrentList = [];
   const { imageList, delRemoteMaterialFetch, updateOperateMaterial } = useModel('material');
   // const [ limit] = useState(props.limit || 20);
@@ -65,10 +67,12 @@ function ImgList() {
         html.push(
           <li className="item" key={item.keys}>
             <div className={item.current ? 'style current' : 'style'}>
-              <div className="checkbox_input" onClick={() => handelSelectCurrent(item)}>
-                <span className="checkbox_inner"></span>
-              </div>
-              <div className="img-box" onClick={() => handelSelectCurrent(item)}>
+              {from === 'selectModal' && (
+                <div className="checkbox_input" onClick={() => handelSelectCurrent(item)}>
+                  <span className="checkbox_inner"></span>
+                </div>
+              )}
+              <div className="img-box">
                 <Image
                   width={160}
                   src={`${item.url}${ResizeImg['w_160']}`}
@@ -84,11 +88,7 @@ function ImgList() {
                 <DownloadOutlined onClick={() => onDownload(item)} />
               </div>
               <div className="line"></div>
-              <div
-                className="title ellipsis"
-                title={item.filename}
-                onClick={() => handelSelectCurrent(item)}
-              >
+              <div className="title ellipsis" title={item.filename}>
                 {item.filename}
               </div>
             </div>
