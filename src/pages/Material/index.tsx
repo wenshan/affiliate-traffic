@@ -183,6 +183,8 @@ function MaterialPage() {
                         showLine // 显示连接线
                         selectable // 是否可选中
                         checkable={false}
+                        virtual={true}
+                        height={1900}
                       />
                     )}
                   </div>

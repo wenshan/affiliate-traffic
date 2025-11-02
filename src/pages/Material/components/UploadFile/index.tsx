@@ -12,7 +12,7 @@ const UploadFile: React.FC = (props: { [key: string]: string | any }) => {
   const uploadProps = {
     accept: 'image/*',
     action: uploadFileURL(),
-    multiple: false,
+    multiple: true,
     data: selectFolderDirectory,
     headers: {},
     withCredentials: true,
